@@ -1,8 +1,9 @@
 import { MapPin } from "lucide-react";
 
+import { GithubIcon } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SOCIALS } from "@/lib/socials";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 import {
   AnimatedSpan,
   Terminal,
@@ -58,29 +59,33 @@ export function Hero() {
             Web 开发、创意编程与 AI 应用。
           </p>
 
-          {/* 联系方式圆圈组(底部 Dock 中同样保留) */}
+          {/* 行动按钮：主按钮跳转联系板块,次按钮打开 GitHub */}
           <div
-            className="mt-5 flex flex-wrap items-center justify-center gap-3 animate-blur-in sm:justify-start"
+            className="mt-6 flex flex-wrap items-center justify-center gap-3 animate-blur-in sm:justify-start"
             style={{ "--blur-delay": "0.85s" } as React.CSSProperties}
           >
-            {SOCIALS.map((social) => (
-              <Button
-                key={social.name}
-                asChild
-                variant="outline"
-                size="icon"
-                className="size-10 rounded-full"
+            <ShimmerButton
+              href="#contact"
+              background="rgba(0, 0, 0, 1)"
+              className="h-10 shadow-xl"
+            >
+              <span className="text-sm font-medium text-white">联系我</span>
+            </ShimmerButton>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="h-10 rounded-full px-5"
+            >
+              <a
+                href="https://github.com/HanHanWeb"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <a
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.name}
-                >
-                  <social.Icon />
-                </a>
-              </Button>
-            ))}
+                <GithubIcon className="size-4" />
+                GitHub
+              </a>
+            </Button>
           </div>
         </div>
 

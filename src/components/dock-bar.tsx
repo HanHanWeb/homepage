@@ -25,7 +25,7 @@ export function DockBar() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center pb-4 animate-blur-in"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center pb-4 animate-dock-in"
       style={{ "--blur-delay": "1.2s" } as React.CSSProperties}
     >
       <Dock direction="middle" className="pointer-events-auto">

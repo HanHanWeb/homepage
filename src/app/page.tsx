@@ -1,4 +1,5 @@
 import { About } from "@/components/about";
+import { Contact } from "@/components/contact";
 import { DockBar } from "@/components/dock-bar";
 import { FlickeringGridTop } from "@/components/flickering-grid-top";
 import { Hero } from "@/components/hero";
@@ -20,6 +21,7 @@ export default function Home() {
       <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-20 pb-28">
         <Hero />
         <About />
+        <Contact />
       </main>
     </>
   );

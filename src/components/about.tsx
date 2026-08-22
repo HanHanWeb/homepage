@@ -1,25 +1,46 @@
-import { Badge } from "@/components/ui/badge";
-import { Reveal } from "@/components/reveal";
+import {
+  siCss,
+  siDocker,
+  siFigma,
+  siGithub,
+  siHtml5,
+  siJavascript,
+  siLinux,
+  siMysql,
+  siNextdotjs,
+  siNginx,
+  siNodedotjs,
+  siPostgresql,
+  siReact,
+  siShadcnui,
+  siSqlite,
+  siTailwindcss,
+  siTypescript,
+  type SimpleIcon,
+} from "simple-icons";
 
-const SKILLS = [
-  "React.js",
-  "Next.js",
-  "TypeScript",
-  "Node.js",
-  "Postgres",
-  "MySQL",
-  "SQLite",
-  "Docker",
-  "Tailwind CSS",
-  "Git/GitHub",
-  "JavaScript",
-  "Shadcn/UI",
-  "NGINX",
-  "Linux",
-  "Figma",
-  "VS Code",
-  "HTML",
-  "CSS",
+import { Reveal } from "@/components/reveal";
+import { Badge } from "@/components/ui/badge";
+import { BrandIcon } from "@/components/ui/brand-icon";
+
+const SKILLS: Array<{ name: string; icon: SimpleIcon }> = [
+  { name: "React.js", icon: siReact },
+  { name: "Next.js", icon: siNextdotjs },
+  { name: "TypeScript", icon: siTypescript },
+  { name: "Node.js", icon: siNodedotjs },
+  { name: "Postgres", icon: siPostgresql },
+  { name: "MySQL", icon: siMysql },
+  { name: "SQLite", icon: siSqlite },
+  { name: "Docker", icon: siDocker },
+  { name: "Tailwind CSS", icon: siTailwindcss },
+  { name: "Git/GitHub", icon: siGithub },
+  { name: "JavaScript", icon: siJavascript },
+  { name: "Shadcn/UI", icon: siShadcnui },
+  { name: "NGINX", icon: siNginx },
+  { name: "Linux", icon: siLinux },
+  { name: "Figma", icon: siFigma },
+  { name: "HTML", icon: siHtml5 },
+  { name: "CSS", icon: siCss },
 ];
 
 export function About() {
@@ -45,11 +66,12 @@ export function About() {
           <div className="mt-2 flex flex-wrap gap-1.5">
             {SKILLS.map((skill) => (
               <Badge
-                key={skill}
+                key={skill.name}
                 variant="outline"
                 className="dark:border-white/20"
               >
-                {skill}
+                <BrandIcon icon={skill.icon} />
+                {skill.name}
               </Badge>
             ))}
           </div>

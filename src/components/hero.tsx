@@ -4,6 +4,7 @@ import { GithubIcon } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { TiltCard } from "@/components/ui/tilt-card";
 import {
   AnimatedSpan,
   Terminal,
@@ -46,7 +47,7 @@ export function Hero() {
             delay={0.4}
             duration={0.5}
             startOnView={false}
-            className="mt-4 text-3xl font-semibold tracking-tight sm:text-5xl"
+            className="font-serif-sc mt-4 text-3xl font-semibold tracking-tight sm:text-5xl"
           >
             Hi, I&apos;m Han.
           </TextAnimate>
@@ -94,49 +95,51 @@ export function Hero() {
           className="w-full animate-blur-in"
           style={{ "--blur-delay": "1.1s" } as React.CSSProperties}
         >
-          <Terminal
-            sequence={false}
-            className="bg-card text-sm shadow-lg [&_code]:font-sans [&_pre]:font-sans"
-          >
-            {TERMINAL_LINES.map((line, i) =>
-              line.kind === "cmd" ? (
-                <AnimatedSpan
-                  key={i}
-                  className="flex gap-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: line.at / 1000,
-                    ease: "easeOut",
-                  }}
-                >
-                  <span className="text-green-500">❯</span>
-                  <TypingAnimation
-                    delay={line.at + 150}
-                    duration={50}
-                    startOnView={false}
+          <TiltCard>
+            <Terminal
+              sequence={false}
+              className="bg-card text-sm shadow-lg [&_code]:font-sans [&_pre]:font-sans"
+            >
+              {TERMINAL_LINES.map((line, i) =>
+                line.kind === "cmd" ? (
+                  <AnimatedSpan
+                    key={i}
+                    className="flex gap-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: line.at / 1000,
+                      ease: "easeOut",
+                    }}
+                  >
+                    <span className="text-green-500">❯</span>
+                    <TypingAnimation
+                      delay={line.at + 150}
+                      duration={50}
+                      startOnView={false}
+                    >
+                      {line.text}
+                    </TypingAnimation>
+                  </AnimatedSpan>
+                ) : (
+                  <AnimatedSpan
+                    key={i}
+                    className="text-muted-foreground"
+                    initial={{ opacity: 0, y: -12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.35,
+                      delay: line.at / 1000,
+                      ease: "easeOut",
+                    }}
                   >
                     {line.text}
-                  </TypingAnimation>
-                </AnimatedSpan>
-              ) : (
-                <AnimatedSpan
-                  key={i}
-                  className="text-muted-foreground"
-                  initial={{ opacity: 0, y: -12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.35,
-                    delay: line.at / 1000,
-                    ease: "easeOut",
-                  }}
-                >
-                  {line.text}
-                </AnimatedSpan>
-              ),
-            )}
-          </Terminal>
+                  </AnimatedSpan>
+                ),
+              )}
+            </Terminal>
+          </TiltCard>
         </div>
       </div>
     </section>

@@ -47,7 +47,7 @@ export function About() {
   return (
     <section id="about" className="scroll-mt-6 py-10">
       <Reveal delay="1.35s">
-        <h2 className="text-2xl font-semibold tracking-tight">关于</h2>
+        <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">关于</h2>
       </Reveal>
 
       <div className="mt-4 space-y-4">

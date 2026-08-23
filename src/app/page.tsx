@@ -4,6 +4,7 @@ import { DockBar } from "@/components/dock-bar";
 import { FlickeringGridTop } from "@/components/flickering-grid-top";
 import { Hero } from "@/components/hero";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
+import { ScrollProgress } from "@/components/scroll-progress";
 
 export default function Home() {
   return (
@@ -16,6 +17,8 @@ export default function Home() {
         <ProgressiveBlur position="top" height="20vh" />
       </div>
       <FlickeringGridTop />
+      {/* 右上角滚动进度环 */}
+      <ScrollProgress />
       {/* 底部 Dock：主题切换 + 联系方式 */}
       <DockBar />
       <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-20 pb-28">

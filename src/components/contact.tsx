@@ -9,7 +9,7 @@ export function Contact() {
   return (
     <section id="contact" className="scroll-mt-6 py-10">
       <Reveal delay="1.8s">
-        <h2 className="text-2xl font-semibold tracking-tight">联系</h2>
+        <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">联系</h2>
       </Reveal>
 
       <Reveal delay="1.95s">

@@ -35,12 +35,18 @@ importers:
       react-dom:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
+      react-github-calendar:
+        specifier: ^5.0.8
+        version: 5.0.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       simple-icons:
         specifier: ^16.28.0
         version: 16.28.0
       tailwind-merge:
         specifier: ^3.6.0
         version: 3.6.0
+      thinking-orbs:
+        specifier: ^0.3.1
+        version: 0.3.1(react@19.2.8)
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
@@ -282,6 +288,12 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
+
+  '@floating-ui/react@0.27.20':
+    resolution: {integrity: sha512-CMqMy7OaXl9W0eq1Uy7L7i2Y/anPvHmFmESd2CEw0t5YvZhcVCeo4MBevAmswRllX7Y2dEidA4ozGPunLSTQpw==}
+    peerDependencies:
+      react: '>=17.0.0'
+      react-dom: '>=17.0.0'
 
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
@@ -1879,6 +1891,9 @@ packages:
     resolution: {integrity: sha512-BS8PfmtDGnrgYdOonGZQdLZslWIeCGFP9tpan0hi1Co2Zr2NKADsvGYA8XxuG/4UWgJ6Cjtv+YJnB6MM69QGlQ==}
     engines: {node: '>= 0.4'}
 
+  date-fns@4.4.0:
+    resolution: {integrity: sha512-+1UMbeh68lH1SegH83CGWwpb6OHHbpSgr3+s5Eww5M4CAgswBpoWS0AjTOfEJ33HiYKz1hdj/KTFprzXHmq/6w==}
+
   debounce-fn@4.0.0:
     resolution: {integrity: sha512-8pYCQiL9Xdcg0UPSD3d+0KMlOjp+KGU5EPwYddgzQ7DATsg4fuUDjQtsYLmWjnk2obnNHgV3vE2Y4jejSOJVBQ==}
     engines: {node: '>=10'}
@@ -3195,10 +3210,20 @@ packages:
     resolution: {integrity: sha512-K5zQjDllxWkf7Z5xJdV0/B0WTNqx6vxG70zJE4N0kBs4LovmEYWJzQGxC9bS9RAKu3bgM40lrd5zoLJ12MQ5BA==}
     engines: {node: '>= 0.10'}
 
+  react-activity-calendar@3.2.1:
+    resolution: {integrity: sha512-FcdwCu7V0XzGfx3MNQ7qFuIA0IGnJ0yPu46jvDjfA33OlqIkcth096Mdpl1exR3HwLv2nbK2yJAKyBqdzk4DHw==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+
   react-dom@19.2.8:
     resolution: {integrity: sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ==}
     peerDependencies:
       react: ^19.2.8
+
+  react-github-calendar@5.0.8:
+    resolution: {integrity: sha512-anay9yE3XdXEFeuIE3eDFUOQ+cN2bbuhUMe/iOQFEsAdzvIB/jpV6qohSbK9BSdrfd7alq+gcsZWmxfsZu6Obg==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -3499,6 +3524,9 @@ packages:
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
 
+  tabbable@6.5.0:
+    resolution: {integrity: sha512-wieBHXygIm7OyQOu5hQlkk62/WyCFYGlWg7L6/ZCUZwx0o398Zkn4pVmMyfYhfMG8kGrj/Krt8eIk6UKC6VzwA==}
+
   tailwind-merge@3.6.0:
     resolution: {integrity: sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w==}
 
@@ -3508,6 +3536,11 @@ packages:
   tapable@2.3.3:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
     engines: {node: '>=6'}
+
+  thinking-orbs@0.3.1:
+    resolution: {integrity: sha512-3BG1aeB1RUTxItCml/BBuIz5JRM4kZqGuyx+vouv0fXTtcR9ZNoKjWGneHPx94y74GxgArwJZ1qbJR5dt54kSw==}
+    peerDependencies:
+      react: '>=18.0.0'
 
   tiny-invariant@1.3.3:
     resolution: {integrity: sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==}
@@ -4014,6 +4047,14 @@ snapshots:
       '@floating-ui/dom': 1.8.0
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
+
+  '@floating-ui/react@0.27.20(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      '@floating-ui/react-dom': 2.1.9(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@floating-ui/utils': 0.2.12
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+      tabbable: 6.5.0
 
   '@floating-ui/utils@0.2.12': {}
 
@@ -5565,6 +5606,8 @@ snapshots:
       es-errors: 1.3.0
       is-data-view: 1.0.2
 
+  date-fns@4.4.0: {}
+
   debounce-fn@4.0.0:
     dependencies:
       mimic-fn: 3.1.0
@@ -7022,10 +7065,25 @@ snapshots:
       iconv-lite: 0.7.3
       unpipe: 1.0.0
 
+  react-activity-calendar@3.2.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      '@floating-ui/react': 0.27.20(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      date-fns: 4.4.0
+      react: 19.2.8
+    transitivePeerDependencies:
+      - react-dom
+
   react-dom@19.2.8(react@19.2.8):
     dependencies:
       react: 19.2.8
       scheduler: 0.27.0
+
+  react-github-calendar@5.0.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      react: 19.2.8
+      react-activity-calendar: 3.2.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+    transitivePeerDependencies:
+      - react-dom
 
   react-is@16.13.1: {}
 
@@ -7433,11 +7491,17 @@ snapshots:
 
   systeminformation@5.33.1: {}
 
+  tabbable@6.5.0: {}
+
   tailwind-merge@3.6.0: {}
 
   tailwindcss@4.3.3: {}
 
   tapable@2.3.3: {}
+
+  thinking-orbs@0.3.1(react@19.2.8):
+    dependencies:
+      react: 19.2.8
 
   tiny-invariant@1.3.3: {}
 

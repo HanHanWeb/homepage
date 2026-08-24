@@ -207,6 +207,13 @@ html {
   animation-delay: var(--blur-delay, 0s);
 }
 
+/* 贡献图：覆写 react-activity-calendar 默认的横向滚动，改为居右裁剪、无滚动条 */
+.react-activity-calendar__scroll-container {
+  overflow: hidden !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+}
+
 /* Magic UI ShimmerButton 动画 */
 @keyframes shimmer-slide {
   to {

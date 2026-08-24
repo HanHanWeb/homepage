@@ -1,37 +1,34 @@
-import type { ComponentType, SVGProps } from "react";
-import { Mail } from "lucide-react";
+import type { SimpleIcon } from "simple-icons";
+import { siBilibili, siGithub, siQq } from "simple-icons";
 
-import { BilibiliIcon, GithubIcon, QQIcon } from "@/components/icons";
-
-/** 联系方式(联系板块卡片与底部 Dock 共用;handle 为卡片副标题) */
+/** 联系方式(联系板块使用;handle 为副标题;icon 缺省时渲染 lucide Mail) */
 export const SOCIALS: Array<{
   name: string;
   handle: string;
   href: string;
-  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  icon?: SimpleIcon;
 }> = [
   {
     name: "GitHub",
     handle: "@HanHanWeb",
     href: "https://github.com/HanHanWeb",
-    Icon: GithubIcon,
+    icon: siGithub,
   },
   {
     name: "邮箱",
     handle: "1956526909@qq.com",
     href: "mailto:1956526909@qq.com",
-    Icon: Mail,
   },
   {
     name: "QQ",
     handle: "1956526909",
     href: "https://qm.qq.com/q/XjHABirz6m",
-    Icon: QQIcon,
+    icon: siQq,
   },
   {
     name: "Bilibili",
     handle: "UID 518129719",
     href: "https://space.bilibili.com/518129719",
-    Icon: BilibiliIcon,
+    icon: siBilibili,
   },
 ];

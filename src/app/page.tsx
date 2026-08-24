@@ -1,10 +1,11 @@
 import { About } from "@/components/about";
 import { Contact } from "@/components/contact";
-import { DockBar } from "@/components/dock-bar";
+import { Contributions } from "@/components/contributions";
 import { FlickeringGridTop } from "@/components/flickering-grid-top";
 import { Hero } from "@/components/hero";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { ScrollProgress } from "@/components/scroll-progress";
+import { Services } from "@/components/services";
 
 export default function Home() {
   return (
@@ -19,11 +20,11 @@ export default function Home() {
       <FlickeringGridTop />
       {/* 右上角滚动进度环 */}
       <ScrollProgress />
-      {/* 底部 Dock：主题切换 + 联系方式 */}
-      <DockBar />
       <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-20 pb-28">
         <Hero />
         <About />
+        <Services />
+        <Contributions />
         <Contact />
       </main>
     </>

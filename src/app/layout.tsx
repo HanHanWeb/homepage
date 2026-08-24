@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { SuppressScriptWarning } from "@/components/suppress-script-warning";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
@@ -35,10 +36,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.3.0/index.css"
         />
       </head>
-      <body className="min-h-full flex flex-col">
+      <body suppressHydrationWarning className="min-h-full flex flex-col">
+        <SuppressScriptWarning />
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >

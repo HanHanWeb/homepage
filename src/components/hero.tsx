@@ -1,7 +1,5 @@
-import { MapPin } from "lucide-react";
-
 import { GithubIcon } from "@/components/icons";
-import { Badge } from "@/components/ui/badge";
+import { InstallBadge } from "@/components/install-badge";
 import { Button } from "@/components/ui/button";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { TiltCard } from "@/components/ui/tilt-card";
@@ -32,13 +30,7 @@ export function Hero() {
       <div className="flex flex-col items-center gap-10 sm:grid sm:grid-cols-2 sm:items-center">
         {/* 左侧：文字内容 */}
         <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-          <Badge
-            variant="secondary"
-            className="w-fit gap-1.5 animate-blur-in"
-          >
-            <MapPin />
-            China
-          </Badge>
+          <InstallBadge className="w-fit animate-blur-in" />
 
           <TextAnimate
             animation="blurInUp"
@@ -60,17 +52,17 @@ export function Hero() {
             Web 开发、创意编程与 AI 应用。
           </p>
 
-          {/* 行动按钮：主按钮跳转联系板块,次按钮打开 GitHub */}
+          {/* 行动按钮：主按钮跳转关于板块,次按钮打开 GitHub */}
           <div
             className="mt-6 flex flex-wrap items-center justify-center gap-3 animate-blur-in sm:justify-start"
             style={{ "--blur-delay": "0.85s" } as React.CSSProperties}
           >
             <ShimmerButton
-              href="#contact"
+              href="#about"
               background="rgba(0, 0, 0, 1)"
               className="h-10 shadow-xl"
             >
-              <span className="text-sm font-medium text-white">联系我</span>
+              <span className="text-sm font-medium text-white">关于</span>
             </ShimmerButton>
             <Button
               asChild

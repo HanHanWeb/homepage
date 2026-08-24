@@ -1,34 +1,48 @@
+import { ArrowUpRight, Mail } from "lucide-react";
+
 import { Reveal } from "@/components/reveal";
+import { BrandIcon } from "@/components/ui/brand-icon";
 import { SOCIALS } from "@/lib/socials";
 
-/**
- * 联系板块:仿卡片网格设计,整卡可点击。
- * 桌面端一行四列,移动端两列;深浅色均使用语义色(bg-card / muted-foreground)。
- */
+/** 联系板块:极简分行列表 */
 export function Contact() {
   return (
     <section id="contact" className="scroll-mt-6 py-10">
       <Reveal delay="1.8s">
-        <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">联系</h2>
+        <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">
+          联系{" "}
+          <span className="align-baseline text-sm font-normal tracking-widest text-muted-foreground/40">
+            #CONTACT
+          </span>
+        </h2>
       </Reveal>
 
       <Reveal delay="1.95s">
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-4 divide-y overflow-hidden rounded-xl border">
           {SOCIALS.map((social) => (
             <a
               key={social.name}
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 rounded-xl border bg-card p-4 text-card-foreground transition-colors hover:bg-secondary dark:border-white/20"
+              className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/50"
             >
-              <social.Icon className="size-5 shrink-0" />
-              <div className="min-w-0">
-                <div className="text-sm font-medium">{social.name}</div>
-                <div className="mt-0.5 truncate text-xs text-muted-foreground">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full border bg-card">
+                {social.icon ? (
+                  <BrandIcon icon={social.icon} className="size-4" />
+                ) : (
+                  <Mail className="size-4" />
+                )}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-medium leading-5">
+                  {social.name}
+                </span>
+                <span className="block truncate text-xs text-muted-foreground">
                   {social.handle}
-                </div>
-              </div>
+                </span>
+              </span>
+              <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
             </a>
           ))}
         </div>

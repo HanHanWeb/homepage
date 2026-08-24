@@ -20,7 +20,7 @@ const TERMINAL_LINES: Array<{ kind: "cmd" | "out"; text: string; at: number }> =
     { kind: "out", text: "喜欢用代码做有意思的东西", at: 3350 },
     { kind: "cmd", text: "ls -la skills/", at: 3800 },
     { kind: "out", text: "drwxr-xr-x 前端 设计 运维", at: 4700 },
-    { kind: "cmd", text: "curl -s https://", at: 5150 },
+    { kind: "cmd", text: "curl -s https://www.hhan.me", at: 5150 },
   ];
 
 export function Hero() {

@@ -16,12 +16,12 @@ export function Contributions() {
   return (
     <section id="contributions" className="scroll-mt-6 py-10">
       <Reveal delay="2.2s">
-        <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">
-          贡献{" "}
-          <span className="align-baseline text-sm font-normal tracking-widest text-muted-foreground/40">
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">贡献</h2>
+          <span className="text-sm font-normal tracking-widest text-muted-foreground/40">
             #CONTRIBUTIONS
           </span>
-        </h2>
+        </div>
       </Reveal>
 
       <Reveal delay="2.35s">

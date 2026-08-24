@@ -5,7 +5,6 @@ import {
   siGithub,
   siHtml5,
   siJavascript,
-  siLinux,
   siMysql,
   siNextdotjs,
   siNginx,
@@ -37,7 +36,6 @@ const SKILLS: Array<{ name: string; icon: SimpleIcon }> = [
   { name: "JavaScript", icon: siJavascript },
   { name: "Shadcn/UI", icon: siShadcnui },
   { name: "NGINX", icon: siNginx },
-  { name: "Linux", icon: siLinux },
   { name: "Figma", icon: siFigma },
   { name: "HTML", icon: siHtml5 },
   { name: "CSS", icon: siCss },
@@ -47,12 +45,12 @@ export function About() {
   return (
     <section id="about" className="scroll-mt-6 py-10">
       <Reveal delay="1.35s">
-        <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">
-          关于{" "}
-          <span className="align-baseline text-sm font-normal tracking-widest text-muted-foreground/40">
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">关于</h2>
+          <span className="text-sm font-normal tracking-widest text-muted-foreground/40">
             #ABOUT
           </span>
-        </h2>
+        </div>
       </Reveal>
 
       <div className="mt-4 space-y-4">

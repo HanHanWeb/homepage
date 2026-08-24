@@ -28,12 +28,12 @@ export function Services() {
   return (
     <section id="services" className="scroll-mt-6 py-10">
       <Reveal delay="1.65s">
-        <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">
-          我喜欢做什么{" "}
-          <span className="align-baseline text-sm font-normal tracking-widest text-muted-foreground/40">
-            #SERVICES
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">专注领域</h2>
+          <span className="text-sm font-normal tracking-widest text-muted-foreground/40">
+            #FOCUS
           </span>
-        </h2>
+        </div>
       </Reveal>
 
       <div className="mt-6 space-y-3">

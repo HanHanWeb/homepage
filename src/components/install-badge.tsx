@@ -8,12 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export function InstallBadge({ className }: { className?: string }) {
-  const [state, setState] = useState<"working" | "breathing">("breathing");
+  const [orbState, setOrbState] = useState<"searching" | "composing">("composing");
 
   useEffect(() => {
     const update = () => {
       const h = new Date().getHours();
-      setState(h >= 8 && h < 23 ? "working" : "breathing");
+      setOrbState(h >= 8 && h < 23 ? "searching" : "composing");
     };
     update();
     const id = setInterval(update, 30_000);
@@ -23,14 +23,14 @@ export function InstallBadge({ className }: { className?: string }) {
   return (
     <Badge variant="secondary" className={cn("h-6 gap-1.5 py-1", className)}>
       <ThinkingOrb
-        state={state}
+        state={orbState}
         size={20}
         theme="auto"
         aria-hidden
         className="block"
       />
       <span className="font-mono text-xs">
-        {state === "working" ? "working" : "sleeping"}
+        {orbState === "searching" ? "working" : "sleeping"}
       </span>
     </Badge>
   );

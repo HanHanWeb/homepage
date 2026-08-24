@@ -11,16 +11,12 @@ const ITEMS = [
     options: ["科技", "数码"],
   },
   {
-    title: "产品设计",
-    options: ["设计", "UI/UX", "产品设计"],
+    title: "创意设计",
+    options: ["平面设计", "UI/UX", "产品设计", "PowerPoint", "版式设计"],
   },
   {
     title: "影像创作",
     options: ["摄影", "航拍", "视频剪辑"],
-  },
-  {
-    title: "视觉表达",
-    options: ["PowerPoint", "版式设计"],
   },
 ];
 

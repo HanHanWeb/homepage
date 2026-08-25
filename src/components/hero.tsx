@@ -1,8 +1,11 @@
+"use client";
+
 import { GithubIcon } from "@/components/icons";
 import { InstallBadge } from "@/components/install-badge";
 import { Button } from "@/components/ui/button";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { TiltCard } from "@/components/ui/tilt-card";
+import { useLanguage } from "@/components/language-provider";
 import {
   AnimatedSpan,
   Terminal,
@@ -10,25 +13,22 @@ import {
 } from "@/registry/magicui/terminal";
 import { TextAnimate } from "@/registry/magicui/text-animate";
 
-/** 终端脚本:cmd = 整行淡入后打字机输入,out = 整行下落出现;at 为出现延迟 ms */
-const TERMINAL_LINES: Array<{ kind: "cmd" | "out"; text: string; at: number }> =
-  [
-    { kind: "cmd", text: "whoami", at: 1150 },
-    { kind: "out", text: "Han", at: 1700 },
-    { kind: "cmd", text: "cat bio.txt", at: 2150 },
-    { kind: "out", text: "大一在读 / 河南", at: 2900 },
-    { kind: "out", text: "喜欢用代码做有意思的东西", at: 3350 },
-    { kind: "cmd", text: "ls -la skills/", at: 3800 },
-    { kind: "out", text: "drwxr-xr-x 前端 设计 运维", at: 4700 },
-    { kind: "cmd", text: "curl -s https://www.hhan.me", at: 5150 },
+export function Hero() {
+  const { t } = useLanguage();
+  const TERMINAL_LINES: Array<{ kind: "cmd" | "out"; text: string; at: number }> = [
+    { kind: "cmd", text: t.hero.terminal.whoami, at: 1150 },
+    { kind: "out", text: t.hero.terminal.han, at: 1700 },
+    { kind: "cmd", text: t.hero.terminal.catBio, at: 2150 },
+    { kind: "out", text: t.hero.terminal.bio1, at: 2900 },
+    { kind: "out", text: t.hero.terminal.bio2, at: 3350 },
+    { kind: "cmd", text: t.hero.terminal.lsSkills, at: 3800 },
+    { kind: "out", text: t.hero.terminal.lsOutput, at: 4700 },
+    { kind: "cmd", text: t.hero.terminal.curl, at: 5150 },
   ];
 
-export function Hero() {
   return (
     <section id="intro" className="flex flex-col pb-10 mt-20">
-      {/* 桌面端左右 1:1;移动端上下堆叠,文字在上 */}
       <div className="flex flex-col items-center gap-10 sm:grid sm:grid-cols-2 sm:items-center">
-        {/* 左侧：文字内容 */}
         <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
           <InstallBadge className="w-fit animate-blur-in" />
 
@@ -41,18 +41,16 @@ export function Hero() {
             startOnView={false}
             className="font-serif-sc mt-4 text-3xl font-semibold tracking-tight sm:text-5xl"
           >
-            Hi, I&apos;m Han.
+            {t.hero.title}
           </TextAnimate>
 
           <p
             className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base animate-blur-in"
             style={{ "--blur-delay": "0.6s" } as React.CSSProperties}
           >
-            一名学生、开发者与设计师。喜欢用代码和设计把事情做得简洁、好用又好看，目前主要探索
-            Web 开发、创意编程与 AI 应用。
+            {t.hero.description}
           </p>
 
-          {/* 行动按钮：主按钮跳转关于板块,次按钮打开 GitHub */}
           <div
             className="mt-6 flex flex-wrap items-center justify-center gap-3 animate-blur-in sm:justify-start"
             style={{ "--blur-delay": "0.85s" } as React.CSSProperties}
@@ -62,7 +60,7 @@ export function Hero() {
               background="rgba(0, 0, 0, 1)"
               className="h-10 shadow-xl"
             >
-              <span className="text-sm font-medium text-white">关于</span>
+              <span className="text-sm font-medium text-white">{t.hero.ctaAbout}</span>
             </ShimmerButton>
             <Button
               asChild
@@ -76,13 +74,12 @@ export function Hero() {
                 rel="noopener noreferrer"
               >
                 <GithubIcon className="size-4" />
-                GitHub
+                {t.hero.ctaGithub}
               </a>
             </Button>
           </div>
         </div>
 
-        {/* 右侧：终端（与左侧 1:1）；序列在终端淡入后依次播放 */}
         <div
           className="w-full animate-blur-in"
           style={{ "--blur-delay": "1.1s" } as React.CSSProperties}
@@ -90,7 +87,7 @@ export function Hero() {
           <TiltCard>
             <Terminal
               sequence={false}
-              className="bg-card text-sm shadow-lg [&_code]:font-sans [&_pre]:font-sans"
+              className="bg-card text-sm shadow-lg [&_code]:font-mono [&_pre]:font-mono"
             >
               {TERMINAL_LINES.map((line, i) =>
                 line.kind === "cmd" ? (

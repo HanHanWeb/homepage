@@ -2,17 +2,23 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { LanguageProvider } from "@/components/language-provider";
+import { LanguageToggle } from "@/components/language-toggle";
 import { SuppressScriptWarning } from "@/components/suppress-script-warning";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-sans",
   subsets: ["latin"],
+  display: "swap",
+  preload: false,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -28,14 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
     >
-      {/* 思源宋体(Noto Serif SC):标题用,按 unicode-range 分包加载 */}
-      <head>
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.3.0/index.css"
-        />
-      </head>
+      <head />
       <body suppressHydrationWarning className="min-h-full flex flex-col">
         <SuppressScriptWarning />
         <ThemeProvider
@@ -44,7 +43,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <LanguageProvider>
+            <div className="pointer-events-none fixed top-5 right-20 z-50">
+              <div className="pointer-events-auto">
+                <LanguageToggle />
+              </div>
+            </div>
+            {children}
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -6,25 +6,27 @@ import { useTheme } from "next-themes";
 
 import { Reveal } from "@/components/reveal";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useLanguage } from "@/components/language-provider";
 
 export function Contributions() {
   const { resolvedTheme } = useTheme();
+  const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
   return (
     <section id="contributions" className="scroll-mt-6 py-10">
-      <Reveal delay="2.2s">
+      <Reveal delay="2.35s" direction="down">
         <div className="flex items-baseline justify-between gap-4">
-          <h2 className="font-serif-sc text-2xl font-semibold tracking-tight">贡献</h2>
+          <h2 className="font-serif-sc text-3xl font-semibold tracking-tight sm:text-4xl">{t.contributions.title}</h2>
           <span className="text-sm font-normal tracking-widest text-muted-foreground/40">
             #CONTRIBUTIONS
           </span>
         </div>
       </Reveal>
 
-      <Reveal delay="2.35s">
+      <Reveal delay="2.5s" direction="down">
         <div className="mt-4 overflow-hidden rounded-xl border bg-card p-4">
           {mounted ? (
             <GitHubCalendar
@@ -42,8 +44,10 @@ export function Contributions() {
                   <TooltipContent>
                     <p>
                       {activity.count === 0
-                        ? `无贡献 · ${activity.date}`
-                        : `${activity.count} 次贡献 · ${activity.date}`}
+                        ? t.contributions.tooltipEmpty.replace("{date}", activity.date)
+                        : t.contributions.tooltipCount
+                            .replace("{count}", String(activity.count))
+                            .replace("{date}", activity.date)}
                     </p>
                   </TooltipContent>
                 </Tooltip>

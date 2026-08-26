@@ -14,7 +14,7 @@ export default function Home() {
         aria-hidden
         className="pointer-events-none fixed inset-x-0 top-0 z-40"
       >
-        <ProgressiveBlur position="top" height="20vh" />
+        <ProgressiveBlur position="top" height="10vh" />
       </div>
       <FlickeringGridTop />
       <ScrollProgress />

@@ -1,10 +1,10 @@
 <div align="center">
 
-# ✦ Han · 个人主页
+# Han · 个人主页
 
 **学生 · 开发者 · 设计师**
 
-一个基于 Next.js 构建的个人主页,记录学习与创作。
+一个基于 Next.js 构建的个人主页，记录学习与创作。
 
 <br/>
 
@@ -18,11 +18,15 @@
   <img alt="MIT license" src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" />
 </p>
 
+<br/>
+
+<img alt="项目截图" src="https://picui.ogmua.cn/s1/2026/08/27/6a901f85477e7.webp" width="760" />
+
 </div>
 
 ## ✨ 简介
 
-这是我的个人主页 —— 使用 Next.js 16、React 19 与 TypeScript 构建,展示个人简介、技术栈与联系方式。支持深浅色主题切换,并适配移动端。
+这是我的个人主页 —— 使用 Next.js 16、React 19 与 TypeScript 构建，展示个人简介、技术栈与联系方式。支持深浅色主题切换与中英文切换，并适配移动端。
 
 ## 🛠️ 技术栈
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { Sparkles } from "lucide-react";
 import {
   siCss,
   siDocker,
@@ -59,6 +60,10 @@ export function About() {
         <Reveal delay="1.5s" direction="down">
           <div className="space-y-2.5">
             <p className="text-sm leading-6 text-muted-foreground">{t.about.description}</p>
+            <Badge variant="outline" className="dark:border-white/20">
+              <Sparkles />
+              {t.about.personality}
+            </Badge>
           </div>
         </Reveal>
 

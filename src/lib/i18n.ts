@@ -23,6 +23,7 @@ export const dictionaries = {
       title: "关于",
       description:
         "一名来自中国的大学学生，同时是一名开发者与设计师。平时喜欢折腾各种小项目，把想法从草图变成可用的产品。我关注简洁、克制的设计，也相信好的工具应该让人更专注。",
+      personality: "INFJ · 提倡者",
       skills: "技能",
     },
     services: {
@@ -70,6 +71,7 @@ export const dictionaries = {
       title: "About",
       description:
         "A university student from China, also a developer and designer. I love tinkering with small projects and turning ideas from sketches into usable products. I care about concise, restrained design and believe good tools should help people stay focused.",
+      personality: "INFJ · Advocate",
       skills: "Skills",
     },
     services: {

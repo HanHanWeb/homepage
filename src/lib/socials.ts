@@ -1,5 +1,5 @@
 import type { SimpleIcon } from "simple-icons";
-import { siBilibili, siGithub, siQq } from "simple-icons";
+import { siBilibili, siGithub, siQq, siX } from "simple-icons";
 
 /** 联系方式(联系板块使用;handle 为副标题;icon 缺省时渲染 lucide Mail) */
 export const SOCIALS: Array<{
@@ -13,6 +13,12 @@ export const SOCIALS: Array<{
     handle: "@HanHanWeb",
     href: "https://github.com/HanHanWeb",
     icon: siGithub,
+  },
+  {
+    name: "X",
+    handle: "@Mountain_Know",
+    href: "https://x.com/Mountain_Know",
+    icon: siX,
   },
   {
     name: "邮箱",

@@ -14,7 +14,17 @@ export function LanguageToggle({ className }: { className?: string }) {
         className,
       )}
     >
-      {locale === "zh" ? "EN" : "中"}
+      <span aria-hidden className="block h-4 overflow-hidden">
+        <span
+          className={cn(
+            "flex flex-col transition-transform duration-300 ease-in-out",
+            locale === "zh" ? "-translate-y-1/2" : "translate-y-0",
+          )}
+        >
+          <span className="flex h-4 items-center justify-center leading-4">中</span>
+          <span className="flex h-4 items-center justify-center leading-4">EN</span>
+        </span>
+      </span>
     </button>
   );
 }

@@ -8,7 +8,7 @@ import { BrandIcon } from "@/components/ui/brand-icon";
 import { SOCIALS } from "@/lib/socials";
 
 export function Contact() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   return (
     <section id="contact" className="scroll-mt-6 py-10">
       <Reveal delay="2.65s" direction="down">
@@ -37,7 +37,7 @@ export function Contact() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-medium leading-5">
-                  {social.name === "邮箱" && t.contact.title === "Contact" ? "Email" : social.name}
+                  {social.name === "邮箱" && locale === "en" ? "Email" : social.name}
                 </span>
                 <span className="block truncate text-xs text-muted-foreground">{social.handle}</span>
               </span>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { cloneElement, useState, useSyncExternalStore } from "react";
+import type { MouseEvent as ReactMouseEvent, ReactElement, ReactNode } from "react";
 import { GitHubCalendar } from "react-github-calendar";
 import { useTheme } from "next-themes";
 
@@ -8,12 +9,37 @@ import { Reveal } from "@/components/reveal";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLanguage } from "@/components/language-provider";
 
+// Radix Tooltip 不响应触摸（onPointerMove 直接忽略 touch），此处改为受控 open，
+// 触摸设备上通过点击格子切换 tooltip 显隐
+type BlockProps = {
+  onClick?: (event: ReactMouseEvent) => void;
+};
+
+function BlockTooltip({ block, children }: { block: ReactElement; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Tooltip open={open} onOpenChange={setOpen}>
+      <TooltipTrigger asChild>
+        {cloneElement(block as ReactElement<BlockProps>, {
+          onClick: (event: ReactMouseEvent) => {
+            if (!window.matchMedia("(hover: none) and (pointer: coarse)").matches) return;
+            event.preventDefault();
+            setOpen((v) => !v);
+          },
+        })}
+      </TooltipTrigger>
+      <TooltipContent>{children}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+const emptySubscribe = () => () => {};
+
 export function Contributions() {
   const { resolvedTheme } = useTheme();
   const { t } = useLanguage();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   return (
     <section id="contributions" className="scroll-mt-6 py-10">
@@ -39,18 +65,15 @@ export function Contributions() {
               showTotalCount={false}
               throwOnError={false}
               renderBlock={(block, activity) => (
-                <Tooltip key={activity.date}>
-                  <TooltipTrigger asChild>{block}</TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      {activity.count === 0
-                        ? t.contributions.tooltipEmpty.replace("{date}", activity.date)
-                        : t.contributions.tooltipCount
-                            .replace("{count}", String(activity.count))
-                            .replace("{date}", activity.date)}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
+                <BlockTooltip key={activity.date} block={block}>
+                  <p>
+                    {activity.count === 0
+                      ? t.contributions.tooltipEmpty.replace("{date}", activity.date)
+                      : t.contributions.tooltipCount
+                          .replace("{count}", String(activity.count))
+                          .replace("{date}", activity.date)}
+                  </p>
+                </BlockTooltip>
               )}
             />
           ) : (

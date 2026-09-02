@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useSpring, useTransform } from "motion/react";
+import { motion, useScroll, useSpring } from "motion/react";
 
 /** 右上角滚动进度环:useScroll 跟踪页面滚动,spring 平滑数值,pathLength 驱动圆环描边 */
 export function ScrollProgress() {
@@ -10,7 +10,6 @@ export function ScrollProgress() {
     damping: 30,
     mass: 0.5,
   });
-  const percent = useTransform(smooth, (v) => Math.round(v * 100));
 
   return (
     <div
@@ -37,9 +36,6 @@ export function ScrollProgress() {
           style={{ pathLength: smooth }}
         />
       </svg>
-      <motion.span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
-        {percent}
-      </motion.span>
     </div>
   );
 }

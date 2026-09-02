@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { LanguageProvider } from "@/components/language-provider";
-import { LanguageToggle } from "@/components/language-toggle";
 import { SuppressScriptWarning } from "@/components/suppress-script-warning";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -51,11 +50,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           disableTransitionOnChange
         >
           <LanguageProvider>
-            <div className="pointer-events-none fixed top-5 right-20 z-50">
-              <div className="pointer-events-auto">
-                <LanguageToggle />
-              </div>
-            </div>
             {children}
           </LanguageProvider>
         </ThemeProvider>

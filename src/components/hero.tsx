@@ -11,7 +11,6 @@ import {
   Terminal,
   TypingAnimation,
 } from "@/registry/magicui/terminal";
-import { TextAnimate } from "@/registry/magicui/text-animate";
 
 export function Hero() {
   const { t } = useLanguage();
@@ -32,17 +31,27 @@ export function Hero() {
         <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
           <InstallBadge className="w-fit animate-blur-in" />
 
-          <TextAnimate
-            animation="blurInUp"
-            as="h1"
-            by="character"
-            delay={0.4}
-            duration={0.5}
-            startOnView={false}
+          {/* 逐字符浮现：纯 CSS 合成器驱动（见 globals.css 的 .hero-char），与 motion 版视觉一致 */}
+          <h1
+            aria-label={t.hero.title}
             className="font-serif-sc mt-4 text-3xl font-semibold tracking-tight sm:text-5xl"
           >
-            {t.hero.title}
-          </TextAnimate>
+            <span className="sr-only">{t.hero.title}</span>
+            {t.hero.title.split("").map((ch, i) => (
+              <span
+                key={`char-${i}`}
+                aria-hidden
+                className="hero-char"
+                style={
+                  {
+                    "--char-delay": `${(0.4 + i * (0.5 / t.hero.title.length)).toFixed(3)}s`,
+                  } as React.CSSProperties
+                }
+              >
+                {ch}
+              </span>
+            ))}
+          </h1>
 
           <p
             className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base animate-blur-in"
@@ -115,8 +124,8 @@ export function Hero() {
                   <AnimatedSpan
                     key={i}
                     className="text-muted-foreground"
-                    initial={{ opacity: 0, y: -12 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     transition={{
                       duration: 0.35,
                       delay: line.at / 1000,

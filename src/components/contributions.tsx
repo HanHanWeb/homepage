@@ -1,6 +1,6 @@
 "use client";
 
-import { cloneElement, useState, useSyncExternalStore } from "react";
+import { cloneElement, useEffect, useState } from "react";
 import type { MouseEvent as ReactMouseEvent, ReactElement, ReactNode } from "react";
 import { GitHubCalendar } from "react-github-calendar";
 import { useTheme } from "next-themes";
@@ -34,12 +34,17 @@ function BlockTooltip({ block, children }: { block: ReactElement; children: Reac
   );
 }
 
-const emptySubscribe = () => () => {};
-
 export function Contributions() {
   const { resolvedTheme } = useTheme();
   const { t } = useLanguage();
-  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  // 日历含 365 个 Tooltip，渲染是长任务；推迟到入场动画（约 3s）结束后再挂载，
+  // 避免巨型 React commit 阻塞主线程、卡住按钮/关于等板块的动画
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const id = setTimeout(() => setMounted(true), 3000);
+    return () => clearTimeout(id);
+  }, []);
 
   return (
     <section id="contributions" className="scroll-mt-6 py-10">

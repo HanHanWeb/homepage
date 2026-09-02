@@ -29,7 +29,7 @@ export function Focus() {
                   "repeating-linear-gradient(45deg, var(--border) 0 1px, transparent 1px 10px)",
               }}
             >
-              <div className="absolute inset-0 bg-card/60 backdrop-blur-[0.5px]" aria-hidden />
+              <div className="absolute inset-0 bg-card/60" aria-hidden />
               <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between [perspective:800px]">
                 <Text3DFlip
                   as="h3"

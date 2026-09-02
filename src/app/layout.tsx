@@ -11,14 +11,12 @@ const geistSans = Geist({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
-  preload: false,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
-  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -34,7 +32,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
     >
-      <head />
+      <head>
+        {/* 预加载标题字体，避免 font swap 在入场动画中途改变字形 */}
+        <link
+          rel="preload"
+          href="/fonts/ChillJinshuSong_CompactRegular-subset.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col">
         <SuppressScriptWarning />
         <ThemeProvider

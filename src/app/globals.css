@@ -147,11 +147,15 @@
   }
 }
 
-/* 细滚动条：替换原生样式 */
+/* 隐藏页面滚动条：滚动功能保留，仅不显示 */
 html {
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: var(--border) transparent; /* Firefox */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* 旧版 Edge/IE */
 }
+html::-webkit-scrollbar {
+  display: none;
+}
+/* 内部可滚动区域（终端等）保留细滚动条，避免内容无法感知可滚 */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -188,6 +192,8 @@ html {
 .animate-blur-in {
   animation: blur-in 0.5s ease-out both;
   animation-delay: var(--blur-delay, 0s);
+  /* 提前提升到合成层，动画不因主线程繁忙（hydration 等）丢帧 */
+  will-change: opacity, filter, transform;
 }
 
 /* 含 backdrop-filter 的元素祖先只使用 opacity 淡入，避免创建 backdrop root。 */
@@ -200,12 +206,47 @@ html {
   }
 }
 
+/* 标题逐字符浮现：合成器驱动的纯 CSS 实现（替代 motion JS 逐帧驱动，避免起点掉帧） */
+@keyframes char-float-in-tf {
+  from {
+    filter: blur(10px);
+    transform: translateY(20px);
+  }
+  to {
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes char-float-in-o {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.hero-char {
+  display: inline-block;
+  white-space: pre;
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(20px);
+  /* 预建合成层：动画首帧无需临时建层/栅格化，消除起点卡顿 */
+  will-change: opacity, filter, transform;
+  animation:
+    char-float-in-tf 0.3s ease-out forwards,
+    char-float-in-o 0.4s ease-out forwards;
+  animation-delay: var(--char-delay, 0s), var(--char-delay, 0s);
+}
+
 .animate-dock-in {
   animation: dock-in 0.5s ease-out backwards;
   animation-delay: var(--blur-delay, 0s);
 }
 
-/* 滚动进入视口时触发：由 Reveal 组件（IntersectionObserver）添加类名 */
+/* Reveal 组件挂载即播放（整页入场编排，--blur-delay 控制各板块先后顺序） */
 .blur-in-pending {
   opacity: 0;
   filter: blur(8px);
@@ -215,6 +256,8 @@ html {
 .blur-in-pending.is-blur-in {
   animation: blur-in 0.5s ease-out both;
   animation-delay: var(--blur-delay, 0s);
+  /* 预建合成层：与 .animate-blur-in 同机制，避免动画首帧建层掉帧 */
+  will-change: opacity, filter, transform;
 }
 
 /* 贡献图：覆写 react-activity-calendar 默认的横向滚动，改为居右裁剪、无滚动条 */

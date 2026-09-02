@@ -5,7 +5,7 @@ export const dictionaries = {
     hero: {
       title: "Hi, I'm Han.",
       description:
-        "一名学生、开发者与设计师。喜欢用代码和设计把事情做得简洁、好用又好看，目前主要探索 Web 开发、创意编程与 AI 应用。",
+        "一名学生、开发者与设计师。喜欢用代码和设计把事情做得简洁、好用又好看，目前主要探索 Web 开发与 AI 应用。",
       ctaAbout: "关于",
       ctaGithub: "GitHub",
       terminal: {
@@ -53,7 +53,7 @@ export const dictionaries = {
     hero: {
       title: "Hi, I'm Han.",
       description:
-        "A student, developer and designer. I enjoy making things simple, useful and beautiful with code and design, currently exploring Web Development, Creative Coding and AI.",
+        "A student, developer and designer. I enjoy making things simple, useful and beautiful with code and design, currently exploring Web Development and AI.",
       ctaAbout: "About",
       ctaGithub: "GitHub",
       terminal: {

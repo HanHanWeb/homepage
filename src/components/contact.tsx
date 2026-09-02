@@ -11,14 +11,14 @@ export function Contact() {
   const { t, locale } = useLanguage();
   return (
     <section id="contact" className="scroll-mt-6 py-10">
-      <Reveal delay="2.65s" direction="down">
+      <Reveal delay="3.2s" direction="down">
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="font-serif-sc text-3xl font-semibold tracking-tight sm:text-4xl">{t.contact.title}</h2>
           <span className="text-sm font-normal tracking-widest text-muted-foreground/40">#CONTACT</span>
         </div>
       </Reveal>
 
-      <Reveal delay="2.8s" direction="down">
+      <Reveal delay="3.35s" direction="down">
         <div className="mt-4 divide-y overflow-hidden rounded-xl border">
             {SOCIALS.map((social) => (
             <a

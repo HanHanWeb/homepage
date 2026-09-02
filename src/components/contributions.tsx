@@ -68,7 +68,7 @@ export function Contributions() {
 
   return (
     <section id="contributions" className="scroll-mt-6 py-10">
-      <Reveal delay="2.35s" direction="down">
+      <Reveal delay="2.9s" direction="down">
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="font-serif-sc text-3xl font-semibold tracking-tight sm:text-4xl">{t.contributions.title}</h2>
           <span className="text-sm font-normal tracking-widest text-muted-foreground/40">
@@ -77,7 +77,7 @@ export function Contributions() {
         </div>
       </Reveal>
 
-      <Reveal delay="2.5s" direction="down">
+      <Reveal delay="3.05s" direction="down">
         <div className="relative mt-4 overflow-hidden rounded-xl border bg-card p-4">
           {/* 日历层：就绪前透明（min-h 防塌陷），数据到达后淡入 */}
           <div

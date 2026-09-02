@@ -4,6 +4,7 @@ import { Contributions } from "@/components/contributions";
 import { FlickeringGridTop } from "@/components/flickering-grid-top";
 import { Focus } from "@/components/focus";
 import { Hero } from "@/components/hero";
+import { Projects } from "@/components/projects";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { ScrollProgress } from "@/components/scroll-progress";
@@ -29,6 +30,7 @@ export default function Home() {
         <Hero />
         <About />
         <Focus />
+        <Projects />
         <Contributions />
         <Contact />
       </main>

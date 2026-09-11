@@ -6,6 +6,7 @@ import { Focus } from "@/components/focus";
 import { Hero } from "@/components/hero";
 import { Projects } from "@/components/projects";
 import { LanguageToggle } from "@/components/language-toggle";
+import { BottomGlow } from "@/components/ui/bottom-glow";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { ScrollProgress } from "@/components/scroll-progress";
 
@@ -26,7 +27,7 @@ export default function Home() {
           <LanguageToggle />
         </div>
       </div>
-      <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-20 pb-28">
+      <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-20 pb-16">
         <Hero />
         <About />
         <Focus />
@@ -34,6 +35,7 @@ export default function Home() {
         <Contributions />
         <Contact />
       </main>
+      <BottomGlow />
     </>
   );
 }

@@ -96,6 +96,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --bottom-glow-primary: oklch(0.702 0.158 160 / 13%);
+  --bottom-glow-secondary: oklch(0.702 0.158 160 / 9%);
 }
 
 .dark {
@@ -130,6 +132,8 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --bottom-glow-primary: oklch(0.702 0.158 160 / 58%);
+  --bottom-glow-secondary: oklch(0.702 0.158 160 / 30%);
 }
 
 @layer base {
@@ -287,5 +291,38 @@ html::-webkit-scrollbar {
   }
   100% {
     transform: translateZ(0) rotate(360deg);
+  }
+}
+
+/* 底部贴边弥散光晕：两层椭圆径向渐变，光源位于底边中点 */
+.bottom-glow {
+  background:
+    radial-gradient(
+      ellipse 120% 100% at 50% 100%,
+      var(--bottom-glow-secondary) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 70% 90% at 50% 100%,
+      var(--bottom-glow-primary) 0%,
+      transparent 70%
+    );
+  animation: bottom-glow-breathe 5s ease-in-out infinite;
+}
+
+/* 呼吸灯：透明度 0.55 ↔ 1 往复脉动 */
+@keyframes bottom-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-glow {
+    animation: none;
   }
 }

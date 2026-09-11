@@ -22,8 +22,8 @@ export const SOCIALS: Array<{
   },
   {
     name: "邮箱",
-    handle: "1956526909@qq.com",
-    href: "mailto:1956526909@qq.com",
+    handle: "im@hhan.me",
+    href: "mailto:im@hhan.me",
   },
   {
     name: "QQ",

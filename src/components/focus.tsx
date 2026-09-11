@@ -10,7 +10,10 @@ export function Focus() {
     <section id="focus" className="scroll-mt-6 py-10">
       <Reveal delay="1.8s" direction="down">
         <div className="flex items-baseline justify-between gap-4">
-          <h2 className="font-serif-sc text-3xl font-semibold tracking-tight sm:text-4xl">{t.services.title}</h2>
+          <h2 className="font-serif-sc relative inline-block text-3xl font-semibold tracking-tight sm:text-4xl">
+            {t.services.title}
+            <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-[#00bc7d]" aria-hidden />
+          </h2>
           <span className="text-sm font-normal tracking-widest text-muted-foreground/40">#FOCUS</span>
         </div>
       </Reveal>

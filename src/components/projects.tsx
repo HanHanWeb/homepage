@@ -34,11 +34,13 @@ export function Projects() {
       </Reveal>
 
       <Reveal delay="2.45s" direction="down">
-        <article className="mt-4 rounded-xl border bg-card p-5 sm:p-6">
+        <article className="mt-4 rounded-xl border bg-card p-5">
           <div className="sm:flex sm:gap-8">
-            <header className="sm:w-2/5 sm:shrink-0">
+            <header className="flex flex-col sm:flex-1">
               <div className="flex items-center justify-between gap-2">
-                <h3 className="font-mono text-base font-semibold tracking-tight">{featured.name}</h3>
+                <h3 className="font-mono text-base font-semibold tracking-tight">
+                  {locale === "en" ? featured.nameEn : featured.name}
+                </h3>
                 <span className="rounded-full border px-2.5 py-0.5 text-xs text-[#00bc7d]">
                   {t.projects.featured}
                 </span>
@@ -46,8 +48,19 @@ export function Projects() {
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 {locale === "en" ? featured.descEn : featured.descZh}
               </p>
+              <div className="mt-4 flex flex-wrap items-center gap-1.5 sm:mt-auto">
+                <span className="mr-1 text-xs text-muted-foreground">{t.projects.affiliated}</span>
+                {featured.subProjects.map((sub) => (
+                  <span
+                    key={sub.name}
+                    className="rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground"
+                  >
+                    {locale === "en" ? sub.nameEn : sub.name}
+                  </span>
+                ))}
+              </div>
             </header>
-            <figure className="relative mt-5 overflow-hidden rounded-lg bg-linear-to-br from-[#00bc7d]/10 to-[#00bc7d]/[0.04] p-4 sm:mt-0 sm:flex-1">
+            <figure className="relative mt-5 overflow-hidden rounded-lg bg-linear-to-br from-[#00bc7d]/10 to-[#00bc7d]/[0.04] p-4 sm:mt-0 sm:w-[calc(50%-6px)] sm:shrink-0">
               <Quote
                 className="absolute -top-1 right-2 size-10 text-[#00bc7d]/20"
                 strokeWidth={1.5}

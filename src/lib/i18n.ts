@@ -38,6 +38,7 @@ export const dictionaries = {
     },
     projects: {
       title: "项目",
+      featured: "精选项目",
     },
     contributions: {
       title: "贡献",
@@ -90,6 +91,7 @@ export const dictionaries = {
     },
     projects: {
       title: "Projects",
+      featured: "Featured",
     },
     contributions: {
       title: "Contributions",

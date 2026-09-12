@@ -1,13 +1,26 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Quote } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { Reveal } from "@/components/reveal";
-import { PROJECTS } from "@/lib/projects";
+import { FEATURED_PROJECT, PROJECTS } from "@/lib/projects";
 
 export function Projects() {
   const { t, locale } = useLanguage();
+  const featured = FEATURED_PROJECT;
+  const titles = (locale === "en" ? featured.quote.titleEn : featured.quote.titleZh)
+    .split("·")
+    .map((title) => title.trim());
+
+  const [titleIndex, setTitleIndex] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTitleIndex((index) => (index + 1) % titles.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [titles.length]);
   return (
     <section id="projects" className="scroll-mt-6 py-10">
       <Reveal delay="2.35s" direction="down">
@@ -20,7 +33,56 @@ export function Projects() {
         </div>
       </Reveal>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+      <Reveal delay="2.45s" direction="down">
+        <article className="mt-4 rounded-xl border bg-card p-5 sm:p-6">
+          <div className="sm:flex sm:gap-8">
+            <header className="sm:w-2/5 sm:shrink-0">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="font-mono text-base font-semibold tracking-tight">{featured.name}</h3>
+                <span className="rounded-full border px-2.5 py-0.5 text-xs text-[#00bc7d]">
+                  {t.projects.featured}
+                </span>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {locale === "en" ? featured.descEn : featured.descZh}
+              </p>
+            </header>
+            <figure className="relative mt-5 overflow-hidden rounded-lg bg-linear-to-br from-[#00bc7d]/10 to-[#00bc7d]/[0.04] p-4 sm:mt-0 sm:flex-1">
+              <Quote
+                className="absolute -top-1 right-2 size-10 text-[#00bc7d]/20"
+                strokeWidth={1.5}
+                aria-hidden
+              />
+              <blockquote className="relative pr-10 text-sm leading-6">
+                {locale === "en" ? featured.quote.textEn : featured.quote.textZh}
+              </blockquote>
+              <figcaption className="relative mt-3.5 flex items-center gap-2.5">
+                <img
+                  src={featured.quote.avatar}
+                  alt={featured.quote.author}
+                  loading="lazy"
+                  className="size-8 shrink-0 rounded-full border object-cover"
+                />
+                <p className="min-w-0 text-xs text-muted-foreground">
+                  <span className="block text-sm font-medium leading-5 text-foreground">
+                    {featured.quote.author}
+                  </span>
+                  <span className="mt-0.5 block h-5 overflow-hidden leading-5">
+                    <span
+                      key={titleIndex}
+                      className="block truncate animate-in fade-in slide-in-from-bottom-2 duration-500"
+                    >
+                      {titles[titleIndex]}
+                    </span>
+                  </span>
+                </p>
+              </figcaption>
+            </figure>
+          </div>
+        </article>
+      </Reveal>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
         {PROJECTS.map((project, i) => (
           <Reveal key={project.name} delay={`${2.5 + i * 0.08}s`} direction="down">
             <a

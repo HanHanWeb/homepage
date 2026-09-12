@@ -43,3 +43,32 @@ export const PROJECTS: Project[] = [
     stack: ["TypeScript", "CSS", "JavaScript"],
   },
 ];
+
+/** 精选项目：非 GitHub 仓库的社区项目，静态维护 */
+export type FeaturedProject = {
+  name: string;
+  descZh: string;
+  descEn: string;
+  quote: {
+    textZh: string;
+    textEn: string;
+    author: string;
+    titleZh: string;
+    titleEn: string;
+    avatar: string;
+  };
+};
+
+export const FEATURED_PROJECT: FeaturedProject = {
+  name: "界面生态",
+  descZh: "界面生态是国内最大的以 PPT OS 创意为核心的社区生态，汇聚创作者、作品和交流平台，曾推动 PPT 创意设计的发展。",
+  descEn: "Jiemian Ecosystem is China's largest community ecosystem centered on PPT OS creativity, bringing together creators, works and conversations, and has helped drive creative PPT design forward.",
+  quote: {
+    textZh: "界面生态是 PPT 圈少见的兴趣垂类社区，希望热爱 PPT 的大家在这里玩的开心，愿 PPT 兴趣圈人来人往，永不落幕~",
+    textEn: "Jiemian Ecosystem is a rare passion-driven community in the PPT circle. May everyone who loves PPT have a great time here — may people come and go, and the show never end~",
+    author: "安逸",
+    titleZh: "「安逸PPT」账号主理人 · 金山最具价值专家（KVP） · 微软国际办公认证 MOS-PPT 专家 · 51PPT模板网大设计师",
+    titleEn: "Founder of 安逸PPT · Kingsoft Most Valuable Professional (KVP) · Microsoft Office Specialist (MOS-PPT) · Distinguished Designer at 51PPT",
+    avatar: "https://q1.qlogo.cn/g?b=qq&nk=1559655822&s=640",
+  },
+};

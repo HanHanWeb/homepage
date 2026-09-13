@@ -49,6 +49,17 @@ export const dictionaries = {
     contact: {
       title: "联系",
     },
+    cmdk: {
+      placeholder: "搜索板块或操作…",
+      empty: "没有找到相关结果",
+      nav: "板块",
+      actions: "操作",
+      links: "外链",
+      copyEmail: "复制邮箱",
+      emailCopied: "邮箱已复制",
+      toggleTheme: "切换深浅色主题",
+      toggleLang: "切换语言",
+    },
     meta: {
       title: "Han — Student · Developer · Designer",
       description:
@@ -102,6 +113,17 @@ export const dictionaries = {
     },
     contact: {
       title: "Contact",
+    },
+    cmdk: {
+      placeholder: "Search sections and actions…",
+      empty: "No results found.",
+      nav: "Sections",
+      actions: "Actions",
+      links: "Links",
+      copyEmail: "Copy email",
+      emailCopied: "Email copied",
+      toggleTheme: "Toggle theme",
+      toggleLang: "Toggle language",
     },
     meta: {
       title: "Han — Student · Developer · Designer",

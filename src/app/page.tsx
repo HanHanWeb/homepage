@@ -1,4 +1,5 @@
 import { About } from "@/components/about";
+import { CommandPalette } from "@/components/command-palette";
 import { Contact } from "@/components/contact";
 import { Contributions } from "@/components/contributions";
 import { FlickeringGridTop } from "@/components/flickering-grid-top";
@@ -36,6 +37,7 @@ export default function Home() {
         <Contact />
       </main>
       <BottomGlow />
+      <CommandPalette />
     </>
   );
 }

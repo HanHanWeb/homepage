@@ -2,6 +2,7 @@
 
 import { GithubIcon } from "@/components/icons";
 import { InstallBadge } from "@/components/install-badge";
+import { Typewriter } from "@/components/typewriter";
 import { Button } from "@/components/ui/button";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { TiltCard } from "@/components/ui/tilt-card";
@@ -19,10 +20,17 @@ export function Hero() {
     { kind: "out", text: t.hero.terminal.han, at: 1700 },
     { kind: "cmd", text: t.hero.terminal.catBio, at: 2150 },
     { kind: "out", text: t.hero.terminal.bio1, at: 2900 },
-    { kind: "out", text: t.hero.terminal.bio2, at: 3350 },
     { kind: "cmd", text: t.hero.terminal.lsSkills, at: 3800 },
     { kind: "out", text: t.hero.terminal.lsOutput, at: 4700 },
     { kind: "cmd", text: t.hero.terminal.curl, at: 5150 },
+  ];
+
+  // 序列播完后底部「等待输入」行：循环敲出示例命令（仅演示，不执行）
+  const INPUT_PHRASES = [
+    "ls -la ~/projects",
+    "pnpm dev",
+    "vim design-proposals.md",
+    "git push origin main",
   ];
 
   return (
@@ -136,6 +144,16 @@ export function Hero() {
                   </AnimatedSpan>
                 ),
               )}
+              {/* 序列播完后出现的输入行：打字机循环敲命令 */}
+              <AnimatedSpan
+                className="flex gap-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 7.8, ease: "easeOut" }}
+              >
+                <span className="text-green-500">❯</span>
+                <Typewriter phrases={INPUT_PHRASES} typeMs={60} holdMs={2800} />
+              </AnimatedSpan>
             </Terminal>
           </TiltCard>
         </div>

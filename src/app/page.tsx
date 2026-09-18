@@ -1,4 +1,5 @@
 import { About } from "@/components/about";
+import { BackToTop } from "@/components/back-to-top";
 import { CommandPalette } from "@/components/command-palette";
 import { Contact } from "@/components/contact";
 import { Contributions } from "@/components/contributions";
@@ -22,6 +23,7 @@ export default function Home() {
       </div>
       <FlickeringGridTop />
       <ScrollProgress />
+      <BackToTop />
       {/* 语言切换仅首页显示（404 等页面不渲染） */}
       <div className="pointer-events-none fixed top-5 right-20 z-50">
         <div className="pointer-events-auto">

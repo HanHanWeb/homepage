@@ -5,7 +5,7 @@ export const dictionaries = {
     hero: {
       title: "Hi, I'm Han.",
       description:
-        "一名学生、开发者与设计师。喜欢用代码和设计把事情做得简洁、好用又好看，目前主要探索 Web 开发与 AI 应用。",
+        "一名学生、开发者与设计师。喜欢用设计把事情做得简洁、好用又好看，目前主要探索 Web 开发与 AI 应用。",
       ctaAbout: "关于",
       ctaGithub: "GitHub",
       terminal: {
@@ -13,7 +13,6 @@ export const dictionaries = {
         han: "Han",
         catBio: "cat bio.txt",
         bio1: "大一在读 / 西安",
-        bio2: "喜欢用代码做有意思的东西",
         lsSkills: "ls -la skills/",
         lsOutput: "drwxr-xr-x 前端 设计 运维",
         curl: "curl -s https://www.hhan.me",
@@ -38,7 +37,6 @@ export const dictionaries = {
     },
     projects: {
       title: "项目",
-      featured: "精选项目",
       affiliated: "附属项目",
     },
     contributions: {
@@ -49,6 +47,7 @@ export const dictionaries = {
     contact: {
       title: "联系",
     },
+    backToTop: "回到顶部",
     cmdk: {
       placeholder: "搜索板块或操作…",
       empty: "没有找到相关结果",
@@ -70,7 +69,7 @@ export const dictionaries = {
     hero: {
       title: "Hi, I'm Han.",
       description:
-        "A student, developer and designer. I enjoy making things simple, useful and beautiful with code and design, currently exploring Web Development and AI.",
+        "A student, developer and designer. I enjoy making things simple, useful and beautiful with design, currently exploring Web Development and AI.",
       ctaAbout: "About",
       ctaGithub: "GitHub",
       terminal: {
@@ -78,7 +77,6 @@ export const dictionaries = {
         han: "Han",
         catBio: "cat bio.txt",
         bio1: "First-year Undergraduate / Xi'an",
-        bio2: "Building interesting things with code",
         lsSkills: "ls -la skills/",
         lsOutput: "drwxr-xr-x frontend design ops",
         curl: "curl -s https://www.hhan.me",
@@ -103,7 +101,6 @@ export const dictionaries = {
     },
     projects: {
       title: "Projects",
-      featured: "Featured",
       affiliated: "Affiliated",
     },
     contributions: {
@@ -114,6 +111,7 @@ export const dictionaries = {
     contact: {
       title: "Contact",
     },
+    backToTop: "Back to top",
     cmdk: {
       placeholder: "Search sections and actions…",
       empty: "No results found.",

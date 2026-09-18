@@ -42,7 +42,7 @@ export function Projects() {
                   {locale === "en" ? featured.nameEn : featured.name}
                 </h3>
                 <span className="rounded-full border px-2.5 py-0.5 text-xs text-[#00bc7d]">
-                  {t.projects.featured}
+                  {locale === "en" ? featured.roleEn : featured.roleZh}
                 </span>
               </div>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">

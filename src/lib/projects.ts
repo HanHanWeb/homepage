@@ -48,6 +48,8 @@ export const PROJECTS: Project[] = [
 export type FeaturedProject = {
   name: string;
   nameEn: string;
+  roleZh: string;
+  roleEn: string;
   descZh: string;
   descEn: string;
   quote: {
@@ -67,6 +69,8 @@ export type FeaturedProject = {
 export const FEATURED_PROJECT: FeaturedProject = {
   name: "界面生态",
   nameEn: "Intereco",
+  roleZh: "Founder · 已离职",
+  roleEn: "Founder · Former",
   descZh: "界面生态是国内最大的以 PPT OS 创意为核心的社区生态，汇聚创作者、作品和交流平台，曾推动 PPT 创意设计的发展。",
   descEn: "Intereco is China's largest community ecosystem centered on PPT OS creativity, bringing together creators, works and conversations, and has helped drive creative PPT design forward.",
   quote: {

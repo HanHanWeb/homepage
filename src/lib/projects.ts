@@ -83,6 +83,7 @@ export const FEATURED_PROJECT: FeaturedProject = {
   },
   subProjects: [
     { name: "主页", nameEn: "Home" },
+    { name: "社区", nameEn: "Community" },
     { name: "作品中心", nameEn: "Gallery" },
     { name: "IPOA赛事系统", nameEn: "IPOA Competition System" },
     { name: "财务公开平台", nameEn: "Finance Disclosure" },

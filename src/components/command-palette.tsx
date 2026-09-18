@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BookOpen,
   Copy,
   FolderGit2,
   Check,
@@ -26,6 +27,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useLanguage } from "@/components/language-provider";
+import { navigateWithTransition } from "@/components/route-transition";
 
 const EMAIL = "im@hhan.me";
 
@@ -49,6 +51,12 @@ export function CommandPalette() {
   const jumpTo = (id: string) => {
     setOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // 等面板退出动画播完再截图，避免过渡快照里残留半关闭的面板
+  const openBlog = () => {
+    setOpen(false);
+    setTimeout(() => navigateWithTransition("/blog"), 200);
   };
 
   const copyEmail = async () => {
@@ -75,6 +83,7 @@ export function CommandPalette() {
     { id: "projects", icon: FolderGit2, label: t.projects.title },
     { id: "contributions", icon: Trophy, label: t.contributions.title },
     { id: "contact", icon: Mail, label: t.contact.title },
+    { id: "blog", icon: BookOpen, label: t.blog.title, href: "/blog" },
   ];
 
   return (
@@ -90,7 +99,11 @@ export function CommandPalette() {
         <CommandEmpty>{t.cmdk.empty}</CommandEmpty>
         <CommandGroup heading={t.cmdk.nav}>
           {navItems.map((item) => (
-            <CommandItem key={item.id} value={item.label} onSelect={() => jumpTo(item.id)}>
+            <CommandItem
+              key={item.id}
+              value={item.label}
+              onSelect={() => ("href" in item && item.href ? openBlog() : jumpTo(item.id))}
+            >
               <item.icon />
               {item.label}
             </CommandItem>

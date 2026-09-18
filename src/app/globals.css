@@ -23,6 +23,7 @@
   --font-heading: var(--font-sans);
   --font-serif-sc: "ChillJinshuSong_CompactRegular", serif;
   --font-serif-sc-stretch: condensed;
+  --font-serif-song: "Noto Serif SC", "Songti SC", "SimSun", serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -245,17 +246,6 @@ html::-webkit-scrollbar {
   animation-delay: var(--char-delay, 0s), var(--char-delay, 0s);
 }
 
-/* 打字机标题光标（Typewriter 组件） */
-@keyframes type-caret-blink {
-  50% {
-    opacity: 0;
-  }
-}
-
-.type-caret {
-  animation: type-caret-blink 1s steps(1) infinite;
-}
-
 .animate-dock-in {
   animation: dock-in 0.5s ease-out backwards;
   animation-delay: var(--blur-delay, 0s);
@@ -344,5 +334,67 @@ html::-webkit-scrollbar {
 @media (prefers-reduced-motion: reduce) {
   .bottom-glow {
     animation: none;
+  }
+}
+
+/* ===== 路由切换过渡（View Transitions API，快照合成层动画）===== */
+/* antd 风格推屏转场：新页作为遮挡层从侧边完整滑入，旧页视差位移并渐隐 */
+/* 位移时露出的边缘用主题背景兜底，避免闪出黑/白边 */
+::view-transition-group(root) {
+  background: var(--background);
+}
+
+/* 前进（进子页面）：新页自右滑入盖住，旧页向左视差淡出 */
+html[data-vt-direction="forward"]::view-transition-old(root) {
+  animation: vt-forward-old 0.4s cubic-bezier(0.645, 0.045, 0.355, 1) both;
+}
+html[data-vt-direction="forward"]::view-transition-new(root) {
+  animation: vt-forward-new 0.4s cubic-bezier(0.645, 0.045, 0.355, 1) both;
+}
+
+/* 返回（回上级页面）：新页自左滑入盖住，旧页向右视差淡出 */
+html[data-vt-direction="back"]::view-transition-old(root) {
+  animation: vt-back-old 0.4s cubic-bezier(0.645, 0.045, 0.355, 1) both;
+}
+html[data-vt-direction="back"]::view-transition-new(root) {
+  animation: vt-back-new 0.4s cubic-bezier(0.645, 0.045, 0.355, 1) both;
+}
+
+@keyframes vt-forward-old {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-22%);
+    opacity: 0.4;
+  }
+}
+@keyframes vt-forward-new {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes vt-back-old {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(22%);
+    opacity: 0.4;
+  }
+}
+@keyframes vt-back-new {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

@@ -47,6 +47,16 @@ export const dictionaries = {
     contact: {
       title: "联系",
     },
+    blog: {
+      title: "博客",
+      backHome: "返回首页",
+      categories: "分类",
+      all: "全部",
+      words: "{count} 字",
+      empty: "还没有文章",
+      noMatch: "没有找到相关文章",
+      clearFilter: "清除筛选",
+    },
     backToTop: "回到顶部",
     cmdk: {
       placeholder: "搜索板块或操作…",
@@ -110,6 +120,16 @@ export const dictionaries = {
     },
     contact: {
       title: "Contact",
+    },
+    blog: {
+      title: "Blog",
+      backHome: "Back to home",
+      categories: "Categories",
+      all: "All",
+      words: "{count} words",
+      empty: "No posts yet",
+      noMatch: "No matching posts",
+      clearFilter: "Clear filters",
     },
     backToTop: "Back to top",
     cmdk: {

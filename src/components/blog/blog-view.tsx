@@ -116,22 +116,24 @@ export function BlogView({ posts }: { posts: Post[] }) {
             </button>
           </section>
           <HitokotoCard />
-          <LicenseCard />
-          <a
-            href="https://www.travellings.cn/go.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="开往 · 去往下一个博客"
-            className="inline-flex w-fit"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://www.travellings.cn/assets/logo.svg"
-              alt="开往 · Travellings"
-              className="h-4 w-auto"
-              loading="lazy"
-            />
-          </a>
+          <div className="flex items-center gap-2.5">
+            <LicenseCard />
+            <a
+              href="https://www.travellings.cn/go.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="开往 · 去往下一个博客"
+              className="inline-flex h-4 w-fit items-center"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://www.travellings.cn/assets/logo.svg"
+                alt="开往 · Travellings"
+                className="h-4 w-auto"
+                loading="lazy"
+              />
+            </a>
+          </div>
         </aside>
       </div>
     </main>

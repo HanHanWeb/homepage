@@ -15,6 +15,8 @@ import { useState } from "react";
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { HitokotoCard } from "@/components/hitokoto-card";
 import { LicenseCard } from "@/components/license-card";
+import { Input } from "@/components/ui/input";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export function BlogView({ posts }: { posts: Post[] }) {
   const [copied, setCopied] = useState(false);
@@ -72,38 +74,36 @@ export function BlogView({ posts }: { posts: Post[] }) {
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <div
-          className="flex items-center gap-1 rounded-full border bg-card p-1"
-          role="tablist"
+        <ToggleGroup
+          type="single"
+          value={category}
+          onValueChange={(v) => {
+            if (v) setCategory(v);
+          }}
           aria-label="文章分类"
+          className="h-9 rounded-full border bg-card p-1"
         >
           {categories.map((c) => (
-            <button
+            <ToggleGroupItem
               key={c}
-              type="button"
-              role="tab"
-              aria-selected={category === c}
-              onClick={() => setCategory(c)}
-              className={`rounded-full px-4 py-1.5 text-sm transition-colors ${
-                category === c
-                  ? "bg-[#00bc7d]/10 font-medium text-[#00bc7d]"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              value={c}
+              aria-label={`分类：${c}`}
+              className="h-7 rounded-full border-0 px-4 text-sm data-[state=on]:bg-[#00bc7d]/10 data-[state=on]:font-medium data-[state=on]:text-[#00bc7d] data-[state=on]:shadow-none"
             >
               {c}
-            </button>
+            </ToggleGroupItem>
           ))}
-        </div>
-        <label className="flex w-full max-w-64 items-center gap-2 rounded-full border bg-card px-4 py-2 text-sm sm:w-64">
+        </ToggleGroup>
+        <label className="relative block">
           <Search
-            className="size-3.5 shrink-0 text-muted-foreground"
+            className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground"
             strokeWidth={1.5}
           />
-          <input
+          <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="搜索文章…"
-            className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
+            className="h-9 w-full rounded-full bg-card pr-4 pl-9 text-sm sm:w-64"
           />
         </label>
       </div>

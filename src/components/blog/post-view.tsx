@@ -213,7 +213,7 @@ export function PostView({ post }: { post: Post }) {
         }
       />
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent side="right" className="w-72 gap-4 overflow-y-auto">
+        <SheetContent side="right" className="w-80 gap-4 overflow-y-auto p-4">
           <SheetHeader>
             <SheetTitle>文章侧边栏</SheetTitle>
           </SheetHeader>

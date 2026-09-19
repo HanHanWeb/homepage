@@ -116,9 +116,12 @@ export function PostView({ post }: { post: Post }) {
     lockTimerRef.current = window.setTimeout(() => {
       clickLockRef.current = false;
     }, 1000);
-    document
-      .getElementById(`toc-b-${i}`)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // 不用 scrollIntoView({behavior:'smooth'})：实测它时灵时不灵，
+    // 改为 scrollTo + 手动偏移（导航 56px + 呼吸空间 24px = 80px）
+    const el = document.getElementById(`toc-b-${i}`);
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 80;
+    window.scrollTo({ top, behavior: "smooth" });
   };
 
   const fontSizeCard = (
@@ -274,7 +277,7 @@ export function PostView({ post }: { post: Post }) {
           </div>
           <div
             ref={contentRef}
-            className="mt-8 space-y-4 leading-8 text-foreground/90"
+            className="mt-8 space-y-4 leading-8 text-foreground/90 [overflow-anchor:none]"
             style={{ fontSize: FONT_STEPS[fontStep] }}
           >
             {blocks.map((b, i) => {
@@ -284,7 +287,7 @@ export function PostView({ post }: { post: Post }) {
                     key={i}
                     id={showToc ? `toc-b-${i}` : undefined}
                     data-toc={showToc ? "" : undefined}
-                    className="font-serif-song mt-9 scroll-mt-24 text-2xl tracking-tight"
+                    className="font-serif-song mt-9 scroll-mt-20 text-[1.6em] leading-[1.4] tracking-tight"
                   >
                     {b.text}
                   </h2>
@@ -297,7 +300,7 @@ export function PostView({ post }: { post: Post }) {
                     <img
                       src={b.src}
                       alt={b.alt}
-                      loading="lazy"
+                      loading="eager"
                       data-fancybox="post"
                       data-caption={b.alt}
                       className="w-full cursor-zoom-in rounded-xl border"

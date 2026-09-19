@@ -180,7 +180,7 @@ export function PostView({ post }: { post: Post }) {
                     key={i}
                     id={showToc ? `toc-b-${i}` : undefined}
                     data-toc={showToc ? "" : undefined}
-                    className="font-serif-song mt-9 scroll-mt-24 text-xl tracking-tight"
+                    className="font-serif-song mt-9 scroll-mt-24 text-2xl tracking-tight"
                   >
                     {b.text}
                   </h2>

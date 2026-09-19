@@ -66,7 +66,10 @@ export function BlogView({ posts }: { posts: Post[] }) {
         }
       />
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent side="right" className="w-80 gap-4 overflow-y-auto p-4">
+        <SheetContent
+          side="right"
+          className="w-80 gap-4 overflow-y-auto px-4 pt-12 pb-4"
+        >
           <SheetTitle className="sr-only">博客侧边栏</SheetTitle>
           <div className="space-y-4">
             <section className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3">

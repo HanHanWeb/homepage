@@ -52,10 +52,10 @@ export function BlogView({ posts }: { posts: Post[] }) {
       </div>
 
       <div
-        className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_15rem] animate-blur-in"
+        className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_15rem]"
         style={{ "--blur-delay": "0.3s" } as React.CSSProperties}
       >
-        <div className="min-w-0 space-y-3">
+        <div className="min-w-0 space-y-3 animate-blur-in">
           {posts.length === 0 ? (
             <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-16 text-muted-foreground">
               <FileText className="size-8 opacity-40" strokeWidth={1.5} />

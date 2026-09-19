@@ -373,7 +373,6 @@ export function PostView({ post }: { post: Post }) {
                   : "border-border bg-card text-muted-foreground hover:border-[#00bc7d]/50 hover:text-[#00bc7d]"
               }`}
             >
-            >
               <Triangle
                 className={`size-4 ${liked ? "fill-[#00bc7d] text-[#00bc7d]" : ""}`}
                 strokeWidth={1.5}

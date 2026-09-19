@@ -50,7 +50,7 @@ export function BlogNav({ title }: { title?: string }) {
                 passed ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
               }`}
             >
-              <span className="font-serif-sc truncate text-[15px] tracking-tight">
+              <span className="font-serif-song truncate text-[15px] tracking-tight">
                 {title}
               </span>
             </span>

@@ -83,7 +83,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
                       <span aria-hidden className="opacity-60">
                         ·
                       </span>
-                      {post.wordCount.toLocaleString()} 字
+                      约 {Math.max(1, Math.ceil(post.wordCount / 400))} 分钟
                     </>
                   )}
                 </span>

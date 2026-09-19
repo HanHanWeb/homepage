@@ -4,7 +4,7 @@ import { Calendar } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-import type { Post } from "@/lib/blog";
+import { estimateReadingMinutes, type Post } from "@/lib/blog";
 
 const FONT_STEPS = ["14px", "15px", "17px"];
 const FONT_LABELS = ["A-", "A", "A+"];
@@ -107,7 +107,7 @@ export function PostView({ post }: { post: Post }) {
                 <span aria-hidden className="opacity-60">
                   ·
                 </span>
-                {post.wordCount.toLocaleString()} 字
+                约 {estimateReadingMinutes(post.wordCount)} 分钟
               </>
             )}
           </div>

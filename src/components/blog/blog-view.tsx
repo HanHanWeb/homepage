@@ -4,7 +4,7 @@ import { Calendar, Check, Copy, FileText, Rss } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-import type { Post } from "@/lib/blog";
+import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { HitokotoCard } from "@/components/hitokoto-card";
 
 export function BlogView({ posts }: { posts: Post[] }) {
@@ -84,7 +84,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
                       <span aria-hidden className="opacity-60">
                         ·
                       </span>
-                      约 {Math.max(1, Math.ceil(post.wordCount / 400))} 分钟
+                      约 {estimateReadingMinutes(post.wordCount)} 分钟
                     </>
                   )}
                 </span>

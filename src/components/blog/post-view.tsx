@@ -31,6 +31,24 @@ function parseBlocks(content: string): Block[] {
     });
 }
 
+/** 把段落里的裸 URL（http(s):// 或 www. 开头）拆分为链接片段 */
+function splitLinks(text: string): { type: "text" | "url"; value: string }[] {
+  const parts: { type: "text" | "url"; value: string }[] = [];
+  const re = /(?:https?:\/\/|www\.)[^\s（）<>]+/g;
+  let last = 0;
+  for (const m of text.matchAll(re)) {
+    if (m.index > last) parts.push({ type: "text", value: text.slice(last, m.index) });
+    parts.push({ type: "url", value: m[0] });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push({ type: "text", value: text.slice(last) });
+  return parts;
+}
+
+function toHref(url: string): string {
+  return url.startsWith("www.") ? `https://${url}` : url;
+}
+
 export function PostView({ post }: { post: Post }) {
   const blocks = parseBlocks(post.content ?? post.description ?? "");
   // 目录只索引章节标题
@@ -185,7 +203,21 @@ export function PostView({ post }: { post: Post }) {
               }
               return (
                 <p key={i} className="whitespace-pre-line">
-                  {b.text}
+                  {splitLinks(b.text).map((seg, j) =>
+                    seg.type === "text" ? (
+                      seg.value
+                    ) : (
+                      <a
+                        key={j}
+                        href={toHref(seg.value)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline decoration-[#00bc7d]/60 decoration-[1.5px] underline-offset-4 transition-colors hover:text-[#00bc7d] hover:decoration-[#00bc7d]"
+                      >
+                        {seg.value}
+                      </a>
+                    ),
+                  )}
                 </p>
               );
             })}

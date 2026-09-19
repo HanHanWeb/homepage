@@ -22,7 +22,7 @@ export const SOCIALS: Array<{
   },
   {
     name: "邮箱",
-    handle: "im@hhan.me",
+    handle: "im[at]hhan.me",
     href: "mailto:im@hhan.me",
   },
   {

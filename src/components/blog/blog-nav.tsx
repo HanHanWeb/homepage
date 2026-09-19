@@ -39,7 +39,7 @@ export function BlogNav({ title }: { title?: string }) {
                 className="size-full object-cover"
               />
             </span>
-            <span className="font-mono text-sm font-medium tracking-[0.18em]">
+            <span className="font-mono text-base font-medium tracking-[0.18em]">
               BLOG
             </span>
           </Link>

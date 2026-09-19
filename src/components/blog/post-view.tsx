@@ -52,31 +52,24 @@ export function PostView({ post }: { post: Post }) {
     localStorage.setItem("post-font-size", String(step));
   };
 
-  // 滚动时高亮视口顶附近的章节标题
+  // 滚动时高亮视口顶附近的章节标题；不依赖 rAF（后台/节流时会被暂停导致失效）
   useEffect(() => {
     if (!showToc) return;
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const hs =
-          contentRef.current?.querySelectorAll<HTMLElement>("h2[data-toc]") ??
-          [];
-        let current = headings[0]?.i ?? 0;
-        hs.forEach((h) => {
-          if (h.getBoundingClientRect().top <= 130) {
-            current = Number((h.id ?? "").replace("toc-b-", "")) || current;
-          }
-        });
-        setActive(current);
+    const update = () => {
+      const hs =
+        contentRef.current?.querySelectorAll<HTMLElement>("h2[data-toc]") ??
+        [];
+      let current = headings[0]?.i ?? 0;
+      hs.forEach((h) => {
+        if (h.getBoundingClientRect().top <= 130) {
+          current = Number((h.id ?? "").replace("toc-b-", "")) || current;
+        }
       });
+      setActive(current);
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(raf);
-    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showToc]);
 
@@ -142,7 +135,7 @@ export function PostView({ post }: { post: Post }) {
                     key={i}
                     id={showToc ? `toc-b-${i}` : undefined}
                     data-toc={showToc ? "" : undefined}
-                    className="font-serif-sc mt-9 scroll-mt-24 text-xl tracking-tight"
+                    className="font-serif-song mt-9 scroll-mt-24 text-xl tracking-tight"
                   >
                     {b.text}
                   </h2>
@@ -216,14 +209,15 @@ export function PostView({ post }: { post: Post }) {
                     <button
                       key={i}
                       type="button"
-                      onClick={() =>
+                      onClick={() => {
+                        setActive(i);
                         document
                           .getElementById(`toc-b-${i}`)
                           ?.scrollIntoView({
                             behavior: "smooth",
                             block: "start",
-                          })
-                      }
+                          });
+                      }}
                       className={`flex w-full items-center gap-2 py-1 text-left text-xs transition-colors ${
                         active === i
                           ? "font-medium text-foreground"

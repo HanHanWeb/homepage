@@ -225,36 +225,6 @@ export function PostView({ post }: { post: Post }) {
         </article>
 
         <aside className="space-y-4 lg:sticky lg:top-20">
-          <ReadingBgPicker />
-          <section className="rounded-xl border bg-card px-4 py-3">
-            <div className="flex items-center gap-3">
-              <p className="min-w-0 flex-1 text-sm font-medium">阅读字号</p>
-              <div
-                className="flex overflow-hidden rounded-[9px] border"
-                role="group"
-                aria-label="调节正文字号"
-              >
-                {FONT_STEPS.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => changeFont(i)}
-                    aria-pressed={fontStep === i}
-                    className={`w-9 py-1.5 text-center text-xs transition-colors ${
-                      i > 0 ? "border-l" : ""
-                    } ${
-                      fontStep === i
-                        ? "bg-[#00bc7d]/10 font-medium text-[#00bc7d]"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {FONT_LABELS[i]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </section>
-
           {showToc && (
             <section className="rounded-xl border bg-card px-4 py-3">
               <div className="flex items-center gap-3 pb-1">
@@ -290,6 +260,35 @@ export function PostView({ post }: { post: Post }) {
               </div>
             </section>
           )}
+          <ReadingBgPicker />
+          <section className="rounded-xl border bg-card px-4 py-3">
+            <div className="flex items-center gap-3">
+              <p className="min-w-0 flex-1 text-sm font-medium">阅读字号</p>
+              <div
+                className="flex overflow-hidden rounded-[9px] border"
+                role="group"
+                aria-label="调节正文字号"
+              >
+                {FONT_STEPS.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => changeFont(i)}
+                    aria-pressed={fontStep === i}
+                    className={`w-9 py-1.5 text-center text-xs transition-colors ${
+                      i > 0 ? "border-l" : ""
+                    } ${
+                      fontStep === i
+                        ? "bg-[#00bc7d]/10 font-medium text-[#00bc7d]"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {FONT_LABELS[i]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
         </aside>
       </div>
     </main>

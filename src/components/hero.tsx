@@ -2,23 +2,22 @@
 
 import { GithubIcon } from "@/components/icons";
 import { InstallBadge } from "@/components/install-badge";
+import { Typewriter } from "@/components/typewriter";
 import { Button } from "@/components/ui/button";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { TiltCard } from "@/components/ui/tilt-card";
 import { useLanguage } from "@/components/language-provider";
-import {
-  AnimatedSpan,
-  Terminal,
-  TypingAnimation,
-} from "@/registry/magicui/terminal";
+import { AnimatedSpan, Terminal } from "@/registry/magicui/terminal";
 
 export function Hero() {
   const { t } = useLanguage();
-  const TERMINAL_LINES: Array<{ kind: "cmd" | "out"; text: string; at: number }> = [
+
+  const LINES: Array<{ kind: "cmd" | "out"; text: string; at: number }> = [
     { kind: "cmd", text: t.hero.terminal.whoami, at: 1150 },
     { kind: "out", text: t.hero.terminal.han, at: 1700 },
     { kind: "cmd", text: t.hero.terminal.catBio, at: 2150 },
     { kind: "out", text: t.hero.terminal.bio1, at: 2900 },
+    { kind: "out", text: t.hero.terminal.bio2, at: 3350 },
     { kind: "cmd", text: t.hero.terminal.lsSkills, at: 3800 },
     { kind: "out", text: t.hero.terminal.lsOutput, at: 4700 },
     { kind: "cmd", text: t.hero.terminal.curl, at: 5150 },
@@ -97,27 +96,22 @@ export function Hero() {
               sequence={false}
               className="bg-card text-sm shadow-lg [&_code]:font-mono [&_pre]:font-mono"
             >
-              {TERMINAL_LINES.map((line, i) =>
+              {LINES.map((line, i) =>
                 line.kind === "cmd" ? (
                   <AnimatedSpan
                     key={i}
                     className="flex gap-2"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: line.at / 1000,
-                      ease: "easeOut",
-                    }}
+                    transition={{ duration: 0.3, delay: line.at / 1000, ease: "easeOut" }}
                   >
                     <span className="text-green-500">❯</span>
-                    <TypingAnimation
-                      delay={line.at + 150}
-                      duration={50}
-                      startOnView={false}
-                    >
-                      {line.text}
-                    </TypingAnimation>
+                    <Typewriter
+                      phrases={[line.text]}
+                      loop={false}
+                      typeMs={50}
+                      startDelay={line.at + 150}
+                    />
                   </AnimatedSpan>
                 ) : (
                   <AnimatedSpan
@@ -125,11 +119,7 @@ export function Hero() {
                     className="text-muted-foreground"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{
-                      duration: 0.35,
-                      delay: line.at / 1000,
-                      ease: "easeOut",
-                    }}
+                    transition={{ duration: 0.35, delay: line.at / 1000, ease: "easeOut" }}
                   >
                     {line.text}
                   </AnimatedSpan>

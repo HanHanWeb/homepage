@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
+import { ReadingBgPicker } from "@/components/reading-bg";
 
 const FONT_STEPS = ["14px", "15px", "17px"];
 const FONT_LABELS = ["A-", "A", "A+"];
@@ -130,6 +131,7 @@ export function PostView({ post }: { post: Post }) {
         </article>
 
         <aside className="space-y-4 lg:sticky lg:top-20">
+          <ReadingBgPicker />
           <section className="rounded-xl border bg-card px-4 py-3">
             <div className="flex items-center gap-3">
               <p className="min-w-0 flex-1 text-sm font-medium">阅读字号</p>

@@ -143,6 +143,10 @@
   html {
     @apply font-sans;
   }
+  ::selection {
+    background: #00bc7d;
+    color: #fff;
+  }
 }
 
 /* 隐藏页面滚动条：滚动功能保留，仅不显示 */

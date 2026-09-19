@@ -2,13 +2,20 @@
 
 import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Menu } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { ReadingBgPicker } from "@/components/reading-bg";
 import { BlogBadges } from "@/components/blog-badges";
+import { BlogNav } from "@/components/blog/blog-nav";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 const FONT_STEPS = ["14px", "15px", "17px"];
 const FONT_LABELS = ["A-", "A", "A+"];
@@ -59,6 +66,7 @@ export function PostView({ post }: { post: Post }) {
   const showToc = headings.length >= 2;
   const [fontStep, setFontStep] = useState(1);
   const [active, setActive] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
   // 点击目录后的平滑滚动期间锁定高亮，避免路过中间章节时闪烁
   const clickLockRef = useRef(false);
@@ -118,8 +126,107 @@ export function PostView({ post }: { post: Post }) {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const fontSizeCard = (
+    <section className="rounded-xl border bg-card px-4 py-3">
+      <div className="flex items-center gap-3">
+        <p className="min-w-0 flex-1 text-sm font-medium">阅读字号</p>
+        <div
+          className="flex overflow-hidden rounded-[9px] border"
+          role="group"
+          aria-label="调节正文字号"
+        >
+          {FONT_STEPS.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => changeFont(i)}
+              aria-pressed={fontStep === i}
+              className={`flex h-6 w-9 items-center justify-center text-center text-xs transition-colors ${
+                i > 0 ? "border-l" : ""
+              } ${
+                fontStep === i
+                  ? "bg-[#00bc7d]/10 font-medium text-[#00bc7d]"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {FONT_LABELS[i]}
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  const tocCard = (closeAfter = false) =>
+    showToc ? (
+      <section className="rounded-xl border bg-card px-4 py-3">
+        <div className="flex items-center gap-3 pb-1">
+          <p className="min-w-0 flex-1 text-sm font-medium">本文目录</p>
+          <span className="font-mono text-[10px] tracking-widest text-muted-foreground/60">
+            #TOC
+          </span>
+        </div>
+        <div>
+          {headings.map(({ b, i }) => {
+            const text = b.kind === "heading" ? b.text : "";
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => {
+                  choose(i);
+                  if (closeAfter) setMenuOpen(false);
+                }}
+                className={`flex w-full items-center gap-2 py-1 text-left text-xs transition-colors ${
+                  active === i
+                    ? "font-medium text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <span
+                  aria-hidden
+                  className={`h-3.5 w-[3px] shrink-0 rounded-full ${
+                    active === i ? "bg-[#00bc7d]" : "bg-border"
+                  }`}
+                />
+                <span className="truncate">{text}</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    ) : null;
+
   return (
-    <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 pt-20 pb-16">
+    <>
+      <BlogNav
+        title={post.title}
+        menu={
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-label="打开侧边栏菜单"
+            className="rounded-full border bg-card p-2 text-foreground transition-colors hover:text-[#00bc7d]"
+          >
+            <Menu className="size-4" strokeWidth={1.5} />
+          </button>
+        }
+      />
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+        <SheetContent side="right" className="w-72 gap-4 overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>文章侧边栏</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4">
+            {tocCard(true)}
+            <ReadingBgPicker />
+            {fontSizeCard}
+            <BlogBadges />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 pt-20 pb-16">
       <nav
         aria-label="面包屑"
         className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground animate-blur-in"
@@ -225,74 +332,14 @@ export function PostView({ post }: { post: Post }) {
           </div>
         </article>
 
-        <aside className="space-y-4 lg:sticky lg:top-20">
-          {showToc && (
-            <section className="rounded-xl border bg-card px-4 py-3">
-              <div className="flex items-center gap-3 pb-1">
-                <p className="min-w-0 flex-1 text-sm font-medium">本文目录</p>
-                <span className="font-mono text-[10px] tracking-widest text-muted-foreground/60">
-                  #TOC
-                </span>
-              </div>
-              <div>
-                {headings.map(({ b, i }) => {
-                  const text = b.kind === "heading" ? b.text : "";
-                  return (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => choose(i)}
-                      className={`flex w-full items-center gap-2 py-1 text-left text-xs transition-colors ${
-                        active === i
-                          ? "font-medium text-foreground"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      <span
-                        aria-hidden
-                        className={`h-3.5 w-[3px] shrink-0 rounded-full ${
-                          active === i ? "bg-[#00bc7d]" : "bg-border"
-                        }`}
-                      />
-                      <span className="truncate">{text}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          )}
+        <aside className="hidden space-y-4 lg:sticky lg:top-20 lg:block">
+          {tocCard()}
           <ReadingBgPicker />
-          <section className="rounded-xl border bg-card px-4 py-3">
-            <div className="flex items-center gap-3">
-              <p className="min-w-0 flex-1 text-sm font-medium">阅读字号</p>
-              <div
-                className="flex overflow-hidden rounded-[9px] border"
-                role="group"
-                aria-label="调节正文字号"
-              >
-                {FONT_STEPS.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => changeFont(i)}
-                    aria-pressed={fontStep === i}
-                    className={`flex h-6 w-9 items-center justify-center text-center text-xs transition-colors ${
-                      i > 0 ? "border-l" : ""
-                    } ${
-                      fontStep === i
-                        ? "bg-[#00bc7d]/10 font-medium text-[#00bc7d]"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {FONT_LABELS[i]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </section>
+          {fontSizeCard}
           <BlogBadges />
         </aside>
       </div>
     </main>
+    </>
   );
 }

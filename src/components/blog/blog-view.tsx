@@ -6,6 +6,7 @@ import {
   Clock,
   Copy,
   FileText,
+  Menu,
   Rss,
   Search,
 } from "lucide-react";
@@ -15,13 +16,16 @@ import { useState } from "react";
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { HitokotoCard } from "@/components/hitokoto-card";
 import { BlogBadges } from "@/components/blog-badges";
+import { BlogNav } from "@/components/blog/blog-nav";
 import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export function BlogView({ posts }: { posts: Post[] }) {
   const [copied, setCopied] = useState(false);
   const [category, setCategory] = useState("全部");
   const [query, setQuery] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const categories = [
     "全部",
@@ -48,7 +52,52 @@ export function BlogView({ posts }: { posts: Post[] }) {
   };
 
   return (
-    <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 pt-20 pb-16">
+    <>
+      <BlogNav
+        menu={
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-label="打开侧边栏菜单"
+            className="rounded-full border bg-card p-2 text-foreground transition-colors hover:text-[#00bc7d]"
+          >
+            <Menu className="size-4" strokeWidth={1.5} />
+          </button>
+        }
+      />
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+        <SheetContent side="right" className="w-72 gap-4 overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>博客侧边栏</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4">
+            <section className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3">
+              <Rss className="size-4 shrink-0 text-[#00bc7d]" />
+              <p className="min-w-0 flex-1 text-sm font-medium">订阅更新</p>
+              <button
+                type="button"
+                onClick={copyFeedUrl}
+                aria-label={copied ? "已复制" : "复制订阅链接"}
+                className={`shrink-0 rounded-full border p-1.5 transition-colors ${
+                  copied
+                    ? "border-[#00bc7d]/60 bg-[#00bc7d]/10 text-[#00bc7d]"
+                    : "text-muted-foreground hover:border-[#00bc7d]/50 hover:text-[#00bc7d]"
+                }`}
+              >
+                {copied ? (
+                  <Check className="size-3.5" aria-hidden />
+                ) : (
+                  <Copy className="size-3.5" aria-hidden />
+                )}
+              </button>
+            </section>
+            <HitokotoCard />
+            <BlogBadges />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 pt-20 pb-16">
       <nav
         aria-label="面包屑"
         className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground"
@@ -154,7 +203,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
           )}
         </div>
 
-        <aside className="space-y-4 lg:sticky lg:top-20">
+        <aside className="hidden space-y-4 lg:sticky lg:top-20 lg:block">
           <section className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3">
             <Rss className="size-4 shrink-0 text-[#00bc7d]" />
             <p className="min-w-0 flex-1 text-sm font-medium">订阅更新</p>
@@ -180,5 +229,6 @@ export function BlogView({ posts }: { posts: Post[] }) {
         </aside>
       </div>
     </main>
+    </>
   );
 }

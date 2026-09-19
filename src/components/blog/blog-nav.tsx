@@ -1,10 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
-/** 博客页导航：左侧头像 + BLOG；详情页滚过文章标题后左侧替换为标题 */
-export function BlogNav({ title }: { title?: string }) {
+/** 博客页导航：左侧头像 + BLOG；详情页滚过文章标题后左侧替换为标题。
+ * menu 插槽渲染在右侧，仅移动端显示（用于打开侧边栏抽屉）。 */
+export function BlogNav({
+  title,
+  menu,
+}: {
+  title?: string;
+  menu?: ReactNode;
+}) {
   const [passed, setPassed] = useState(false);
 
   useEffect(() => {
@@ -22,7 +29,7 @@ export function BlogNav({ title }: { title?: string }) {
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-5xl items-center px-6">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
         <div className="relative min-w-0 flex-1">
           <Link
             href="/blog"
@@ -56,6 +63,7 @@ export function BlogNav({ title }: { title?: string }) {
             </span>
           )}
         </div>
+        {menu && <div className="lg:hidden">{menu}</div>}
       </div>
     </header>
   );

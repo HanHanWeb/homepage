@@ -13,7 +13,9 @@ export function HitokotoCard() {
   useEffect(() => {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 5000);
-    fetch("https://v1.hitokoto.cn/?max_length=30", { signal: controller.signal })
+    fetch("https://v1.hitokoto.cn/?c=k&max_length=30", {
+      signal: controller.signal,
+    })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
       .then((data) => {
         if (typeof data?.hitokoto === "string" && data.hitokoto) {

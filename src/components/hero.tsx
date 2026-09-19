@@ -17,7 +17,6 @@ export function Hero() {
     { kind: "out", text: t.hero.terminal.han, at: 1700 },
     { kind: "cmd", text: t.hero.terminal.catBio, at: 2150 },
     { kind: "out", text: t.hero.terminal.bio1, at: 2900 },
-    { kind: "out", text: t.hero.terminal.bio2, at: 3350 },
     { kind: "cmd", text: t.hero.terminal.lsSkills, at: 3800 },
     { kind: "out", text: t.hero.terminal.lsOutput, at: 4700 },
     { kind: "cmd", text: t.hero.terminal.curl, at: 5150 },

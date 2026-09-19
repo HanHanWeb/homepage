@@ -40,7 +40,7 @@ export function HitokotoCard() {
           #HITOKOTO
         </span>
       </div>
-      <p className="font-serif-sc text-[13.5px] leading-relaxed text-foreground/90">
+      <p className="font-serif-song text-[13.5px] leading-relaxed text-foreground/90">
         「{quote.text}」
       </p>
       <p className="mt-1.5 text-right text-xs text-muted-foreground">

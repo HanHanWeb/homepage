@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { BackToTop } from "@/components/back-to-top";
 import { PostView } from "@/components/blog/post-view";
-import { getPost } from "@/lib/blog-content";
+import { postExcerpt, postOgImage, getPost } from "@/lib/blog-content";
 
 export const revalidate = 300;
 
@@ -13,10 +13,27 @@ export async function generateMetadata(
   const { slug } = await props.params;
   const post = await getPost(slug);
   if (!post) return {};
+  const description = postExcerpt(post);
+  const image = postOgImage(post);
   return {
     title: `${post.title} — Han`,
-    description: post.description,
+    description,
     alternates: { canonical: `/blog/${slug}` },
+    openGraph: {
+      title: post.title,
+      description,
+      url: `/blog/${slug}`,
+      type: "article",
+      publishedTime: post.createdAt,
+      tags: post.tags,
+      images: image ? [image] : undefined,
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title: post.title,
+      description,
+      images: image ? [image] : undefined,
+    },
   };
 }
 

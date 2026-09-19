@@ -1,8 +1,7 @@
 import { listPosts } from "@/lib/blog-content";
+import { SITE_URL } from "@/lib/site";
 
 export const revalidate = 300;
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.hhan.me";
 
 function escapeXml(value: string): string {
   return value

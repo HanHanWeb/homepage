@@ -9,6 +9,12 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "博客 — Han",
   description: "记录学习、创作与思考。",
+  openGraph: {
+    title: "博客 — Han",
+    description: "记录学习、创作与思考。",
+    url: "/blog",
+    type: "website",
+  },
   alternates: {
     types: { "application/rss+xml": "/feed.xml" },
   },

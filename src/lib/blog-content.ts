@@ -119,6 +119,26 @@ export async function getPost(slug: string): Promise<Post | null> {
   return readPost(slug);
 }
 
+/** 分享/SEO 摘要：优先 frontmatter description，缺省时截取正文开头约 100 字 */
+export function postExcerpt(post: Post, max = 100): string {
+  if (post.description) return post.description;
+  const text = (post.content ?? "")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/[#>*`~|_\-[\]()]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.length > max ? `${text.slice(0, max)}…` : text;
+}
+
+/** 分享缩略图：取正文第一张图片的绝对路径；无图返回 undefined */
+export function postOgImage(post: Post): string | undefined {
+  const m = (post.content ?? "").match(/^!\[[^\]]*\]\(([^)]+)\)$/m);
+  if (!m) return undefined;
+  const src = m[1];
+  if (/^(https?:)?\/\//.test(src) || src.startsWith("/")) return src;
+  return `/blog/${post.slug}/${src}`;
+}
+
 let client: Client | null = null;
 
 function getClient(): Client | null {

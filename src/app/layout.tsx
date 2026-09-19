@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/components/language-provider";
 import { RouteTransition } from "@/components/route-transition";
 import { SuppressScriptWarning } from "@/components/suppress-script-warning";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SITE_URL } from "@/lib/site";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -15,9 +16,19 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  // Open Graph / Twitter 等相对链接以此为基准转成绝对地址
+  metadataBase: new URL(SITE_URL),
   title: "Han — Student · Developer · Designer",
   description:
     "一名来自中国的学生、开发者与设计师的个人主页。学生 · 开发者 · 设计师，记录学习与创作。",
+  openGraph: {
+    type: "website",
+    siteName: "Han",
+    locale: "zh_CN",
+    url: "/",
+    images: ["/icon.png"],
+  },
+  twitter: { card: "summary" },
   alternates: {
     types: { "application/rss+xml": "/feed.xml" },
   },

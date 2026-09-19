@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { changePostLikes, getPostLikes } from "@/lib/blog";
+import { changePostLikes, getPostLikes } from "@/lib/blog-content";
 
 type Params = { params: Promise<{ slug: string }> };
 

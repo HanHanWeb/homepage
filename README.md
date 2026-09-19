@@ -57,6 +57,36 @@ pnpm start
 
 打开 [http://localhost:3000](http://localhost:3000) 即可访问。
 
+## ✍️ 写博客
+
+文章以文件形式存储，每篇文章一个目录，方便直接整理与版本管理：
+
+```
+blog/
+└── nextstep2026/
+    ├── index.md            # 文章正文（frontmatter + Markdown）
+    ├── DSC00369.jpg        # 图片等资源，与正文同目录
+    └── ...
+```
+
+`index.md` 头部为 `---` 包裹的简单 frontmatter，图片在正文中用相对路径引用，由 `/blog/<slug>/<文件名>` 路由自动提供：
+
+```markdown
+---
+title: 文章标题
+description: 列表页与 RSS 显示的摘要。
+category: 随笔
+tags: [标签一, 标签二]
+date: 2026-07-06
+---
+
+正文段落……
+
+![图片说明](DSC00369.jpg)
+```
+
+目录名即文章 slug（访问地址 `/blog/<slug>`）。新增或修改文章后无需重启，约 1 分钟内生效（生产构建下随下次重新生成生效）。文章的「有用」计数存放在 Turso 数据库的 `post_likes` 表，初始化执行 `node scripts/setup-blog-db.mjs`（需要 `.env.local` 中的 `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN`）。
+
 ## 📄 许可证
 
 使用 [MIT](LICENSE) 许可证开源。

@@ -12,7 +12,7 @@ import { LanguageToggle } from "@/components/language-toggle";
 import { BottomGlow } from "@/components/ui/bottom-glow";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { ScrollProgress } from "@/components/scroll-progress";
-import { listPosts } from "@/lib/blog";
+import { listPosts } from "@/lib/blog-content";
 
 export const revalidate = 300;
 

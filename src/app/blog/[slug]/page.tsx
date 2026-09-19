@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { BackToTop } from "@/components/back-to-top";
 import { PostView } from "@/components/blog/post-view";
-import { getPost } from "@/lib/blog";
+import { getPost } from "@/lib/blog-content";
 
 export const revalidate = 300;
 

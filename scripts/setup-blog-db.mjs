@@ -1,5 +1,6 @@
 /**
- * 初始化 Turso 博客表结构（不写入数据）。
+ * 初始化博客所需的数据表。文章正文以文件形式存放在 blog/<slug>/ 目录，
+ * 数据库只存「有用」计数（post_likes 表）。
  * 用法：node scripts/setup-blog-db.mjs
  * 需要 .env.local 中的 TURSO_DATABASE_URL / TURSO_AUTH_TOKEN。
  */
@@ -23,26 +24,8 @@ const client = createClient({
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
-await client.execute(`
-  CREATE TABLE IF NOT EXISTS posts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    slug TEXT NOT NULL UNIQUE,
-    title TEXT NOT NULL,
-    description TEXT NOT NULL DEFAULT '',
-    category TEXT NOT NULL DEFAULT '随笔',
-    tags TEXT NOT NULL DEFAULT '[]',
-    word_count INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  )
-`);
+await client.execute(
+  "CREATE TABLE IF NOT EXISTS post_likes (slug TEXT PRIMARY KEY, count INTEGER NOT NULL DEFAULT 0)",
+);
 
-// 旧表迁移：word_count 列不存在时补加
-try {
-  await client.execute("ALTER TABLE posts ADD COLUMN word_count INTEGER NOT NULL DEFAULT 0");
-  console.log("已添加 word_count 列。");
-} catch (e) {
-  if (!String(e.message).includes("duplicate column")) throw e;
-}
-
-const count = await client.execute("SELECT COUNT(*) AS n FROM posts");
-console.log(`博客表初始化完成，当前 ${count.rows[0].n} 篇文章。`);
+console.log("post_likes 表已就绪。文章请直接添加到 blog/<slug>/index.md。");

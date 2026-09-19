@@ -347,11 +347,17 @@ export function PostView({ post }: { post: Post }) {
                 );
               }
               if (b.kind === "image") {
+                // 正文里的相对路径图片位于文章目录 blog/<slug>/ 下；
+                // 页面 URL 无尾斜杠时浏览器会把相对路径解析到上级，需补全为绝对路径
+                const src =
+                  b.src.startsWith("/") || /^(https?:)?\/\//.test(b.src)
+                    ? b.src
+                    : `/blog/${post.slug}/${b.src}`;
                 return (
                   <span key={i} className="block">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={b.src}
+                      src={src}
                       alt={b.alt}
                       loading="eager"
                       data-fancybox="post"

@@ -1,4 +1,4 @@
-import { listPosts } from "@/lib/blog";
+import { listPosts } from "@/lib/blog-content";
 
 export const revalidate = 300;
 

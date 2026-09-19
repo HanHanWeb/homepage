@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { BackToTop } from "@/components/back-to-top";
 import { BlogView } from "@/components/blog/blog-view";
-import { listPosts } from "@/lib/blog";
+import { listPosts } from "@/lib/blog-content";
 
 export const revalidate = 300;
 

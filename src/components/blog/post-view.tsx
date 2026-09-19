@@ -85,19 +85,25 @@ export function PostView({ post }: { post: Post }) {
     }
   }, [post.slug]);
 
-  const markUseful = () => {
-    if (liked) return;
-    let count = 1;
+  const toggleUseful = () => {
+    let count = likeCount;
     try {
       const store = JSON.parse(localStorage.getItem("post-likes") ?? "{}");
-      count = (Number(store[post.slug]) || 0) + 1;
-      store[post.slug] = count;
+      if (liked) {
+        // 撤销
+        count = Math.max(0, (Number(store[post.slug]) || 0) - 1);
+        if (count > 0) store[post.slug] = count;
+        else delete store[post.slug];
+      } else {
+        count = (Number(store[post.slug]) || 0) + 1;
+        store[post.slug] = count;
+      }
       localStorage.setItem("post-likes", JSON.stringify(store));
+      setLikeCount(count);
     } catch {
       // 存储不可用时仅本次会话生效
     }
-    setLiked(true);
-    setLikeCount(count);
+    setLiked(!liked);
   };
 
   // 正文图片灯箱
@@ -359,14 +365,14 @@ export function PostView({ post }: { post: Post }) {
           <div className="mt-10 flex justify-center">
             <button
               type="button"
-              onClick={markUseful}
-              disabled={liked}
+              onClick={toggleUseful}
               aria-pressed={liked}
               className={`inline-flex items-center gap-2 rounded-full border px-5 py-2 text-sm transition-colors ${
                 liked
                   ? "border-[#00bc7d]/60 bg-[#00bc7d]/10 text-[#00bc7d]"
                   : "border-border bg-card text-muted-foreground hover:border-[#00bc7d]/50 hover:text-[#00bc7d]"
               }`}
+            >
             >
               <Triangle
                 className={`size-4 ${liked ? "fill-[#00bc7d] text-[#00bc7d]" : ""}`}

@@ -1,0 +1,2602 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>功能建议预览 — Han 个人主页</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --fg: #171717;
+    --muted: #737373;
+    --muted2: #a3a3a3;
+    --border: rgba(0,0,0,.1);
+    --accent: #00bc7d;
+    --card: #fff;
+    --radius: 12px;
+  }
+  body {
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    background: #fafafa;
+    color: var(--fg);
+    padding: 48px 0 100px;
+  }
+  .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+  .wrap { width: 760px; margin: 0 auto; }
+
+  .page-head { margin-bottom: 56px; }
+  .page-head h1 { font-size: 24px; letter-spacing: -0.02em; }
+  .page-head p { font-size: 13.5px; color: var(--muted); margin-top: 8px; line-height: 1.7; }
+
+  .mod { margin-bottom: 64px; }
+  .mod-label { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+  .mod-label b { font-size: 16px; }
+  .mod-label b em { font-style: normal; color: var(--accent); margin-right: 10px; }
+  .mod-label span { font-size: 12px; letter-spacing: 0.12em; color: var(--muted2); }
+  .mod-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+  .mod-desc .where { color: var(--accent); }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .chip {
+    display: inline-block; border: 1px solid var(--border); border-radius: 999px;
+    padding: 2px 10px; font-size: 12px; color: var(--muted);
+  }
+
+  /* 1 状态栏 */
+  .now { display: flex; align-items: stretch; }
+  .now > div { padding: 16px 20px; }
+  .now > div + div { border-left: 1px solid var(--border); }
+  .now .k { font-size: 11px; letter-spacing: 0.14em; color: var(--muted2); margin-bottom: 6px; }
+  .now .v { font-size: 15px; font-weight: 600; }
+  .now .v small { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 4px; }
+  .now .bar { margin-top: 8px; height: 4px; border-radius: 99px; background: rgba(0,0,0,.07); overflow: hidden; }
+  .now .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+
+  /* 2 时间线 */
+  .tl { padding: 22px 24px; }
+  .tl-item { position: relative; padding: 0 0 22px 24px; border-left: 1px solid var(--border); }
+  .tl-item:last-child { padding-bottom: 2px; border-left-color: transparent; }
+  .tl-item::before {
+    content: ""; position: absolute; left: -5px; top: 3px;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 0 3px rgba(0,188,125,.15);
+  }
+  .tl-item .t { font-size: 12px; color: var(--muted2); }
+  .tl-item .h { font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .tl-item .d { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.6; }
+
+  /* 3 数据统计 */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; }
+  .stats > div { padding: 18px 20px; }
+  .stats > div + div { border-left: 1px solid var(--border); }
+  .stats .num { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+  .stats .num i { font-style: normal; color: var(--accent); }
+  .stats .k { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* 4 博客列表 */
+  .posts { overflow: hidden; }
+  .posts a {
+    display: flex; align-items: baseline; gap: 14px;
+    padding: 14px 20px; text-decoration: none; color: inherit;
+    border-bottom: 1px solid var(--border); transition: background .15s;
+  }
+  .posts a:last-child { border-bottom: none; }
+  .posts a:hover { background: rgba(0,0,0,.03); }
+  .posts .title { font-size: 14px; font-weight: 500; flex: 1; min-width: 0; }
+  .posts .meta { font-size: 12px; color: var(--muted2); white-space: nowrap; }
+
+  /* 5 摄影 */
+  .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .gallery figure {
+    position: relative; border-radius: 10px; overflow: hidden;
+    aspect-ratio: 4/3; background: #ececec;
+  }
+  .gallery img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+  .gallery figure:hover img { transform: scale(1.06); }
+  .gallery figcaption {
+    position: absolute; inset: auto 0 0 0; padding: 20px 12px 10px;
+    background: linear-gradient(transparent, rgba(0,0,0,.55));
+    color: #fff; font-size: 12px; opacity: 0; transition: opacity .3s;
+  }
+  .gallery figure:hover figcaption { opacity: 1; }
+
+  /* 6 一言 */
+  .hitokota { padding: 20px 24px; display: flex; align-items: flex-start; gap: 14px; }
+  .hitokota .mark { font-family: Georgia, serif; font-size: 40px; line-height: 1; color: rgba(0,188,125,.35); }
+  .hitokota blockquote { flex: 1; }
+  .hitokota .txt { font-size: 14px; line-height: 1.8; }
+  .hitokota .from { font-size: 12px; color: var(--muted2); margin-top: 8px; }
+  .hitokota button {
+    border: 1px solid var(--border); background: #fff; border-radius: 999px;
+    padding: 5px 14px; font-size: 12px; color: var(--muted); cursor: pointer;
+  }
+  .hitokota button:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* 7 技能可视化 */
+  .skillbars { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 36px; }
+  .skill .row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 7px; }
+  .skill .row b { font-weight: 500; }
+  .skill .row span { color: var(--muted2); font-size: 12px; }
+  .skill .bar { height: 5px; border-radius: 99px; background: rgba(0,0,0,.07); overflow: hidden; }
+  .skill .bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, rgba(0,188,125,.55), var(--accent)); }
+
+  /* 8 友链 */
+  .friends { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .friend {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 18px 10px; text-decoration: none; color: inherit;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .friend:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+  .friend img { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border); }
+  .friend .n { font-size: 13px; font-weight: 500; }
+  .friend .d { font-size: 11px; color: var(--muted2); text-align: center; }
+
+  /* 9 命令面板 mock */
+  .cmdk-backdrop {
+    border-radius: var(--radius); overflow: hidden; position: relative;
+    padding: 26px 0 30px;
+    background:
+      linear-gradient(rgba(250,250,250,.55), rgba(250,250,250,.55)),
+      repeating-linear-gradient(45deg, #f0f0f0 0 12px, #f7f7f7 12px 24px);
+  }
+  .cmdk {
+    width: 480px; margin: 0 auto; background: #fff;
+    border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.14); overflow: hidden;
+  }
+  .cmdk .search { display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+  .cmdk .search svg { flex-shrink: 0; color: var(--muted2); }
+  .cmdk .search input { border: none; outline: none; flex: 1; font-size: 14px; background: transparent; }
+  .cmdk .search kbd {
+    font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--muted2);
+    border: 1px solid var(--border); border-radius: 5px; padding: 2px 6px;
+  }
+  .cmdk .group { padding: 8px; }
+  .cmdk .group .g { font-size: 11px; letter-spacing: .1em; color: var(--muted2); padding: 6px 10px; }
+  .cmdk .item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 8px; font-size: 13.5px;
+  }
+  .cmdk .item.on { background: rgba(0,188,125,.09); }
+  .cmdk .item svg { color: var(--muted); }
+  .cmdk .item .hint { margin-left: auto; font-size: 11px; color: var(--muted2); }
+
+  /* 回到顶部 */
+  .totop {
+    position: fixed; right: 34px; bottom: 34px; z-index: 50;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #fff; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,.08); cursor: pointer;
+    color: var(--muted); transition: color .2s, transform .2s;
+  }
+  .totop:hover { color: var(--accent); transform: translateY(-2px); }
+
+  /* 10 主题切换 */
+  .seg { display: inline-flex; align-items: center; gap: 2px; padding: 4px; border: 1px solid var(--border); border-radius: 999px; background: #fff; }
+  .seg button { width: 36px; height: 30px; border: none; background: transparent; border-radius: 999px; cursor: pointer; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: background .15s, color .15s; }
+  .seg button.on { background: rgba(0,188,125,.12); color: var(--accent); }
+
+  /* 11 打字机 */
+  .type { padding: 20px 24px; }
+  .type .line { display: flex; align-items: center; gap: 12px; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 14.5px; }
+  .type .pmt { color: var(--accent); }
+  .type .caret { width: 8px; height: 17px; background: var(--accent); animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* 12 正在播放 */
+  .np { display: flex; align-items: center; gap: 16px; padding: 18px 24px; }
+  .np .disc { width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0; background: conic-gradient(#e7e7e7, #fff 40%, #e7e7e7 60%, #fff); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; animation: spin 3.5s linear infinite; }
+  .np .disc i { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 1px solid var(--border); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .np .meta { flex: 1; min-width: 0; }
+  .np .meta b { font-size: 14px; font-weight: 600; display: block; }
+  .np .meta > span { font-size: 12px; color: var(--muted); }
+  .np .prog { margin-top: 9px; display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted2); }
+  .np .prog .bar { flex: 1; height: 4px; border-radius: 99px; background: rgba(0,0,0,.07); overflow: hidden; }
+  .np .prog .bar i { display: block; height: 100%; width: 62%; background: var(--accent); border-radius: 99px; }
+
+  /* 13 站内搜索 */
+  .searchbox { overflow: hidden; }
+  .searchbox .row { display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+  .searchbox .row svg { flex-shrink: 0; color: var(--muted2); }
+  .searchbox input { flex: 1; min-width: 0; border: none; outline: none; font-size: 14px; background: transparent; font-family: inherit; }
+  .searchbox kbd { font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--muted2); border: 1px solid var(--border); border-radius: 5px; padding: 2px 6px; }
+  .searchbox .res { padding: 8px; }
+  .searchbox .res .r { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13.5px; }
+  .searchbox .res .r.on { background: rgba(0,188,125,.09); }
+  .searchbox .res .r em { font-style: normal; color: var(--accent); }
+  .searchbox .res .r .tag { margin-left: auto; font-size: 11px; color: var(--muted2); }
+
+  /* 15 鼠标光晕 */
+  .glowdemo { position: relative; height: 150px; border-radius: var(--radius); border: 1px dashed var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; }
+  .glowdemo::before { content: ""; position: absolute; left: var(--gx, 50%); top: var(--gy, 50%); width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(0,188,125,.24), transparent 65%); transform: translate(-50%,-50%); transition: left .25s ease, top .25s ease; }
+
+  /* 16 粒子网格 */
+  .particles { position: relative; height: 150px; border-radius: var(--radius); overflow: hidden; background: radial-gradient(circle, rgba(0,0,0,.13) 1.2px, transparent 1.4px); background-size: 24px 24px; display: flex; align-items: center; justify-content: center; }
+  .particles::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,188,125,.32) 1.4px, transparent 1.6px); background-size: 24px 24px; background-position: 12px 12px; }
+  .particles .chip { position: relative; z-index: 1; background: #fff; }
+
+  /* 17 快捷键 */
+  .hotkeys { padding: 8px 16px; }
+  .hotkeys .hk { display: flex; align-items: center; gap: 8px; padding: 9px 6px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .hotkeys .hk:last-child { border-bottom: none; }
+  .hotkeys kbd { font-family: ui-monospace, Consolas, monospace; font-size: 11px; background: #fff; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 2px 7px; color: var(--muted); }
+  .hotkeys .d { margin-left: auto; font-size: 11.5px; color: var(--muted2); }
+
+  /* 18 文章目录 */
+  .toc { padding: 10px 16px; }
+  .toc .t { font-size: 11px; letter-spacing: .12em; color: var(--muted2); padding: 6px 10px; }
+  .toc .row { padding: 7px 10px 7px 12px; font-size: 13px; color: var(--muted); border-left: 2px solid transparent; }
+  .toc .row.on { border-left-color: var(--accent); color: var(--fg); font-weight: 500; background: rgba(0,188,125,.06); }
+  .toc .row.l2 { padding-left: 26px; font-size: 12.5px; }
+
+  /* 19 代码块复制 */
+  .codeblock { border-radius: 10px; overflow: hidden; background: #171717; }
+  .codeblock .bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .codeblock .lang { font-size: 11px; color: rgba(255,255,255,.45); font-family: ui-monospace, Consolas, monospace; }
+  .codeblock .copy { font-size: 11px; color: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.22); border-radius: 5px; padding: 2px 9px; background: transparent; cursor: pointer; }
+  .codeblock .copy:hover { color: #fff; border-color: rgba(255,255,255,.45); }
+  .codeblock pre { padding: 14px 16px; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; line-height: 1.75; color: #e5e5e5; overflow-x: auto; }
+  .codeblock .c { color: #737373; }
+  .codeblock .g { color: #86efac; }
+
+  /* 20 公式 */
+  .math { padding: 22px 24px; display: flex; align-items: center; gap: 26px; }
+  .math .formula { font-family: Georgia, "Times New Roman", serif; font-size: 17px; font-style: italic; }
+  .math .formula .op { color: var(--accent); }
+  .math .note { margin-left: auto; font-size: 11px; color: var(--muted2); }
+
+  /* 21 RSS */
+  .rss { display: flex; align-items: center; gap: 14px; padding: 18px 24px; }
+  .rss .ico { width: 42px; height: 42px; border-radius: 10px; background: rgba(0,188,125,.1); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .rss .txt { flex: 1; min-width: 0; }
+  .rss .txt b { font-size: 14px; font-weight: 600; display: block; }
+  .rss .txt span { font-size: 12px; color: var(--muted); }
+  .rss button { border: 1px solid var(--border); background: #fff; border-radius: 999px; padding: 6px 16px; font-size: 12.5px; color: var(--fg); cursor: pointer; transition: border-color .15s, color .15s; }
+  .rss button:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* 22 页脚导航 */
+  .sitefoot { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 20px 24px; }
+  .sitefoot .col b { display: block; font-size: 11px; letter-spacing: .12em; color: var(--muted2); font-weight: 500; margin-bottom: 10px; }
+  .sitefoot a { display: block; font-size: 13px; color: var(--muted); text-decoration: none; padding: 3px 0; transition: color .15s; }
+  .sitefoot a:hover { color: var(--accent); }
+
+  /* 23 灯箱 */
+  .lightbox { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 16/9; background: #ececec; }
+  .lightbox img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .lightbox .nav { position: absolute; top: 0; bottom: 0; width: 44px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; background: rgba(0,0,0,.25); opacity: 0; transition: opacity .2s; cursor: pointer; user-select: none; }
+  .lightbox:hover .nav { opacity: 1; }
+  .lightbox .nav.l { left: 0; }
+  .lightbox .nav.r { right: 0; }
+  .lightbox .close { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,.45); color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+  /* 24 浏览量 */
+  .views { overflow: hidden; }
+  .views .v { display: flex; align-items: center; gap: 12px; padding: 12px 20px; font-size: 13.5px; border-bottom: 1px solid var(--border); }
+  .views .v:last-child { border-bottom: none; }
+  .views .v:hover { background: rgba(0,0,0,.03); }
+  .views .cnt { margin-left: auto; display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted2); }
+
+  /* 25 访客计数 */
+  .visitors { display: flex; overflow: hidden; }
+  .visitors > div { flex: 1; padding: 18px 20px; text-align: center; }
+  .visitors > div + div { border-left: 1px solid var(--border); }
+  .visitors .num { font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
+  .visitors .num i { font-style: normal; color: var(--accent); }
+  .visitors .k { font-size: 11px; letter-spacing: .1em; color: var(--muted2); margin-top: 5px; }
+
+  /* 26 公告条 */
+  .notice { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid rgba(0,188,125,.25); border-radius: 10px; background: rgba(0,188,125,.06); font-size: 12.5px; }
+  .notice .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .notice .x { margin-left: auto; border: none; background: none; color: var(--muted2); cursor: pointer; font-size: 14px; padding: 2px 4px; }
+  .notice .x:hover { color: var(--fg); }
+
+  /* 27 天气 */
+  .weather { display: flex; align-items: center; gap: 16px; padding: 18px 24px; }
+  .weather .wico { color: var(--muted); flex-shrink: 0; }
+  .weather .temp { font-size: 34px; font-weight: 700; letter-spacing: -.03em; }
+  .weather .temp small { font-size: 14px; color: var(--muted); font-weight: 400; margin-left: 2px; }
+  .weather .det { flex: 1; font-size: 12px; color: var(--muted); line-height: 1.75; }
+  .weather .det b { color: var(--fg); font-weight: 600; }
+  .weather .aqi { text-align: right; font-size: 11px; color: var(--muted2); }
+  .weather .aqi b { display: block; font-size: 15px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+
+  /* 28 动态标题 */
+  .tabs-demo { display: flex; gap: 8px; padding: 18px 24px 0; }
+  .tabs-demo .tab { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--border); border-bottom: none; border-radius: 9px 9px 0 0; font-size: 12.5px; color: var(--muted); background: #fafafa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
+  .tabs-demo .tab.on { background: #fff; color: var(--fg); }
+  .tabs-demo .tab .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .tabs-body { border-top: 1px solid var(--border); padding: 26px 24px; text-align: center; font-size: 12px; color: var(--muted2); }
+
+  /* 29 开机动画 */
+  .boot { border-radius: 10px; background: #171717; padding: 18px 20px; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; line-height: 1.95; color: #a3a3a3; }
+  .boot .ok { color: var(--accent); }
+  .boot .bar { margin-top: 12px; height: 3px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; }
+  .boot .bar i { display: block; height: 100%; background: linear-gradient(90deg, rgba(0,188,125,.35), var(--accent)); animation: bootbar 2.2s ease-in-out infinite alternate; }
+  @keyframes bootbar { from { width: 34%; } to { width: 92%; } }
+  .boot .cursor { display: inline-block; width: 7px; height: 13px; background: var(--accent); vertical-align: -2px; margin-left: 6px; animation: blink 1s steps(1) infinite; }
+
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: rgba(0,0,0,.05); border-radius: 4px; padding: 1px 5px; }
+
+  /* ========== 30-39 导航与布局 ========== */
+  .navbar { display: flex; align-items: center; gap: 18px; padding: 10px 18px; }
+  .navbar .logo { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .navbar .logo i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .navbar .links { display: flex; gap: 14px; font-size: 13px; color: var(--muted); }
+  .navbar .links b { color: var(--fg); font-weight: 600; }
+  .navbar .links span { cursor: pointer; }
+  .navbar .links span:hover { color: var(--accent); }
+  .navbar .right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .navbar .right .chip { cursor: pointer; }
+
+  .breadcrumb { display: flex; align-items: center; gap: 8px; padding: 12px 18px; font-size: 12.5px; color: var(--muted2); }
+  .breadcrumb b { color: var(--fg); font-weight: 500; cursor: pointer; }
+  .breadcrumb b:hover { color: var(--accent); }
+
+  .pager { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 14px 18px; }
+  .pager button { min-width: 30px; height: 30px; border: 1px solid var(--border); background: #fff; border-radius: 7px; font-size: 12.5px; color: var(--muted); cursor: pointer; font-family: inherit; }
+  .pager button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .pager button:hover:not(.on) { border-color: var(--accent); color: var(--accent); }
+
+  .tagcloud { padding: 18px 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .tagcloud span { border: 1px solid var(--border); border-radius: 999px; color: var(--muted); padding: 3px 12px; cursor: pointer; }
+  .tagcloud span:hover { color: var(--accent); border-color: var(--accent); }
+  .tagcloud .s1 { font-size: 11px; }
+  .tagcloud .s2 { font-size: 12.5px; }
+  .tagcloud .s3 { font-size: 14px; font-weight: 600; color: var(--fg); }
+
+  .archive { padding: 6px 18px; }
+  .archive .row { display: flex; justify-content: space-between; padding: 9px 6px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .archive .row:last-child { border-bottom: none; }
+  .archive .row b { font-weight: 500; }
+  .archive .row span { color: var(--muted2); font-size: 12px; font-family: ui-monospace, Consolas, monospace; }
+
+  .filters { display: flex; gap: 8px; padding: 14px 18px; flex-wrap: wrap; }
+  .filters .f { border: 1px solid var(--border); border-radius: 999px; padding: 4px 14px; font-size: 12.5px; color: var(--muted); cursor: pointer; }
+  .filters .f.on { background: rgba(0,188,125,.1); border-color: var(--accent); color: var(--accent); }
+
+  .hscroll { display: flex; gap: 10px; overflow-x: auto; padding: 16px 18px; scroll-snap-type: x mandatory; }
+  .hscroll .item { flex: 0 0 150px; scroll-snap-align: start; border: 1px solid var(--border); border-radius: 10px; padding: 14px; font-size: 12.5px; background: #fff; }
+  .hscroll .item b { display: block; font-size: 13px; margin-bottom: 4px; }
+  .hscroll .item span { color: var(--muted2); font-size: 11.5px; }
+
+  .drawer { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+  .drawer .menu { display: flex; flex-direction: column; gap: 2px; padding: 10px 18px; }
+  .drawer .menu span { padding: 8px 6px; font-size: 13.5px; color: var(--muted); border-radius: 7px; }
+  .drawer .menu span.on { background: rgba(0,188,125,.09); color: var(--accent); font-weight: 500; }
+  .hamburger { display: flex; flex-direction: column; gap: 4px; width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; align-items: center; justify-content: center; background: #fff; }
+  .hamburger i { width: 15px; height: 2px; background: var(--muted); border-radius: 2px; }
+
+  .bottombar { display: flex; justify-content: space-around; padding: 10px 0; }
+  .bottombar .it { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10.5px; color: var(--muted2); }
+  .bottombar .it.on { color: var(--accent); }
+
+  .fab { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; padding: 18px 20px; }
+  .fab .btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.08); display: flex; align-items: center; justify-content: center; color: var(--muted); cursor: pointer; }
+  .fab .btn:hover { color: var(--accent); border-color: var(--accent); }
+  .fab .btn.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ========== 40-49 内容与排版 ========== */
+  .quote { padding: 22px 26px; }
+  .quote .mark { font-family: Georgia, serif; font-size: 44px; color: rgba(0,188,125,.35); line-height: 1; }
+  .quote p { font-size: 14px; line-height: 1.8; margin-top: 6px; }
+  .quote .from { font-size: 12px; color: var(--muted2); margin-top: 8px; }
+
+  .callouts { display: flex; flex-direction: column; gap: 10px; padding: 18px; }
+  .callout { display: flex; gap: 10px; align-items: flex-start; padding: 11px 14px; border-radius: 9px; font-size: 12.5px; line-height: 1.6; }
+  .callout .ic { flex-shrink: 0; font-size: 13px; }
+  .callout.info { background: rgba(59,130,246,.07); border: 1px solid rgba(59,130,246,.25); color: #1d4ed8; }
+  .callout.ok { background: rgba(0,188,125,.07); border: 1px solid rgba(0,188,125,.25); color: #047857; }
+  .callout.warn { background: rgba(245,158,11,.09); border: 1px solid rgba(245,158,11,.3); color: #b45309; }
+  .callout.err { background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.25); color: #b91c1c; }
+
+  .acc .item { border-bottom: 1px solid var(--border); }
+  .acc .item:last-child { border-bottom: none; }
+  .acc .head { display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; font-size: 13.5px; cursor: pointer; font-weight: 500; }
+  .acc .head span { color: var(--muted2); font-size: 12px; transition: transform .2s; }
+  .acc .item.open .head span { transform: rotate(45deg); }
+  .acc .body { padding: 2px 18px 14px; font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+
+  .tabs { padding: 8px; }
+  .tabs .bar { display: flex; gap: 4px; padding: 0 6px; border-bottom: 1px solid var(--border); }
+  .tabs .bar span { padding: 8px 14px; font-size: 13px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+  .tabs .bar span.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+  .tabs .panel { padding: 14px 12px 6px; font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+
+  .masonry { column-count: 3; column-gap: 10px; padding: 18px; }
+  .masonry .m { break-inside: avoid; border-radius: 8px; background: #ececec; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: var(--muted2); font-size: 11px; }
+  .masonry .m.on { background: rgba(0,188,125,.12); color: var(--accent); }
+
+  .video { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 16/9; background: #171717; display: flex; align-items: center; justify-content: center; }
+  .video .play { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 17px; padding-left: 3px; cursor: pointer; }
+  .video .time { position: absolute; right: 10px; bottom: 10px; font-size: 11px; color: #fff; background: rgba(0,0,0,.5); border-radius: 5px; padding: 2px 7px; font-family: ui-monospace, Consolas, monospace; }
+
+  .audio { display: flex; align-items: center; gap: 14px; padding: 16px 20px; }
+  .audio .play { width: 38px; height: 38px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; padding-left: 2px; flex-shrink: 0; }
+  .audio .meta { flex: 1; min-width: 0; }
+  .audio .meta b { font-size: 13px; display: block; }
+  .audio .meta span { font-size: 11.5px; color: var(--muted); }
+  .audio .waves { display: flex; align-items: center; gap: 2.5px; height: 26px; }
+  .audio .waves i { width: 3px; border-radius: 2px; background: var(--accent); opacity: .75; }
+
+  .table { overflow-x: auto; }
+  .table table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .table th { text-align: left; font-size: 11px; letter-spacing: .1em; color: var(--muted2); font-weight: 500; padding: 10px 18px 8px; border-bottom: 1px solid var(--border); }
+  .table td { padding: 9px 18px; border-bottom: 1px solid var(--border); }
+  .table tr:last-child td { border-bottom: none; }
+  .table .st { color: var(--accent); font-weight: 600; }
+  .table .sort { color: var(--muted2); font-size: 10px; margin-left: 3px; }
+
+  .media { display: flex; gap: 16px; padding: 16px 18px; }
+  .media img { width: 110px; height: 82px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+  .media .txt b { font-size: 14px; font-weight: 600; }
+  .media .txt p { font-size: 12.5px; color: var(--muted); margin-top: 5px; line-height: 1.65; }
+  .media .txt .meta { font-size: 11.5px; color: var(--muted2); margin-top: 7px; }
+
+  .steps { display: flex; align-items: center; padding: 20px 24px; }
+  .steps .st { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--muted2); white-space: nowrap; }
+  .steps .dot { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; background: #fff; }
+  .steps .st.done .dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .steps .st.now .dot { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .steps .line { flex: 1; height: 1px; background: var(--border); margin: 0 12px; }
+  .steps .line.done { background: var(--accent); }
+
+  /* ========== 50-59 动效与趣味 ========== */
+  .parallax { position: relative; height: 170px; border-radius: 10px; overflow: hidden; background: linear-gradient(#f0f0f0, #e3e3e3); display: flex; align-items: center; justify-content: center; }
+  .parallax .layer { position: absolute; border-radius: 50%; }
+  .parallax .l1 { width: 90px; height: 90px; background: rgba(0,188,125,.25); top: 30px; left: 60px; }
+  .parallax .l2 { width: 50px; height: 50px; background: rgba(0,188,125,.4); bottom: 26px; right: 80px; }
+  .parallax .l3 { width: 26px; height: 26px; background: rgba(0,0,0,.15); top: 70px; right: 160px; }
+  .parallax span { position: relative; z-index: 1; }
+
+  .magnetic { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 24px; }
+  .magnetic button { width: 86px; height: 86px; border-radius: 50%; border: 1px solid var(--border); background: #fff; font-size: 13px; color: var(--muted); box-shadow: 0 10px 24px rgba(0,0,0,.08); cursor: pointer; transition: transform .2s; font-family: inherit; }
+  .magnetic button:hover { transform: scale(1.08); border-color: var(--accent); color: var(--accent); }
+
+  .ripple { position: relative; padding: 26px; display: flex; justify-content: center; }
+  .ripple .btn { position: relative; overflow: hidden; border: none; background: var(--accent); color: #fff; font-size: 13px; padding: 10px 26px; border-radius: 999px; cursor: pointer; }
+  .ripple .r { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,.5); left: 38px; top: 12px; }
+
+  .countup { display: flex; }
+  .countup > div { flex: 1; text-align: center; padding: 20px 12px; }
+  .countup > div + div { border-left: 1px solid var(--border); }
+  .countup .num { font-size: 26px; font-weight: 800; letter-spacing: -.02em; font-family: ui-monospace, Consolas, monospace; }
+  .countup .num i { font-style: normal; color: var(--accent); }
+  .countup .k { font-size: 11.5px; color: var(--muted); margin-top: 5px; }
+
+  .skeleton { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .sk { border-radius: 7px; background: linear-gradient(90deg,#ececec 25%,#f5f5f5 37%,#ececec 63%); background-size: 400% 100%; animation: skload 1.4s ease infinite; }
+  @keyframes skload { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+  .sk.l1 { height: 14px; width: 60%; } .sk.l2 { height: 14px; width: 85%; } .sk.l3 { height: 14px; width: 75%; } .sk.cov { height: 90px; width: 100%; }
+
+  .empty { padding: 30px 20px; text-align: center; }
+  .empty .ic { font-size: 30px; opacity: .35; }
+  .empty b { display: block; font-size: 14px; margin-top: 8px; }
+  .empty span { font-size: 12px; color: var(--muted2); }
+
+  .loaders { display: flex; justify-content: center; gap: 34px; padding: 26px; }
+  .loaders .ld { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .9s linear infinite; }
+  .loaders .ld2 { border-top-color: var(--accent); border-right-color: var(--accent); animation-duration: .6s; }
+  .loaders .ld3 { width: 34px; height: 34px; border-radius: 50%; background: conic-gradient(var(--accent), transparent 65%); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); animation: spin 1.2s linear infinite; }
+
+  .topbar-progress { padding: 0; }
+  .topbar-progress .track { height: 4px; background: rgba(0,0,0,.06); }
+  .topbar-progress .track i { display: block; height: 100%; width: 38%; background: linear-gradient(90deg, rgba(0,188,125,.5), var(--accent)); }
+
+  .ringdemo { display: flex; align-items: center; gap: 24px; padding: 20px 26px; }
+  .ringdemo .ring { position: relative; width: 92px; height: 92px; flex-shrink: 0; }
+  .ringdemo .ring svg { transform: rotate(-90deg); }
+  .ringdemo .ring .v { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; font-family: ui-monospace, Consolas, monospace; }
+  .ringdemo .items { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+  .ringdemo .it { display: flex; align-items: center; gap: 10px; font-size: 12.5px; }
+  .ringdemo .it i { display: block; height: 6px; border-radius: 99px; background: rgba(0,0,0,.07); flex: 1; overflow: hidden; position: relative; }
+  .ringdemo .it i b { position: absolute; inset: 0; background: var(--accent); border-radius: 99px; }
+
+  .gtext { padding: 26px 24px; text-align: center; }
+  .gtext b { font-size: 26px; font-weight: 800; letter-spacing: -.02em; background: linear-gradient(90deg, #00bc7d, #22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .gtext span { font-size: 12px; color: var(--muted2); display: block; margin-top: 6px; }
+
+  /* ========== 60-69 消息与状态 ========== */
+  .toasts { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .toast { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 9px; font-size: 12.5px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+  .toast .ic { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; flex-shrink: 0; }
+  .toast .ic.ok { background: var(--accent); } .toast .ic.info { background: #3b82f6; } .toast .ic.warn { background: #f59e0b; }
+  .toast .x { margin-left: auto; color: var(--muted2); cursor: pointer; font-size: 12px; }
+
+  .dialog { padding: 34px 20px; position: relative; }
+  .dialog .backdrop { position: absolute; inset: 10px; border-radius: 14px; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; }
+  .dialog .box { width: 300px; background: #fff; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,.25); padding: 18px; }
+  .dialog .box b { font-size: 14px; display: block; }
+  .dialog .box p { font-size: 12.5px; color: var(--muted); margin: 6px 0 16px; line-height: 1.6; }
+  .dialog .box .btns { display: flex; gap: 8px; justify-content: flex-end; }
+  .dialog .box button { border: 1px solid var(--border); background: #fff; border-radius: 7px; padding: 6px 14px; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+  .dialog .box button.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .dd { position: relative; padding: 24px 28px; }
+  .dd .trigger { border: 1px solid var(--border); background: #fff; border-radius: 9px; padding: 8px 14px; font-size: 12.5px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-family: inherit; }
+  .dd .menu { position: absolute; left: 28px; top: 62px; width: 172px; background: #fff; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.1); padding: 6px; z-index: 2; }
+  .dd .menu .m { padding: 8px 10px; font-size: 12.5px; border-radius: 7px; color: var(--muted); display: flex; align-items: center; gap: 9px; }
+  .dd .menu .m.on { background: rgba(0,188,125,.09); color: var(--accent); font-weight: 500; }
+  .dd .menu .sep { height: 1px; background: var(--border); margin: 5px 8px; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 12px; padding: 18px 22px; align-items: center; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; color: var(--muted); position: relative; }
+  .badge .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--muted2); }
+  .badge.new { border-color: var(--accent); color: var(--accent); background: rgba(0,188,125,.07); }
+  .badge.beta { border-color: #3b82f6; color: #2563eb; background: rgba(59,130,246,.07); }
+  .badge .count { position: absolute; top: -7px; right: -8px; background: var(--accent); color: #fff; border-radius: 999px; font-size: 9.5px; padding: 1px 5px; font-weight: 600; }
+
+  .statuses { display: flex; }
+  .statuses > div { flex: 1; padding: 16px 10px; text-align: center; }
+  .statuses > div + div { border-left: 1px solid var(--border); }
+  .statuses .led { width: 9px; height: 9px; border-radius: 50%; margin: 0 auto 7px; }
+  .statuses .led.g { background: var(--accent); box-shadow: 0 0 0 3px rgba(0,188,125,.15); }
+  .statuses .led.y { background: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.15); }
+  .statuses .led.r { background: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,.15); }
+  .statuses b { font-size: 12.5px; display: block; }
+  .statuses span { font-size: 11px; color: var(--muted2); }
+
+  .countdown { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 24px 20px; }
+  .countdown .cell { text-align: center; }
+  .countdown .n { font-size: 30px; font-weight: 800; font-family: ui-monospace, Consolas, monospace; letter-spacing: -.02em; }
+  .countdown .n i { font-style: normal; color: var(--accent); }
+  .countdown .k { font-size: 10.5px; letter-spacing: .14em; color: var(--muted2); margin-top: 3px; }
+  .countdown .colon { font-size: 24px; color: var(--muted2); margin-top: -14px; font-weight: 300; }
+
+  .bell { display: flex; align-items: center; gap: 14px; padding: 16px 20px; }
+  .bell .ico { position: relative; width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--muted); background: #fff; flex-shrink: 0; }
+  .bell .dot { position: absolute; top: -4px; right: -4px; width: 15px; height: 15px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 9.5px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+  .bell .list { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+  .bell .it { font-size: 12.5px; color: var(--muted); display: flex; gap: 8px; align-items: baseline; }
+  .bell .it b { color: var(--fg); font-weight: 500; }
+  .bell .it .t { margin-left: auto; font-size: 11px; color: var(--muted2); font-family: ui-monospace, Consolas, monospace; }
+
+  .copybtn { display: flex; align-items: center; gap: 12px; padding: 16px 20px; }
+  .copybtn .field { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 12.5px; color: var(--muted); font-family: ui-monospace, Consolas, monospace; background: #fff; }
+  .copybtn button { border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 9px 16px; font-size: 12.5px; cursor: pointer; color: var(--fg); font-family: inherit; }
+  .copybtn button.done { border-color: var(--accent); color: var(--accent); background: rgba(0,188,125,.07); }
+
+  .popblock { padding: 24px 28px; text-align: center; }
+  .popblock .box { border: 1px dashed var(--border); border-radius: 12px; padding: 18px; font-size: 12.5px; color: var(--muted); background: #fafafa; }
+  .popblock .box b { color: var(--fg); }
+  .popblock button { margin-top: 12px; border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 7px 18px; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+
+  /* ========== 70-79 工具类小组件 ========== */
+  .todos .it { display: flex; align-items: center; gap: 12px; padding: 9px 18px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .todos .it:last-child { border-bottom: none; }
+  .todos .cb { width: 17px; height: 17px; border-radius: 5px; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; background: #fff; }
+  .todos .it.done .cb { background: var(--accent); border-color: var(--accent); }
+  .todos .it.done span { text-decoration: line-through; color: var(--muted2); }
+  .todos .pct { margin-left: auto; font-size: 11px; color: var(--muted2); font-family: ui-monospace, Consolas, monospace; }
+
+  .pomo { display: flex; align-items: center; gap: 22px; padding: 20px 26px; }
+  .pomo .ring { position: relative; width: 110px; height: 110px; flex-shrink: 0; }
+  .pomo .ring svg { transform: rotate(-90deg); }
+  .pomo .ring .v { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .pomo .ring .v b { font-size: 22px; font-family: ui-monospace, Consolas, monospace; }
+  .pomo .ring .v span { font-size: 10.5px; color: var(--muted2); letter-spacing: .12em; }
+  .pomo .ctl { display: flex; flex-direction: column; gap: 9px; align-items: flex-start; }
+  .pomo .ctl button { border: 1px solid var(--border); background: #fff; border-radius: 999px; padding: 7px 20px; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+  .pomo .ctl button.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .pomo .rounds { display: flex; gap: 5px; }
+  .pomo .rounds i { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+  .pomo .rounds i.on { background: var(--accent); }
+
+  .calc { width: 220px; margin: 18px auto; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: #fff; }
+  .calc .scr { padding: 14px 16px 8px; text-align: right; font-size: 24px; font-weight: 700; font-family: ui-monospace, Consolas, monospace; }
+  .calc .scr small { display: block; font-size: 11px; color: var(--muted2); font-weight: 400; }
+  .calc .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 10px; }
+  .calc .keys button { border: none; background: #f5f5f5; border-radius: 8px; padding: 11px 0; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .calc .keys button.op { background: rgba(0,188,125,.1); color: var(--accent); font-weight: 600; }
+  .calc .keys button.eq { background: var(--accent); color: #fff; grid-column: span 2; }
+
+  .palette { padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+  .palette .sw { display: flex; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .palette .sw i { flex: 1; height: 46px; }
+  .palette .sw i small { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px; font-size: 9px; color: #fff; opacity: 0; transition: opacity .15s; }
+  .palette .sw:hover i small { opacity: 1; }
+  .palette .copy-row { display: flex; gap: 8px; align-items: center; }
+  .palette .copy-row input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 12px; font-family: ui-monospace, Consolas, monospace; }
+  .palette .copy-row button { border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 8px 14px; font-size: 12px; cursor: pointer; font-family: inherit; }
+
+  .qr { display: flex; align-items: center; gap: 20px; padding: 20px 26px; }
+  .qr .code { width: 96px; height: 96px; border-radius: 10px; border: 1px solid var(--border); padding: 8px; background: #fff; flex-shrink: 0; }
+  .qr .code svg { width: 100%; height: 100%; display: block; }
+  .qr .txt b { font-size: 14px; display: block; }
+  .qr .txt span { font-size: 12px; color: var(--muted); }
+  .qr .txt button { margin-top: 10px; border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .qr .txt button:hover { color: var(--accent); border-color: var(--accent); }
+
+  .picker { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px; }
+  .picker .wheel { position: relative; width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(#00bc7d 0 20%, #e5f7f0 20% 40%, #c9ece0 40% 60%, #e5f7f0 60% 80%, #d9f2e8 80% 100%); display: flex; align-items: center; justify-content: center; }
+  .picker .wheel i { position: absolute; width: 3px; height: 62px; background: #171717; top: 13px; transform-origin: 50% 62px; }
+  .picker .wheel .hub { width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 1px solid var(--border); z-index: 1; }
+  .picker button { border: 1px solid var(--border); background: #fff; border-radius: 999px; padding: 7px 22px; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+  .picker button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .pw { padding: 16px 22px; display: flex; flex-direction: column; gap: 8px; }
+  .pw .row { display: flex; gap: 10px; align-items: center; }
+  .pw input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 12.5px; font-family: ui-monospace, Consolas, monospace; }
+  .pw .meter { display: flex; gap: 5px; }
+  .pw .meter i { flex: 1; height: 5px; border-radius: 99px; background: rgba(0,0,0,.07); }
+  .pw .meter i.on { background: var(--accent); }
+  .pw .hint { font-size: 11px; color: var(--muted2); }
+
+  .words { display: flex; }
+  .words > div { flex: 1; text-align: center; padding: 16px 10px; }
+  .words > div + div { border-left: 1px solid var(--border); }
+  .words .n { font-size: 22px; font-weight: 700; font-family: ui-monospace, Consolas, monospace; }
+  .words .n i { font-style: normal; color: var(--accent); }
+  .words .k { font-size: 11px; color: var(--muted2); margin-top: 4px; }
+
+  .convert { padding: 18px 22px; }
+  .convert .row { display: flex; gap: 10px; align-items: center; }
+  .convert input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 13px; font-family: ui-monospace, Consolas, monospace; }
+  .convert .eq { color: var(--muted2); font-size: 16px; }
+  .convert .sel { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; background: #fff; color: var(--muted); font-family: inherit; }
+  .convert .res { margin-top: 10px; font-size: 12.5px; color: var(--muted); }
+  .convert .res b { color: var(--accent); font-size: 15px; font-family: ui-monospace, Consolas, monospace; }
+
+  .breaks { display: flex; }
+  .breaks > div { flex: 1; padding: 16px 10px; text-align: center; }
+  .breaks > div + div { border-left: 1px solid var(--border); }
+  .breaks .ic { font-size: 20px; }
+  .breaks b { display: block; font-size: 12.5px; margin-top: 5px; }
+  .breaks span { font-size: 11px; color: var(--muted2); }
+
+  /* ========== 80-89 社交与互动 ========== */
+  .comments { padding: 14px 20px; }
+  .comments .cm { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .comments .cm:last-of-type { border-bottom: none; }
+  .comments .av { width: 34px; height: 34px; border-radius: 50%; background: rgba(0,188,125,.15); color: var(--accent); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .comments .cm b { font-size: 12.5px; }
+  .comments .cm .t { font-size: 11px; color: var(--muted2); font-weight: 400; margin-left: 8px; }
+  .comments .cm p { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.6; }
+  .comments .cm .reply { font-size: 11px; color: var(--accent); margin-top: 5px; cursor: pointer; display: inline-block; }
+  .comments .input { display: flex; gap: 10px; margin-top: 10px; }
+  .comments .input .av { background: var(--accent); color: #fff; }
+  .comments .input input { flex: 1; border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; font-size: 12.5px; }
+  .comments .input button { border: none; background: var(--accent); color: #fff; border-radius: 999px; padding: 8px 18px; font-size: 12.5px; cursor: pointer; }
+
+  .like { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 20px; }
+  .like button { width: 64px; height: 64px; border-radius: 50%; border: 1px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 24px; cursor: pointer; transition: all .2s; }
+  .like button.on { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,.05); transform: scale(1.06); }
+  .like .cnt { font-size: 12.5px; color: var(--muted); text-align: center; }
+  .like .cnt b { display: block; font-size: 18px; color: var(--fg); font-family: ui-monospace, Consolas, monospace; }
+
+  .shares { display: flex; justify-content: center; gap: 12px; padding: 18px; }
+  .shares button { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--border); background: #fff; color: var(--muted); display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; transition: all .15s; font-family: inherit; }
+  .shares button:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+  .shares button.wx:hover { border-color: #07c160; color: #07c160; }
+  .shares button.wb:hover { border-color: #e6162d; color: #e6162d; }
+
+  .guest { padding: 12px 20px; }
+  .guest .m { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+  .guest .m:last-child { border-bottom: none; }
+  .guest .av { width: 32px; height: 32px; border-radius: 9px; background: rgba(0,188,125,.12); color: var(--accent); font-size: 11.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .guest .m .txt b { font-size: 12.5px; }
+  .guest .m .txt b em { font-style: normal; font-weight: 400; font-size: 11px; color: var(--muted2); margin-left: 8px; }
+  .guest .m .txt p { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.6; }
+  .guest .write { display: flex; gap: 10px; padding: 12px 0 2px; }
+  .guest .write input { flex: 1; border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; font-size: 12.5px; }
+  .guest .write button { border: none; background: var(--accent); color: #fff; border-radius: 999px; padding: 8px 16px; font-size: 12.5px; cursor: pointer; }
+
+  .support { display: flex; align-items: center; gap: 18px; padding: 20px 24px; }
+  .support .txt b { font-size: 14px; display: block; }
+  .support .txt span { font-size: 12px; color: var(--muted); }
+  .support .btns { display: flex; flex-direction: column; gap: 8px; margin-left: auto; }
+  .support .btns button { border: 1px solid var(--border); background: #fff; border-radius: 999px; padding: 7px 18px; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+  .support .btns button.pri { background: rgba(0,188,125,.1); border-color: var(--accent); color: var(--accent); }
+
+  .socialrow { display: flex; justify-content: center; gap: 10px; padding: 18px; flex-wrap: wrap; }
+  .socialrow a { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; color: var(--muted); text-decoration: none; font-size: 14px; }
+  .socialrow a:hover { color: #fff; background: var(--accent); border-color: var(--accent); }
+
+  .gfeed { padding: 6px 20px; }
+  .gfeed .it { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; align-items: flex-start; }
+  .gfeed .it:last-child { border-bottom: none; }
+  .gfeed .ic { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; color: #fff; }
+  .gfeed .ic.star { background: #f59e0b; } .gfeed .ic.push { background: #6366f1; } .gfeed .ic.fork { background: #0ea5e9; }
+  .gfeed .it .d { color: var(--muted); line-height: 1.55; }
+  .gfeed .it .d b { color: var(--fg); font-weight: 500; }
+  .gfeed .it .t { margin-left: auto; font-size: 11px; color: var(--muted2); font-family: ui-monospace, Consolas, monospace; white-space: nowrap; }
+
+  .avatars { display: flex; align-items: center; gap: 16px; padding: 16px 20px; }
+  .avatars .stack { display: flex; }
+  .avatars .stack i { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #fff; margin-left: -9px; background: linear-gradient(135deg, #00bc7d, #22d3ee); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; }
+  .avatars .stack i:nth-child(2) { background: linear-gradient(135deg, #6366f1, #a78bfa); }
+  .avatars .stack i:nth-child(3) { background: linear-gradient(135deg, #f59e0b, #f97316); }
+  .avatars .stack i:nth-child(4) { background: linear-gradient(135deg, #ef4444, #f472b6); }
+  .avatars .stack i:first-child { margin-left: 0; }
+  .avatars .txt span { font-size: 12px; color: var(--muted); }
+  .avatars .txt b { color: var(--fg); font-weight: 600; }
+
+  .reacts { display: flex; justify-content: center; gap: 9px; padding: 16px; flex-wrap: wrap; }
+  .reacts button { border: 1px solid var(--border); background: #fff; border-radius: 999px; padding: 6px 14px; font-size: 12.5px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--muted); font-family: inherit; }
+  .reacts button.on { border-color: var(--accent); background: rgba(0,188,125,.07); color: var(--accent); }
+  .reacts button .n { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; }
+
+  .follow { display: flex; align-items: center; gap: 14px; padding: 16px 20px; }
+  .follow .av { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #00bc7d, #22d3ee); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .follow .txt { flex: 1; min-width: 0; }
+  .follow .txt b { font-size: 13.5px; display: block; }
+  .follow .txt span { font-size: 11.5px; color: var(--muted2); }
+  .follow button { border: 1px solid var(--accent); background: rgba(0,188,125,.08); color: var(--accent); border-radius: 999px; padding: 6px 20px; font-size: 12.5px; font-weight: 500; cursor: pointer; font-family: inherit; }
+  .follow button.followed { background: var(--accent); color: #fff; }
+
+  /* ========== 90-99 博客增强 ========== */
+  .related { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 16px 20px; }
+  .related a { border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-decoration: none; color: inherit; font-size: 12px; line-height: 1.6; transition: transform .2s, box-shadow .2s; }
+  .related a:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.06); }
+  .related a b { display: block; font-size: 12.5px; font-weight: 500; }
+  .related a .m { font-size: 11px; color: var(--muted2); margin-top: 5px; }
+
+  .pn { display: flex; }
+  .pn a { flex: 1; padding: 14px 18px; font-size: 12.5px; text-decoration: none; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+  .pn a + a { border-left: 1px solid var(--border); text-align: right; }
+  .pn .k { font-size: 10.5px; letter-spacing: .12em; color: var(--muted2); }
+  .pn b { color: var(--fg); font-weight: 500; }
+  .pn a:hover b { color: var(--accent); }
+
+  .posttags { display: flex; align-items: center; gap: 8px; padding: 14px 18px; flex-wrap: wrap; }
+  .posttags .t { border: 1px solid var(--border); border-radius: 999px; padding: 3px 12px; font-size: 11.5px; color: var(--muted); background: #fff; cursor: pointer; }
+  .posttags .t:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hot { padding: 6px 18px; }
+  .hot .it { display: flex; align-items: center; gap: 12px; padding: 10px 6px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .hot .it:last-child { border-bottom: none; }
+  .hot .rank { width: 22px; height: 22px; border-radius: 6px; background: #f5f5f5; color: var(--muted); font-size: 11.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; font-family: ui-monospace, Consolas, monospace; }
+  .hot .it:nth-child(1) .rank { background: rgba(0,188,125,.15); color: var(--accent); }
+  .hot .it:nth-child(2) .rank { background: rgba(0,188,125,.1); color: var(--accent); }
+  .hot .it:nth-child(3) .rank { background: rgba(0,188,125,.07); color: var(--accent); }
+  .hot .cnt { margin-left: auto; font-size: 11px; color: var(--muted2); font-family: ui-monospace, Consolas, monospace; }
+
+  .hilite { padding: 14px 20px; font-size: 13px; line-height: 2; color: var(--muted); }
+  .hilite em { font-style: normal; background: rgba(0,188,125,.18); border-radius: 4px; padding: 1px 5px; color: var(--fg); }
+  .hilite .hint { font-size: 11px; color: var(--muted2); margin-top: 8px; }
+
+  .codetheme { display: flex; gap: 12px; padding: 14px 20px; align-items: center; }
+  .codetheme .seg2 { display: inline-flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .codetheme .seg2 button { border: none; background: #fff; padding: 7px 16px; font-size: 12px; cursor: pointer; color: var(--muted); font-family: inherit; }
+  .codetheme .seg2 button.on { background: #171717; color: #fff; }
+  .codetheme .mini { flex: 1; height: 44px; border-radius: 8px; }
+  .codetheme .mini.dark { background: #171717; }
+  .codetheme .mini.light { background: #f5f5f5; border: 1px solid var(--border); }
+
+  .readpct { display: flex; align-items: center; gap: 14px; padding: 16px 20px; }
+  .readpct .p { font-size: 26px; font-weight: 800; font-family: ui-monospace, Consolas, monospace; color: var(--accent); }
+  .readpct .p small { font-size: 13px; color: var(--muted); font-weight: 400; }
+  .readpct .bar { flex: 1; height: 6px; border-radius: 99px; background: rgba(0,0,0,.07); overflow: hidden; }
+  .readpct .bar i { display: block; height: 100%; width: 64%; background: linear-gradient(90deg, rgba(0,188,125,.5), var(--accent)); border-radius: 99px; }
+
+  .cite { display: flex; align-items: center; gap: 12px; padding: 14px 18px; }
+  .cite input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 11.5px; color: var(--muted); font-family: ui-monospace, Consolas, monospace; }
+  .cite button { border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 8px 14px; font-size: 12px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+  .cite button:hover { color: var(--accent); border-color: var(--accent); }
+
+  .reader { display: flex; align-items: center; gap: 12px; padding: 16px 20px; }
+  .reader .prev { flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: var(--muted); line-height: 1.8; background: linear-gradient(180deg, #fff, #fafafa); }
+  .reader .prev b { font-size: 13px; color: var(--fg); }
+  .reader .ctl { display: flex; flex-direction: column; gap: 8px; }
+  .reader .ctl button { border: 1px solid var(--border); background: #fff; border-radius: 9px; padding: 8px 16px; font-size: 12px; cursor: pointer; color: var(--muted); font-family: inherit; }
+  .reader .ctl button.on { border-color: var(--accent); color: var(--accent); background: rgba(0,188,125,.07); }
+
+  .postbar { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 18px; flex-wrap: wrap; }
+  .postbar button { border: 1px solid var(--border); background: #fff; border-radius: 999px; padding: 7px 18px; font-size: 12.5px; display: flex; align-items: center; gap: 7px; cursor: pointer; color: var(--muted); font-family: inherit; }
+  .postbar button:hover { border-color: var(--accent); color: var(--accent); }
+  .postbar button.on { background: rgba(0,188,125,.08); border-color: var(--accent); color: var(--accent); }
+
+  /* ========== 100-109 个性化与设置 ========== */
+  .fontsw { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .fontsw .row { display: flex; gap: 10px; }
+  .fontsw .opt { flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; background: #fff; }
+  .fontsw .opt.on { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,188,125,.12); }
+  .fontsw .opt b { display: block; font-size: 14px; }
+  .fontsw .opt span { font-size: 11px; color: var(--muted2); }
+  .fontsw .opt.f-serif b { font-family: Georgia, serif; }
+  .fontsw .opt.f-mono b { font-family: ui-monospace, Consolas, monospace; }
+
+  .sizes { display: flex; align-items: center; gap: 14px; padding: 14px 20px; }
+  .sizes .ctl { display: flex; align-items: center; gap: 2px; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .sizes .ctl button { border: none; background: #fff; width: 34px; height: 32px; font-size: 13px; cursor: pointer; color: var(--muted); font-family: inherit; }
+  .sizes .ctl button:hover { color: var(--accent); }
+  .sizes .preview { flex: 1; font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+  .sizes .preview b { color: var(--fg); font-size: 15px; }
+
+  .spacing { padding: 14px 20px; }
+  .spacing .ctl { display: flex; gap: 8px; margin-bottom: 12px; }
+  .spacing .ctl button { border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 6px 14px; font-size: 12px; cursor: pointer; color: var(--muted); font-family: inherit; }
+  .spacing .ctl button.on { border-color: var(--accent); color: var(--accent); }
+  .spacing .demo { border-left: 3px solid var(--accent); padding-left: 14px; font-size: 12.5px; color: var(--muted); }
+  .spacing .demo p { line-height: 1.5; }
+  .spacing .demo p.wide { line-height: 2.2; }
+
+  .invert { display: flex; align-items: center; gap: 14px; padding: 16px 20px; }
+  .switch { width: 42px; height: 24px; border-radius: 999px; background: var(--accent); position: relative; cursor: pointer; flex-shrink: 0; }
+  .switch i { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 3px; left: 21px; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+  .switch.off { background: var(--border); }
+  .switch.off i { left: 3px; }
+  .invert .preview { flex: 1; border-radius: 8px; padding: 10px 14px; font-size: 12px; background: #171717; color: #fff; }
+
+  .radius { padding: 16px 20px; }
+  .radius .row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .radius input[type=range] { flex: 1; accent-color: var(--accent); }
+  .radius .v { font-size: 12px; color: var(--muted); font-family: ui-monospace, Consolas, monospace; width: 44px; text-align: right; }
+  .radius .shapes { display: flex; gap: 10px; }
+  .radius .shape { width: 52px; height: 52px; border: 1px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted2); }
+  .radius .shape.r1 { border-radius: 4px; } .radius .shape.r2 { border-radius: 12px; } .radius .shape.r3 { border-radius: 26px; }
+
+  .accent { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .accent .swatches { display: flex; gap: 10px; }
+  .accent .swatches i { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+  .accent .swatches i.on { border-color: #171717; box-shadow: 0 0 0 3px #fff inset; }
+  .accent .hint { font-size: 12px; color: var(--muted); }
+
+  .density { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .density .opt { border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; font-size: 12.5px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .density .opt.on { border-color: var(--accent); background: rgba(0,188,125,.05); }
+  .density .opt .rows { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .density .opt .rows i { height: 5px; border-radius: 2px; background: var(--border); }
+  .density .opt.cozy .rows i { height: 3px; }
+  .density .opt b { font-weight: 500; }
+
+  .bgpick { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .bgpick .opts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .bgpick .opts i { height: 52px; border-radius: 9px; border: 2px solid transparent; cursor: pointer; display: block; }
+  .bgpick .opts i.on { border-color: var(--accent); }
+  .bgpick .hint { font-size: 11.5px; color: var(--muted2); }
+
+  .layout2 { padding: 14px 18px; display: flex; gap: 10px; }
+  .layout2 .opt { flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 12px; cursor: pointer; }
+  .layout2 .opt.on { border-color: var(--accent); background: rgba(0,188,125,.05); }
+  .layout2 .opt .mock { display: flex; gap: 6px; height: 52px; }
+  .layout2 .opt .mock i { background: var(--border); border-radius: 4px; }
+  .layout2 .opt .mock i.main { flex: 2; }
+  .layout2 .opt .mock i.side { flex: 1; }
+  .layout2 .opt .mock.col { flex-direction: column; }
+  .layout2 .opt .mock.col i { flex: 1; }
+  .layout2 .opt b { font-size: 12px; display: block; margin-top: 8px; font-weight: 500; }
+
+  .export { display: flex; flex-direction: column; gap: 10px; padding: 16px 20px; }
+  .export .row { display: flex; align-items: center; gap: 10px; }
+  .export .row span { flex: 1; font-size: 12.5px; color: var(--muted); }
+  .export .row b { font-size: 11px; color: var(--muted2); font-family: ui-monospace, Consolas, monospace; font-weight: 400; }
+  .export button { border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 6px 16px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .export button:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ========== 110-119 环境与数据 ========== */
+  .cal { padding: 14px 18px; }
+  .cal .hd { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 10px; }
+  .cal .hd b { font-weight: 600; }
+  .cal .hd .nav { display: flex; gap: 6px; }
+  .cal .hd button { width: 24px; height: 24px; border: 1px solid var(--border); border-radius: 6px; background: #fff; font-size: 11px; cursor: pointer; color: var(--muted); font-family: inherit; }
+  .cal .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal .grid .wd { font-size: 10px; color: var(--muted2); text-align: center; padding: 3px 0; }
+  .cal .grid .d { aspect-ratio: 1; border-radius: 6px; font-size: 11px; display: flex; align-items: center; justify-content: center; color: var(--muted); background: #fafafa; }
+  .cal .grid .d.today { background: var(--accent); color: #fff; font-weight: 600; }
+  .cal .grid .d.act { background: rgba(0,188,125,.14); color: var(--accent); font-weight: 600; }
+  .cal .grid .d.other { color: var(--muted2); background: transparent; }
+
+  .week { padding: 16px 18px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+  .week .d { border-radius: 9px; padding: 9px 2px; font-size: 11px; color: var(--muted); }
+  .week .d b { display: block; font-size: 15px; margin-top: 3px; font-family: ui-monospace, Consolas, monospace; font-weight: 600; }
+  .week .d.today { background: rgba(0,188,125,.1); color: var(--accent); }
+  .week .d.today b { color: var(--accent); }
+  .week .d .wico { font-size: 15px; display: block; margin-top: 2px; }
+
+  .world { display: flex; }
+  .world > div { flex: 1; padding: 16px 8px; text-align: center; }
+  .world > div + div { border-left: 1px solid var(--border); }
+  .world b { display: block; font-size: 20px; font-family: ui-monospace, Consolas, monospace; letter-spacing: -.02em; }
+  .world b i { font-style: normal; color: var(--accent); font-size: 12px; }
+  .world .k { font-size: 10.5px; letter-spacing: .1em; color: var(--muted2); margin-top: 4px; }
+  .world .d2 { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .network { display: flex; align-items: center; gap: 14px; padding: 16px 20px; }
+  .network .ic { width: 44px; height: 44px; border-radius: 12px; background: rgba(0,188,125,.12); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .network .txt { flex: 1; min-width: 0; }
+  .network .txt b { font-size: 13.5px; display: block; }
+  .network .txt span { font-size: 11.5px; color: var(--muted2); }
+  .network .meter { display: flex; gap: 4px; align-items: flex-end; height: 22px; }
+  .network .meter i { width: 5px; border-radius: 2px; background: var(--accent); opacity: .5; }
+  .network .meter i:nth-child(n+3) { opacity: .85; }
+  .network .meter i:nth-child(n+5) { opacity: 1; }
+
+  .battery { display: flex; align-items: center; gap: 16px; padding: 16px 20px; }
+  .battery .cell { width: 74px; height: 32px; border: 2px solid var(--fg); border-radius: 6px; position: relative; flex-shrink: 0; }
+  .battery .cell::after { content: ""; position: absolute; right: -6px; top: 9px; width: 4px; height: 10px; background: var(--fg); border-radius: 0 2px 2px 0; }
+  .battery .fill { position: absolute; inset: 2px auto 2px 2px; background: var(--accent); border-radius: 3px; width: 86%; }
+  .battery .txt b { font-size: 16px; font-family: ui-monospace, Consolas, monospace; }
+  .battery .txt span { font-size: 11.5px; color: var(--muted2); display: block; }
+
+  .sysinfo { padding: 10px 20px; }
+  .sysinfo .row { display: flex; justify-content: space-between; padding: 8px 6px; font-size: 12.5px; border-bottom: 1px solid var(--border); }
+  .sysinfo .row:last-child { border-bottom: none; }
+  .sysinfo .k { color: var(--muted2); }
+  .sysinfo .v { font-family: ui-monospace, Consolas, monospace; }
+
+  .langmix { padding: 16px 20px; display: flex; flex-direction: column; gap: 11px; }
+  .langmix .it { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .langmix .n { width: 52px; color: var(--muted); }
+  .langmix .bar { flex: 1; height: 7px; border-radius: 99px; background: rgba(0,0,0,.06); overflow: hidden; }
+  .langmix .bar i { display: block; height: 100%; border-radius: 99px; }
+  .langmix .pct { width: 38px; text-align: right; color: var(--muted2); font-family: ui-monospace, Consolas, monospace; font-size: 11px; }
+
+  .radar { display: flex; align-items: center; gap: 20px; padding: 18px 24px; }
+  .radar .svg { flex-shrink: 0; }
+  .radar .list { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .radar .list .it { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .radar .list .it i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .radar .list .it span { color: var(--muted); }
+
+  .badgeswall { display: flex; flex-wrap: wrap; gap: 9px; padding: 16px 20px; }
+  .badgeswall .b { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-family: ui-monospace, Consolas, monospace; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .badgeswall .b em { font-style: normal; background: #171717; color: #fff; padding: 4px 8px; }
+  .badgeswall .b span { padding: 4px 9px; color: var(--muted); background: #fff; }
+  .badgeswall .b.ok span { color: var(--accent); }
+
+  .subs { display: flex; }
+  .subs > div { flex: 1; text-align: center; padding: 18px 10px; }
+  .subs > div + div { border-left: 1px solid var(--border); }
+  .subs .num { font-size: 22px; font-weight: 700; font-family: ui-monospace, Consolas, monospace; }
+  .subs .num i { font-style: normal; color: var(--accent); }
+  .subs .k { font-size: 11px; color: var(--muted2); margin-top: 4px; }
+  .subs .trend { font-size: 10.5px; color: var(--accent); margin-top: 2px; }
+
+  /* ========== 120-129 趣味彩蛋 ========== */
+  .game { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px; }
+  .game .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; width: 170px; }
+  .game .board i { aspect-ratio: 1; border-radius: 6px; background: rgba(0,188,125,.16); border: 1px solid rgba(0,188,125,.3); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--accent); }
+  .game .board i.big { background: rgba(0,188,125,.35); }
+  .game .score { font-size: 12px; color: var(--muted); font-family: ui-monospace, Consolas, monospace; }
+  .game .score b { color: var(--fg); }
+
+  .typingtest { padding: 16px 20px; }
+  .typingtest .text { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 13px; line-height: 2; color: var(--muted2); }
+  .typingtest .text em { font-style: normal; color: var(--fg); background: rgba(0,188,125,.14); border-radius: 3px; }
+  .typingtest .text b { font-weight: 400; color: var(--accent); }
+  .typingtest .stats { display: flex; gap: 18px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+  .typingtest .stats b { color: var(--fg); font-family: ui-monospace, Consolas, monospace; }
+
+  .clickfx { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 24px; }
+  .clickfx .area { width: 190px; height: 110px; border: 1.5px dashed var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--muted2); position: relative; overflow: hidden; background: #fff; }
+  .clickfx .fx { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); opacity: .5; }
+  .clickfx .legend { font-size: 11.5px; color: var(--muted2); display: flex; flex-direction: column; gap: 6px; }
+
+  .trail { position: relative; height: 130px; border-radius: 12px; background: #fafafa; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--border); }
+  .trail .t { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); opacity: .15; }
+  .trail .t:nth-child(1) { left: 36%; top: 58%; } .trail .t:nth-child(2) { left: 42%; top: 50%; opacity: .3; }
+  .trail .t:nth-child(3) { left: 48%; top: 44%; opacity: .45; } .trail .t:nth-child(4) { left: 54%; top: 40%; opacity: .6; }
+  .trail .t:nth-child(5) { left: 60%; top: 38%; opacity: .8; } .trail .t:nth-child(6) { left: 66%; top: 37%; opacity: 1; }
+  .trail .cursor { position: absolute; left: 66%; top: 37%; font-size: 13px; color: var(--muted); }
+
+  .petals { position: relative; height: 120px; border-radius: 12px; overflow: hidden; background: linear-gradient(180deg, #fdf2f4, #fce7ec); }
+  .petals .p { position: absolute; width: 8px; height: 8px; border-radius: 50% 0 50% 50%; background: #f9a8c4; opacity: .8; animation: fall 4s linear infinite; }
+  .petals .p:nth-child(1) { left: 15%; animation-delay: 0s; } .petals .p:nth-child(2) { left: 35%; animation-delay: 1.2s; }
+  .petals .p:nth-child(3) { left: 55%; animation-delay: 2.1s; } .petals .p:nth-child(4) { left: 72%; animation-delay: .7s; }
+  .petals .p:nth-child(5) { left: 88%; animation-delay: 1.8s; } .petals .p:nth-child(6) { left: 48%; animation-delay: 2.8s; }
+  @keyframes fall { 0% { transform: translateY(-16px) rotate(0); opacity: 0; } 12% { opacity: .9; } 100% { transform: translateY(130px) rotate(300deg); opacity: 0; } }
+  .petals .label { position: relative; z-index: 1; }
+
+  .fireflies { position: relative; height: 120px; border-radius: 12px; overflow: hidden; background: #101418; display: flex; align-items: center; justify-content: center; }
+  .fireflies .f { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #d9f7ec; box-shadow: 0 0 10px 2px rgba(0,188,125,.8); animation: float 5s ease-in-out infinite alternate; }
+  .fireflies .f:nth-child(1) { left: 20%; top: 30%; animation-delay: 0s; } .fireflies .f:nth-child(2) { left: 55%; top: 60%; animation-delay: 1.4s; }
+  .fireflies .f:nth-child(3) { left: 78%; top: 35%; animation-delay: 2.6s; } .fireflies .f:nth-child(4) { left: 38%; top: 70%; animation-delay: 3.4s; }
+  @keyframes float { from { transform: translate(0,0); opacity: .4; } to { transform: translate(12px,-16px); opacity: 1; } }
+  .fireflies .label { position: relative; z-index: 1; color: rgba(255,255,255,.55); }
+
+  .confetti { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 22px; }
+  .confetti button { border: 1px solid var(--accent); background: rgba(0,188,125,.08); color: var(--accent); border-radius: 999px; padding: 9px 26px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+  .confetti button:hover { background: var(--accent); color: #fff; }
+  .confetti .pieces { display: flex; gap: 7px; height: 30px; align-items: center; }
+  .confetti .pieces i { width: 8px; height: 14px; border-radius: 2px; }
+  .confetti .hint { font-size: 11.5px; color: var(--muted2); }
+
+  .crt { display: flex; align-items: center; gap: 16px; padding: 16px 20px; }
+  .crt .screen { flex: 1; border-radius: 8px; background: #171717; color: #7ee787; font-family: ui-monospace, Consolas, monospace; font-size: 12px; padding: 14px 16px; line-height: 1.8; position: relative; overflow: hidden; }
+  .crt .screen::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 3px); pointer-events: none; }
+  .crt .ctl { display: flex; flex-direction: column; gap: 8px; }
+  .crt .ctl button { border: 1px solid var(--border); background: #fff; border-radius: 9px; padding: 8px 16px; font-size: 12px; cursor: pointer; color: var(--muted); font-family: inherit; }
+  .crt .ctl button.on { border-color: var(--accent); color: var(--accent); background: rgba(0,188,125,.07); }
+
+  .sfx { display: flex; flex-direction: column; gap: 12px; padding: 16px 20px; }
+  .sfx .row { display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: var(--muted); }
+  .sfx .row .bars { display: flex; gap: 2px; align-items: flex-end; height: 16px; margin-left: auto; }
+  .sfx .row .bars i { width: 3px; background: var(--accent); border-radius: 2px; }
+  .sfx .row .bars i:nth-child(1) { height: 6px; } .sfx .row .bars i:nth-child(2) { height: 12px; } .sfx .row .bars i:nth-child(3) { height: 9px; } .sfx .row .bars i:nth-child(4) { height: 14px; } .sfx .row .bars i:nth-child(5) { height: 8px; }
+
+  .konami { padding: 16px 20px; text-align: center; }
+  .konami .keys { display: flex; justify-content: center; gap: 6px; margin-bottom: 12px; }
+  .konami .keys kbd { font-family: ui-monospace, Consolas, monospace; font-size: 12px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 6px; padding: 4px 9px; background: #fff; color: var(--muted); }
+  .konami .art { background: #171717; border-radius: 10px; padding: 14px; font-family: ui-monospace, Consolas, monospace; font-size: 11px; line-height: 1.5; color: #7ee787; text-align: left; overflow-x: auto; white-space: pre; }
+  .konami .hint { font-size: 11.5px; color: var(--muted2); margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-head">
+    <h1>功能建议 · 全部模块预览</h1>
+    <p>基于现有页面风格（白底细边框卡片 + 绿色点缀 #00bc7d + 等宽字标签）设计的 129 个候选模块。<br>
+    每个模块上方标注了建议放置的位置。数据均为示例，实际接入时可换真实数据或 API。</p>
+  </div>
+
+  <!-- 1 状态栏 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>01</em>实时状态栏</b><span>NOW</span></div>
+    <div class="mod-desc">放在 <span class="where">Hero 下方 / About 上方</span>。本地时间（西安 UTC+8）、当前状态签名、今年进度条。让访客一眼知道「主人现在在干嘛」，静态站也能有活的感觉。JS 实时计算，零成本。</div>
+    <div class="card now">
+      <div>
+        <div class="k mono">LOCAL TIME · XI'AN</div>
+        <div class="v mono" id="clock">--:--:--</div>
+      </div>
+      <div style="flex:1">
+        <div class="k mono">STATUS</div>
+        <div class="v">In Class &amp; Coding <small>上课摸鱼中</small></div>
+      </div>
+      <div style="flex:1.2">
+        <div class="k mono"><span id="year">2026</span> PROGRESS</div>
+        <div class="bar"><i id="yearbar" style="width:0%"></i></div>
+        <div class="mono" id="yearpct" style="font-size:11px;color:var(--muted2);margin-top:5px;">--%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 命令面板 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>02</em>⌘K 命令面板</b><span>CMD+K</span></div>
+    <div class="mod-desc">按 <b>Ctrl/⌘ + K</b> 呼出，键盘直达任意板块、复制邮箱、切换语言/主题。和终端风 Hero 一脉相承，是开发者主页的「标志性交互」。支持模糊搜索，移动端提供入口按钮。下图为呼出效果示意（真实实现为全屏遮罩弹层）。</div>
+    <div class="cmdk-backdrop">
+      <div class="cmdk">
+        <div class="search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input placeholder="搜索板块或操作…（试试输入「联系」）" value="联">
+          <kbd>ESC</kbd>
+        </div>
+        <div class="group">
+          <div class="g mono">板块</div>
+          <div class="item on">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+            联系我 <span style="color:var(--muted2)">— 邮箱 / 社交账号</span><span class="hint mono">↵</span>
+          </div>
+          <div class="item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22V2"/></svg>
+            关于我 <span style="color:var(--muted2)">— 简介 / 技能</span><span class="hint mono">↵</span>
+          </div>
+          <div class="item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+            项目 <span style="color:var(--muted2)">— 4 个开源项目</span><span class="hint mono">↵</span>
+          </div>
+          <div class="g mono" style="margin-top:6px;">操作</div>
+          <div class="item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            复制邮箱 im@hhan.me<span class="hint mono">⌘C</span>
+          </div>
+          <div class="item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.3 11.3 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.3-11.3 1.4-1.4"/></svg>
+            切换深浅色主题<span class="hint mono">⌘T</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 时间线 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>03</em>经历时间线</b><span>MILESTONES</span></div>
+    <div class="mod-desc">放在 <span class="where">About 之后、专注领域之前</span>。纵向时间线呈现「高中 → 入学 → 项目 → 比赛」的成长轨迹，绿色节点 + 细线，和页面语言一致。下方为示例内容，可替换为真实经历。</div>
+    <div class="card tl">
+      <div class="tl-item">
+        <div class="t mono">2024.06</div>
+        <div class="h">高中毕业</div>
+        <div class="d">开始自学 Web 开发，写下第一行 HTML。</div>
+      </div>
+      <div class="tl-item">
+        <div class="t mono">2024.09</div>
+        <div class="h">进入大学</div>
+        <div class="d">大一在读，主修计算机相关课程，同时钻研前端与设计。</div>
+      </div>
+      <div class="tl-item">
+        <div class="t mono">2025</div>
+        <div class="h">第一个开源项目</div>
+        <div class="d">陆续发布 spark、roadmap 等开源工具，积累 GitHub 首批星星。</div>
+      </div>
+      <div class="tl-item">
+        <div class="t mono">2026.03</div>
+        <div class="h">NextStep 2026 · 武汉站</div>
+        <div class="d">作为小组成员开发 foxity —— AI 对话式能力测评平台。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 数据统计 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>04</em>GitHub 数据卡</b><span>STATS</span></div>
+    <div class="mod-desc">放在 <span class="where">贡献热力图上方</span>，作为热力图的「摘要行」。数据可构建时从 GitHub API 拉取或直接用 GitHub 官方统计卡片，数字用等宽字体。</div>
+    <div class="card stats mono">
+      <div><div class="num">12<i>+</i></div><div class="k">Stars Earned</div></div>
+      <div><div class="num">1.2<i>k</i></div><div class="k">Commits / Year</div></div>
+      <div><div class="num">4</div><div class="k">Public Repos</div></div>
+      <div><div class="num">300<i>d</i></div><div class="k">Longest Streak</div></div>
+    </div>
+  </div>
+
+  <!-- 5 博客列表 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>05</em>最近文章</b><span>BLOG</span></div>
+    <div class="mod-desc">放在 <span class="where">项目之后、联系之前</span>。3 篇最新文章 + 「查看全部」。标题党不需要，简单的日期 + 标题 + 标签最符合页面气质。数据来自 MDX/MD 静态生成，无需后端。</div>
+    <div class="card posts">
+      <a href="#"><span class="title">用 Next.js 16 + Turbopack 重写我的个人主页</span><span class="chip">Next.js</span><span class="meta mono">2026-08-30</span></a>
+      <a href="#"><span class="title">给主页加一个 ⌘K 命令面板</span><span class="chip">React</span><span class="meta mono">2026-09-06</span></a>
+      <a href="#"><span class="title">从 0 到 1：spark 便签工具的设计笔记</span><span class="chip">Design</span><span class="meta mono">2026-09-10</span></a>
+    </div>
+  </div>
+
+  <!-- 6 摄影 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>06</em>镜头 · 影像集</b><span>GALLERY</span></div>
+    <div class="mod-desc">放在 <span class="where">专注领域之后</span>。呼应「摄影 / 航拍 / 视频剪辑」方向的三五张精选图，悬停轻微放大并浮现标题。图片下为占位图，实际替换为真实作品即可。</div>
+    <div class="gallery">
+      <figure><img src="https://picsum.photos/seed/han-a/480/360" alt=""><figcaption>城市夜航 · DJI Air 3</figcaption></figure>
+      <figure><img src="https://picsum.photos/seed/han-b/480/360" alt=""><figcaption>秦岭云海 · A7M3</figcaption></figure>
+      <figure><img src="https://picsum.photos/seed/han-c/480/360" alt=""><figcaption>校园日落 · 35mm</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- 7 一言 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>07</em>一言 · 每日句子</b><span>HITOKOTO</span></div>
+    <div class="mod-desc">放在 <span class="where">页脚上方或 Hero 角落</span>。随机展示一句喜欢的话，可接 hitokoto.cn 免费 API，也可自己维护句子池（下图为本地句子池轮换，点按钮试试）。</div>
+    <div class="card hitokota">
+      <span class="mark">“</span>
+      <blockquote style="flex:1">
+        <div class="txt" id="hk-txt">把喜欢的事做到极致，时间自然会给你答案。</div>
+        <div class="from" id="hk-from">— 示例句子</div>
+      </blockquote>
+      <button id="hk-btn">换一句</button>
+    </div>
+  </div>
+
+  <!-- 8 技能可视化 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>08</em>技能条可视化</b><span>SKILLS</span></div>
+    <div class="mod-desc">放在 <span class="where">About 板块内</span>，替代（或补充）纯文字标签。渐变绿色进度条 + 百分比，比一排 Chip 更直观地传达熟练度。也可做成雷达图。</div>
+    <div class="card skillbars">
+      <div class="skill"><div class="row"><b>前端开发</b><span class="mono">85%</span></div><div class="bar"><i style="width:85%"></i></div></div>
+      <div class="skill"><div class="row"><b>UI / 设计</b><span class="mono">75%</span></div><div class="bar"><i style="width:75%"></i></div></div>
+      <div class="skill"><div class="row"><b>Node / 后端</b><span class="mono">60%</span></div><div class="bar"><i style="width:60%"></i></div></div>
+      <div class="skill"><div class="row"><b>运维 / DevOps</b><span class="mono">55%</span></div><div class="bar"><i style="width:55%"></i></div></div>
+    </div>
+  </div>
+
+  <!-- 9 友链 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>09</em>友链</b><span>FRIENDS</span></div>
+    <div class="mod-desc">放在 <span class="where">联系之前</span>。头像 + 名字 + 一句话简介的小卡片， hover 上浮。第一排可放「界面生态」系（主页 / 作品中心），后续慢慢补充朋友站点。下图为示意数据。</div>
+    <div class="friends">
+      <a class="card friend" href="#">
+        <img src="https://picsum.photos/seed/f1/88/88" alt="">
+        <div class="n">Intereco</div><div class="d">界面生态 · PPT 创意社区</div>
+      </a>
+      <a class="card friend" href="#">
+        <img src="https://picsum.photos/seed/f2/88/88" alt="">
+        <div class="n">安逸PPT</div><div class="d">PPT 教程与模板</div>
+      </a>
+      <a class="card friend" href="#">
+        <img src="https://picsum.photos/seed/f3/88/88" alt="">
+        <div class="n">51PPT</div><div class="d">PPT 模板站</div>
+      </a>
+      <a class="card friend" href="#" style="color:var(--muted2);">
+        <div style="width:44px;height:44px;border-radius:50%;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;">+</div>
+        <div class="n">你的站点</div><div class="d">交换友链</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- 10 明暗主题切换 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>10</em>明暗主题切换</b><span>THEME</span></div>
+    <div class="mod-desc">放在 <span class="where">右上角（语言切换旁）</span>。太阳 / 月亮分段按钮，默认跟随系统并记忆选择。页面颜色已按 CSS 变量组织，接入成本约半小时。</div>
+    <div class="card" style="padding:16px 24px;display:flex;align-items:center;gap:14px;">
+      <div class="seg">
+        <button class="on" title="浅色" aria-label="浅色">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.3 11.3 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.3-11.3 1.4-1.4"/></svg>
+        </button>
+        <button title="深色" aria-label="深色">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+      </div>
+      <span style="font-size:12px;color:var(--muted2);">当前：浅色 · 跟随系统</span>
+    </div>
+  </div>
+
+  <!-- 11 打字机标题 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>11</em>打字机标题</b><span>TYPEWRITER</span></div>
+    <div class="mod-desc">放在 <span class="where">Hero 主标题区</span>。像终端一样逐字「敲出」标题，敲完停顿后删除重打下一句，与现有终端风 Hero 无缝衔接。几行 JS 即可，无依赖。下方为实时演示。</div>
+    <div class="card type">
+      <div class="line">
+        <span class="pmt">han@homepage:~$</span>
+        <span id="type-text"></span>
+        <span class="caret"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12 正在播放 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>12</em>正在播放</b><span>NOW PLAYING</span></div>
+    <div class="mod-desc">放在 <span class="where">Contact 卡片内或页脚上方</span>。旋转唱片 + 歌名 + 进度条，展示「现在在听什么」。可接网易云 / Last.fm API（约半小时），或本地句子池随机轮播。</div>
+    <div class="card np">
+      <div class="disc"><i></i></div>
+      <div class="meta">
+        <b>夜空中最亮的星</b>
+        <span>逃跑计划 · 世界</span>
+        <div class="prog"><span class="mono">1:42</span><div class="bar"><i></i></div><span class="mono">3:27</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 13 站内搜索 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>13</em>站内搜索</b><span>SEARCH</span></div>
+    <div class="mod-desc">放在 <span class="where">博客区顶部 / 页脚上方</span>。与 ⌘K 互补：⌘K 负责「跳转」，这里负责「检索」，实时过滤文章与项目。静态站可构建时生成索引 JSON，零后端。</div>
+    <div class="card searchbox">
+      <div class="row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input placeholder="搜索文章、项目、标签…" value="next">
+        <kbd>ESC</kbd>
+      </div>
+      <div class="res">
+        <div class="r on">用 <em>Next</em>.js 16 + Turbopack 重写我的个人主页<span class="tag">文章</span></div>
+        <div class="r">给主页加一个 ⌘K 命令面板<span class="tag">文章</span></div>
+        <div class="r"><em>Next</em>Step 2026 · 武汉站<span class="tag">项目</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14 阅读时长 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>14</em>阅读时长</b><span>READ TIME</span></div>
+    <div class="mod-desc">放在 <span class="where">文章列表与文章页头部</span>。按字数估算每篇预计阅读时长（中文约 400 字/分钟），等宽小字与日期、标签并列，一行代码的事。</div>
+    <div class="card posts">
+      <a href="#"><span class="title">用 Next.js 16 + Turbopack 重写我的个人主页</span><span class="chip">12 分钟</span><span class="meta mono">2026-08-30</span></a>
+      <a href="#"><span class="title">给主页加一个 ⌘K 命令面板</span><span class="chip">6 分钟</span><span class="meta mono">2026-09-06</span></a>
+      <a href="#"><span class="title">从 0 到 1：spark 便签工具的设计笔记</span><span class="chip">8 分钟</span><span class="meta mono">2026-09-10</span></a>
+    </div>
+  </div>
+
+  <!-- 15 鼠标跟随光晕 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>15</em>鼠标跟随光晕</b><span>CURSOR GLOW</span></div>
+    <div class="mod-desc">放在 <span class="where">全局背景</span>。半透明绿色光斑跟随鼠标缓慢移动，深色模式下尤其好看。CSS 变量 + 少量 JS，几乎零性能开销。下方方框里移动鼠标试试。</div>
+    <div class="glowdemo"><span class="chip">← 鼠标移到这里试试</span></div>
+  </div>
+
+  <!-- 16 粒子网格背景 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>16</em>粒子网格背景</b><span>PARTICLES</span></div>
+    <div class="mod-desc">放在 <span class="where">Hero 背景（可选）</span>。极简点阵：均匀网格 + 错位绿点，营造「图纸感」；也可升级为 Canvas 缓慢漂浮粒子。注意克制，避免抢主内容的注意力。</div>
+    <div class="particles"><span class="chip">点阵网格（示意）</span></div>
+  </div>
+
+  <!-- 17 全站快捷键 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>17</em>全站快捷键</b><span>KEYBOARD</span></div>
+    <div class="mod-desc">放在 <span class="where">全局</span>。在 ⌘K 之外补充轻量键位：<b>j / k</b> 切换文章、<b>/</b> 聚焦搜索、<b>g h</b> 回顶部，页脚小字提示「? 查看全部快捷键」。</div>
+    <div class="card hotkeys">
+      <div class="hk"><kbd>j</kbd><kbd>k</kbd><span>上下切换文章 / 项目</span><span class="d">列表页</span></div>
+      <div class="hk"><kbd>/</kbd><span>聚焦站内搜索</span><span class="d">全局</span></div>
+      <div class="hk"><kbd>g</kbd><kbd>h</kbd><span>回到顶部</span><span class="d">全局</span></div>
+      <div class="hk"><kbd>?</kbd><span>查看全部快捷键</span><span class="d">全局</span></div>
+    </div>
+  </div>
+
+  <!-- 18 文章目录 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>18</em>文章目录</b><span>TOC</span></div>
+    <div class="mod-desc">放在 <span class="where">博客文章页侧边</span>。滚动时高亮当前小节，点击平滑跳转，长文阅读体验明显提升。基于 heading 的 id 自动生成，无需手写。</div>
+    <div class="card toc">
+      <div class="t mono">ON THIS PAGE</div>
+      <div class="row on">为什么重写主页</div>
+      <div class="row l2">旧站的问题</div>
+      <div class="row l2">新站的取舍</div>
+      <div class="row">技术栈与构建</div>
+      <div class="row">设计细节</div>
+      <div class="row">总结</div>
+    </div>
+  </div>
+
+  <!-- 19 代码块复制 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>19</em>代码块复制按钮</b><span>COPY CODE</span></div>
+    <div class="mod-desc">放在 <span class="where">博客文章页代码块</span>。右上角语言标签 + 复制按钮，点击后短暂显示「已复制」。Clipboard API + <code>useState</code>，无依赖。深色代码块也给页面添了点「开发感」。</div>
+    <div class="card" style="padding:18px 24px;">
+      <div class="codeblock">
+        <div class="bar"><span class="lang">bash</span><button class="copy">复制</button></div>
+        <pre><span class="c"># 本地预览</span>
+<span class="g">pnpm</span> dev</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 20 公式渲染 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>20</em>公式渲染</b><span>MATH</span></div>
+    <div class="mod-desc">放在 <span class="where">博客文章页</span>。接入 KaTeX（约 30KB，比 MathJax 轻一个量级），支持行内与块级公式。以后写算法 / 数学笔记直接可用，构建时输出 HTML，无运行时开销。</div>
+    <div class="card math">
+      <span class="formula">E = mc<sup>2</sup></span>
+      <span class="formula"><span class="op">Σ</span><sub>i=1</sub><sup>n</sup> i = <span class="op">n(n+1)/2</span></span>
+      <span class="note mono">KaTeX</span>
+    </div>
+  </div>
+
+  <!-- 21 RSS 订阅 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>21</em>RSS 订阅</b><span>RSS</span></div>
+    <div class="mod-desc">放在 <span class="where">页脚或文章页头部</span>。构建时静态生成 RSS 2.0，配「订阅」按钮。博客类站点的基本礼仪，成本约半小时。</div>
+    <div class="card rss">
+      <div class="ico">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+      </div>
+      <div class="txt"><b>订阅博客更新</b><span>RSS 2.0 · 发布后自动推送</span></div>
+      <button>复制订阅链接</button>
+    </div>
+  </div>
+
+  <!-- 22 页脚导航 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>22</em>页脚导航</b><span>SITEMAP</span></div>
+    <div class="mod-desc">放在 <span class="where">页脚</span>。三列：板块 / 项目 / 外链，让页脚成为全站地图，与顶部导航互补。深色模式下尤其实用。</div>
+    <div class="card sitefoot">
+      <div class="col"><b class="mono">SECTIONS</b><a href="#">关于</a><a href="#">专注领域</a><a href="#">项目</a><a href="#">贡献</a><a href="#">联系</a></div>
+      <div class="col"><b class="mono">PROJECTS</b><a href="#">spark</a><a href="#">roadmap</a><a href="#">foxity</a></div>
+      <div class="col"><b class="mono">LINKS</b><a href="#">GitHub</a><a href="#">博客</a><a href="#">摄影</a></div>
+    </div>
+  </div>
+
+  <!-- 23 图片灯箱 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>23</em>图片灯箱</b><span>LIGHTBOX</span></div>
+    <div class="mod-desc">放在 <span class="where">摄影集</span>。点击图片全屏查看，左右键切换、ESC 关闭，把现有摄影模块的「浏览」体验补全。</div>
+    <div class="card" style="padding:18px 24px;">
+      <div class="lightbox">
+        <img src="https://picsum.photos/seed/han-d/640/360" alt="">
+        <div class="nav l">‹</div>
+        <div class="nav r">›</div>
+        <div class="close">✕</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 24 文章浏览量 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>24</em>文章浏览量</b><span>VIEWS</span></div>
+    <div class="mod-desc">放在 <span class="where">文章列表 / 文章页</span>。每篇显示阅读数。纯静态可先做 localStorage 简化版，后续再换 Umami / 自建计数接口。</div>
+    <div class="card views">
+      <div class="v">用 Next.js 16 + Turbopack 重写我的个人主页
+        <span class="cnt mono"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>1,284</span>
+      </div>
+      <div class="v">给主页加一个 ⌘K 命令面板
+        <span class="cnt mono"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>863</span>
+      </div>
+      <div class="v">从 0 到 1：spark 便签工具的设计笔记
+        <span class="cnt mono"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>512</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 25 访客计数 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>25</em>访客计数</b><span>VISITORS</span></div>
+    <div class="mod-desc">放在 <span class="where">页脚</span>。总访问量 + 今日访问 + 在线人数。可接不蒜子（免费、无后端），或自建轻量接口，数字统一用等宽字体。</div>
+    <div class="card visitors">
+      <div><div class="num">12,<i>847</i></div><div class="k mono">TOTAL VISITS</div></div>
+      <div><div class="num">3<i>2</i></div><div class="k mono">TODAY</div></div>
+      <div><div class="num">2<i>4</i></div><div class="k mono">ONLINE</div></div>
+    </div>
+  </div>
+
+  <!-- 26 顶部公告条 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>26</em>顶部公告条</b><span>ANNOUNCEMENT</span></div>
+    <div class="mod-desc">放在 <span class="where">页面最顶部</span>。可关闭的细横幅，适合「新项目发布」「博客迁移中」等时效信息；关闭后写 localStorage 不再显示。</div>
+    <div class="notice"><span class="dot"></span>新项目 foxity 已开源，欢迎 Star ⭐<button class="x">✕</button></div>
+  </div>
+
+  <!-- 27 天气卡片 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>27</em>天气卡片</b><span>WEATHER</span></div>
+    <div class="mod-desc">放在 <span class="where">About / 实时状态栏旁</span>。西安实时天气 + 空气质量，接和风天气免费 API（每日免费额度足够个人站）。与「实时状态栏」互相呼应。</div>
+    <div class="card weather">
+      <span class="wico"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/></svg></span>
+      <span class="temp">24<small>°C</small></span>
+      <div class="det"><b>西安 · 多云</b><br>体感 26°C · 东南风 2 级 · 湿度 58%</div>
+      <div class="aqi">AQI<b>62 · 良</b></div>
+    </div>
+  </div>
+
+  <!-- 28 动态标签页标题 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>28</em>动态标签页标题</b><span>DYNAMIC TITLE</span></div>
+    <div class="mod-desc">放在 <span class="where">全局（浏览器标签页）</span>。页面失焦时标题变成「✋ 别忘了回来看我」，聚焦后恢复。一行 JS，趣味性拉满，也暗示「这是个活的站」。</div>
+    <div class="card">
+      <div class="tabs-demo">
+        <div class="tab on"><span class="dot"></span>Han — Student · Developer · Designer</div>
+        <div class="tab"><span class="dot" style="background:#f59e0b;"></span>✋ 别忘了回来看我</div>
+      </div>
+      <div class="tabs-body">← 页面失焦后，标签页标题自动变成右侧的样子</div>
+    </div>
+  </div>
+
+  <!-- 29 开机加载动画 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>29</em>开机加载动画</b><span>BOOT SCREEN</span></div>
+    <div class="mod-desc">放在 <span class="where">首屏加载（可选）</span>。终端风格 boot 序列：逐行打印状态 + 进度条，加载完进入 Hero。纯 CSS 模拟，克制使用，避免拖慢首屏。</div>
+    <div class="card" style="padding:18px 24px;">
+      <div class="boot">
+        <div><span class="ok">✓</span> loading config … done</div>
+        <div><span class="ok">✓</span> fetching github stats … done</div>
+        <div><span class="ok">✓</span> warming up terminal … done</div>
+        <div class="bar"><i></i></div>
+        <div>ready in <span class="ok">0.8s</span><span class="cursor"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 30 吸顶导航栏 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>30</em>吸顶导航栏</b><span>STICKY NAV</span></div>
+    <div class="mod-desc">放在 <span class="where">全站顶部</span>。滚动时吸顶的半透明导航：Logo + 板块链接 + 右侧操作区，高亮当前板块。与现有右上角浮层互补，适合板块变多之后。</div>
+    <div class="card navbar">
+      <span class="logo"><i></i>hhan.me</span>
+      <nav class="links"><b>首页</b><span>关于</span><span>项目</span><span>博客</span><span>联系</span></nav>
+      <div class="right"><span class="chip">搜索 ⌘K</span><span class="chip">🌙</span></div>
+    </div>
+  </div>
+
+  <!-- 31 面包屑 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>31</em>面包屑导航</b><span>BREADCRUMB</span></div>
+    <div class="mod-desc">放在 <span class="where">博客文章页顶部</span>。当前位置层级：首页 / 博客 / 分类 / 当前文章，方便访客回退，深色下也清晰。</div>
+    <div class="card breadcrumb"><b>首页</b><span class="sep">/</span><b>博客</b><span class="sep">/</span><b>前端</b><span class="sep">/</span>用 Next.js 16 重写主页</div>
+  </div>
+
+  <!-- 32 分页器 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>32</em>分页器</b><span>PAGINATION</span></div>
+    <div class="mod-desc">放在 <span class="where">文章/项目列表底部</span>。‹ 1 2 3 … 12 › 样式的标准分页，当前页高亮绿色，移动端自动收成「上一页/下一页」。</div>
+    <div class="card pager"><button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>…</button><button>12</button><button>›</button></div>
+  </div>
+
+  <!-- 33 标签云 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>33</em>标签云</b><span>TAG CLOUD</span></div>
+    <div class="mod-desc">放在 <span class="where">博客区 / 页脚上方</span>。字号随文章数变化的热门标签集合，点击跳转标签页。静态生成，无依赖。</div>
+    <div class="card tagcloud"><span class="s3">Next.js</span><span class="s2">React</span><span class="s1">Tailwind</span><span class="s3">设计</span><span class="s2">摄影</span><span class="s1">AI</span><span class="s2">TypeScript</span><span class="s1">PPT</span><span class="s3">开发</span><span class="s1">运维</span><span class="s2">开源</span></div>
+  </div>
+
+  <!-- 34 归档 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>34</em>文章归档</b><span>ARCHIVE</span></div>
+    <div class="mod-desc">放在 <span class="where">博客列表页侧边 / 独立归档页</span>。按年月分组的文章列表，数字为当月篇数，是博客站的经典结构。</div>
+    <div class="card archive">
+      <div class="row"><b>2026 年 9 月</b><span>4 篇</span></div>
+      <div class="row"><b>2026 年 8 月</b><span>3 篇</span></div>
+      <div class="row"><b>2026 年 7 月</b><span>2 篇</span></div>
+      <div class="row"><b>2026 年 6 月</b><span>5 篇</span></div>
+    </div>
+  </div>
+
+  <!-- 35 分类筛选 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>35</em>分类筛选</b><span>FILTERS</span></div>
+    <div class="mod-desc">放在 <span class="where">项目区 / 摄影集顶部</span>。一排可切换的胶囊筛选，当前分类绿色高亮，下方内容随之过滤。</div>
+    <div class="card filters"><span class="f on">全部</span><span class="f">前端</span><span class="f">设计</span><span class="f">开源</span><span class="f">摄影</span><span class="f">教程</span></div>
+  </div>
+
+  <!-- 36 横向滚动 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>36</em>横向滚动条</b><span>H-SCROLL</span></div>
+    <div class="mod-desc">放在 <span class="where">项目区 / 工具推荐区</span>。可横向滑动的一排卡片，滚动吸附对齐，移动端体验比网格更好。纯 CSS scroll-snap。</div>
+    <div class="card hscroll">
+      <div class="item"><b>spark</b><span>轻量便签工具</span></div>
+      <div class="item"><b>roadmap</b><span>学习路线规划</span></div>
+      <div class="item"><b>foxity</b><span>AI 能力测评</span></div>
+      <div class="item"><b>next-gh</b><span>GitHub 卡片</span></div>
+      <div class="item"><b>han.ui</b><span>设计系统</span></div>
+    </div>
+  </div>
+
+  <!-- 37 抽屉菜单 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>37</em>抽屉菜单</b><span>DRAWER</span></div>
+    <div class="mod-desc">放在 <span class="where">移动端全局</span>。汉堡按钮唤出的侧滑菜单，含全部板块与操作项，遮罩点击关闭。移动端导航的标准解。</div>
+    <div class="card">
+      <div class="drawer"><b style="font-size:14px;">hhan.me</b><div class="hamburger"><i></i><i></i><i></i></div></div>
+      <div class="menu"><span class="on">首页</span><span>关于</span><span>项目</span><span>贡献</span><span>联系</span></div>
+    </div>
+  </div>
+
+  <!-- 38 底部工具栏 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>38</em>底部工具栏</b><span>BOTTOM BAR</span></div>
+    <div class="mod-desc">放在 <span class="where">移动端全局底部</span>。首页 / 项目 / 博客 / 我的四个常驻入口，拇指可及，比顶部汉堡更顺手。</div>
+    <div class="card bottombar">
+      <div class="it on">🏠<span>首页</span></div>
+      <div class="it">📦<span>项目</span></div>
+      <div class="it">📝<span>博客</span></div>
+      <div class="it">👤<span>我的</span></div>
+    </div>
+  </div>
+
+  <!-- 39 悬浮操作按钮 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>39</em>悬浮操作按钮</b><span>FAB</span></div>
+    <div class="mod-desc">放在 <span class="where">全局右下角</span>。把高频操作收进悬浮按钮组：回到顶部、复制邮箱、切换主题，展开式布局避免挡内容。</div>
+    <div class="card fab">
+      <div class="btn">✉️</div>
+      <div class="btn">🌙</div>
+      <div class="btn pri">↑</div>
+    </div>
+  </div>
+
+  <!-- 40 引用块 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>40</em>引用块</b><span>BLOCKQUOTE</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页</span>。带绿色引号装饰的引用样式，长文里用来承载名句或重点，比默认浏览器样式精致得多。</div>
+    <div class="card quote">
+      <div class="mark">“</div>
+      <p>设计不是看起来怎么样、感觉怎么样，而是它如何工作。</p>
+      <div class="from">— Steve Jobs</div>
+    </div>
+  </div>
+
+  <!-- 41 提示框 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>41</em>提示框</b><span>CALLOUT</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页</span>。信息 / 成功 / 警告 / 错误四种语义色提示，MDX 里用一行短代码插入，写教程必备。</div>
+    <div class="card callouts">
+      <div class="callout info"><span class="ic">ℹ️</span>本文写于 Next.js 16 正式发布之后，命令以最新版为准。</div>
+      <div class="callout ok"><span class="ic">✅</span>已通过 Lighthouse 性能测试，得分 100。</div>
+      <div class="callout warn"><span class="ic">⚠️</span>该 API 将在 v17 中废弃，请迁移到新写法。</div>
+      <div class="callout err"><span class="ic">⛔</span>注意：此操作会清空数据库，请先备份。</div>
+    </div>
+  </div>
+
+  <!-- 42 折叠面板 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>42</em>折叠面板</b><span>ACCORDION</span></div>
+    <div class="mod-desc">放在 <span class="where">FAQ / 文档页</span>。点击展开收起，同时只开一项，减少页面纵向空间占用。</div>
+    <div class="card acc">
+      <div class="item open"><div class="head">这个主页用什么框架？<span>＋</span></div><div class="body">Next.js 16 + Tailwind CSS 4 + motion，部署在 Vercel。</div></div>
+      <div class="item"><div class="head">如何联系到你？<span>＋</span></div></div>
+      <div class="item"><div class="head">可以复用这些设计吗？<span>＋</span></div></div>
+    </div>
+  </div>
+
+  <!-- 43 选项卡 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>43</em>选项卡</b><span>TABS</span></div>
+    <div class="mod-desc">放在 <span class="where">项目详情 / 关于板块</span>。绿色下划线式 Tab，在同一块空间切换不同视角（简介 / 技能 / 经历）。</div>
+    <div class="card tabs">
+      <div class="bar"><span class="on">简介</span><span>技能</span><span>经历</span><span>作品</span></div>
+      <div class="panel">学生、开发者与设计师。喜欢用代码和设计把事情做得简洁、好用又好看，目前主要探索 Web 开发与 AI 应用。</div>
+    </div>
+  </div>
+
+  <!-- 44 瀑布流 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>44</em>瀑布流布局</b><span>MASONRY</span></div>
+    <div class="mod-desc">放在 <span class="where">摄影集 / 灵感墙</span>。不同高度的卡片错落排列，用 CSS columns 实现，零 JS，适合内容高度不一的场景。</div>
+    <div class="card"><div class="masonry"><div class="m on" style="height:70px">日出</div><div class="m" style="height:110px">城市</div><div class="m" style="height:90px">星空</div><div class="m" style="height:130px">山野</div><div class="m" style="height:80px">街拍</div><div class="m on" style="height:100px">航拍</div></div></div>
+  </div>
+
+  <!-- 45 视频占位 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>45</em>视频嵌入</b><span>VIDEO</span></div>
+    <div class="mod-desc">放在 <span class="where">项目演示 / 影像区</span>。16:9 深色占位 + 播放按钮，实际可嵌入 B 站 / YouTube iframe，保持圆角与边框语言一致。</div>
+    <div class="card" style="padding:18px 24px;"><div class="video"><div class="play">▶</div><span class="time mono">03:24</span></div></div>
+  </div>
+
+  <!-- 46 音频条 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>46</em>音频播放条</b><span>AUDIO</span></div>
+    <div class="mod-desc">放在 <span class="where">正在播放 / 播客页</span>。绿色播放键 + 波形条 + 时长，比「正在播放」卡片更紧凑的音频形式。</div>
+    <div class="card audio">
+      <div class="play">▶</div>
+      <div class="meta"><b>夜空中最亮的星</b><span>逃跑计划 · 04:12</span></div>
+      <div class="waves"><i style="height:8px"></i><i style="height:16px"></i><i style="height:24px"></i><i style="height:12px"></i><i style="height:20px"></i><i style="height:26px"></i><i style="height:14px"></i><i style="height:22px"></i><i style="height:10px"></i><i style="height:18px"></i></div>
+    </div>
+  </div>
+
+  <!-- 47 数据表格 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>47</em>数据表格</b><span>TABLE</span></div>
+    <div class="mod-desc">放在 <span class="where">项目 / 工具对比区</span>。等宽数字 + 可排序表头的项目清单，滚动时表头吸顶，适合放「我的开源项目」结构化数据。</div>
+    <div class="card table">
+      <table>
+        <tr><th>项目<span class="sort">↑</span></th><th>语言<span class="sort">↓</span></th><th>Stars<span class="sort">↑</span></th><th>状态</th></tr>
+        <tr><td>spark</td><td>TypeScript</td><td class="st">1.2k</td><td class="st">活跃</td></tr>
+        <tr><td>roadmap</td><td>Vue</td><td>860</td><td>维护中</td></tr>
+        <tr><td>foxity</td><td>Next.js</td><td>320</td><td>新</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 48 图文卡片 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>48</em>图文卡片</b><span>MEDIA CARD</span></div>
+    <div class="mod-desc">放在 <span class="where">博客列表</span>。缩略图 + 标题 + 摘要 + 元信息的横向卡片，信息密度比纯列表高，比大图卡片轻。</div>
+    <div class="card media">
+      <img src="https://picsum.photos/seed/han-e/220/164" alt="">
+      <div class="txt"><b>用 Next.js 16 重写我的个人主页</b><p>从零搭建、设计系统、动效编排……记录一次完整的重写过程与踩坑。</p><div class="meta mono">2026-08-30 · 12 分钟 · Next.js</div></div>
+    </div>
+  </div>
+
+  <!-- 49 步骤条 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>49</em>步骤条</b><span>STEPS</span></div>
+    <div class="mod-desc">放在 <span class="where">教程 / 流程说明</span>。绿色已完成、描边当前步、灰字未开始的横向步骤条，写教程时让读者知道「进行到哪了」。</div>
+    <div class="card steps">
+      <div class="st done"><span class="dot">✓</span>安装</div><div class="line done"></div>
+      <div class="st done"><span class="dot">✓</span>配置</div><div class="line done"></div>
+      <div class="st now"><span class="dot">3</span>部署</div><div class="line"></div>
+      <div class="st"><span class="dot">4</span>上线</div>
+    </div>
+  </div>
+
+  <!-- 50 滚动视差 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>50</em>滚动视差</b><span>PARALLAX</span></div>
+    <div class="mod-desc">放在 <span class="where">板块过渡区 / Hero 背景</span>。滚动时不同图层以不同速度移动，制造纵深感。用 motion 的 useScroll 几行实现，注意移动端降级为静态。</div>
+    <div class="card" style="padding:18px 24px;">
+      <div class="parallax"><span class="chip">滚动时图层错位（示意）</span><i class="layer l1"></i><i class="layer l2"></i><i class="layer l3"></i></div>
+    </div>
+  </div>
+
+  <!-- 51 磁吸按钮 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>51</em>磁吸按钮</b><span>MAGNETIC</span></div>
+    <div class="mod-desc">放在 <span class="where">CTA / 社交入口</span>。按钮朝鼠标方向轻微吸附移动，松手回弹。几行 JS 的鼠标跟随效果，桌面端让交互「活」起来。</div>
+    <div class="card magnetic"><button>GitHub</button><button>邮件</button><button>博客</button></div>
+  </div>
+
+  <!-- 52 波纹点击 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>52</em>波纹点击</b><span>RIPPLE</span></div>
+    <div class="mod-desc">放在 <span class="where">主按钮 / 卡片</span>。点击处泛起圆形波纹扩散。10 行 JS + 1 个 keyframe 即可，Material 风格的高频微交互。</div>
+    <div class="card ripple"><button class="btn">点我试试<span class="r"></span></button></div>
+  </div>
+
+  <!-- 53 数字滚动 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>53</em>数字滚动</b><span>COUNTUP</span></div>
+    <div class="mod-desc">放在 <span class="where">GitHub 数据卡 / 统计区</span>。进入视口时数字从 0 滚动到目标值，配缓动曲线。比静态数字更有「数据感」，Motion 的 animate 直接支持。</div>
+    <div class="card countup">
+      <div><div class="num">1<i>,284</i></div><div class="k">Stars</div></div>
+      <div><div class="num">8<i>63</i></div><div class="k">Commits</div></div>
+      <div><div class="num">3<i>2</i></div><div class="k">Repos</div></div>
+      <div><div class="num">9<i>8</i>%</div><div class="k">Uptime</div></div>
+    </div>
+  </div>
+
+  <!-- 54 骨架屏 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>54</em>骨架屏</b><span>SKELETON</span></div>
+    <div class="mod-desc">放在 <span class="where">首屏 / 数据加载区</span>。内容到达前显示流动的灰色占位块，比转圈更「有东西」。静态站几乎用不上，接 API 后必备。</div>
+    <div class="card skeleton"><div class="sk cov"></div><div class="sk l1"></div><div class="sk l2"></div><div class="sk l3"></div></div>
+  </div>
+
+  <!-- 55 空状态 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>55</em>空状态</b><span>EMPTY</span></div>
+    <div class="mod-desc">放在 <span class="where">搜索 / 筛选 / 列表页</span>。无结果时的引导：图标 + 文案 + 重置按钮，避免白屏尴尬。</div>
+    <div class="card empty"><div class="ic">🔍</div><b>没有找到「设计」相关的文章</b><span>换个关键词试试，或清空筛选条件</span></div>
+  </div>
+
+  <!-- 56 加载动画 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>56</em>加载动画</b><span>LOADER</span></div>
+    <div class="mod-desc">放在 <span class="where">异步操作 / 图片加载</span>。环形 / 双色 / 描边三种加载指示器，纯 CSS，统一用绿色系。</div>
+    <div class="card loaders"><div class="ld"></div><div class="ld ld2"></div><div class="ld ld3"></div></div>
+  </div>
+
+  <!-- 57 顶部进度条 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>57</em>页面顶部进度条</b><span>TOP PROGRESS</span></div>
+    <div class="mod-desc">放在 <span class="where">全站顶部（与右上角圆环二选一）</span>。一条贯穿页顶的细进度线，比圆环更醒目，长文阅读时知道「还剩多少」。</div>
+    <div class="card topbar-progress"><div class="track"><i></i></div></div>
+  </div>
+
+  <!-- 58 进度圆环 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>58</em>进度圆环组</b><span>RING</span></div>
+    <div class="mod-desc">放在 <span class="where">数据卡 / 技能区</span>。SVG stroke-dasharray 画出的圆环进度 + 列表条形，展示「目标完成度」这类复合数据。</div>
+    <div class="card ringdemo">
+      <div class="ring">
+        <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="3.5"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#00bc7d" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="19.5" transform="rotate(-90 18 18)"/></svg>
+        <div class="v">80%</div>
+      </div>
+      <div class="items">
+        <div class="it">年度目标<i><b style="width:80%"></b></i><span class="mono">80%</span></div>
+        <div class="it">读书计划<i><b style="width:55%"></b></i><span class="mono">55%</span></div>
+        <div class="it">开源输出<i><b style="width:64%"></b></i><span class="mono">64%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 59 渐变文字 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>59</em>渐变文字标题</b><span>GRADIENT TEXT</span></div>
+    <div class="mod-desc">放在 <span class="where">板块标题 / 关键标语</span>。绿 → 青的渐变大字，background-clip 裁出文字渐变，深色背景下尤其出效果。克制使用。</div>
+    <div class="card gtext"><b>Keep Building</b><span>background-clip: text · 一行 CSS</span></div>
+  </div>
+
+  <!-- 60 Toast 通知 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>60</em>Toast 通知</b><span>TOAST</span></div>
+    <div class="mod-desc">放在 <span class="where">全局右下角</span>。成功 / 信息 / 警告三种轻提示，自动消失 + 手动关闭。sonner 或自写均半小时内搞定。</div>
+    <div class="card toasts">
+      <div class="toast"><span class="ic ok">✓</span>已复制邮箱 im@hhan.me<span class="x">✕</span></div>
+      <div class="toast"><span class="ic info">i</span>有新版本可用，刷新后生效<span class="x">✕</span></div>
+      <div class="toast"><span class="ic warn">!</span>图片加载失败，已显示占位图<span class="x">✕</span></div>
+    </div>
+  </div>
+
+  <!-- 61 对话框 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>61</em>确认对话框</b><span>DIALOG</span></div>
+    <div class="mod-desc">放在 <span class="where">危险操作 / 表单提交</span>。居中弹窗 + 遮罩 + 焦点锁定，radix-ui 已有现成 Dialog 封装，无障碍开箱即用。</div>
+    <div class="card dialog">
+      <div class="backdrop">
+        <div class="box"><b>确认删除这篇草稿？</b><p>删除后无法恢复，已导出的备份不受影响。</p><div class="btns"><button>取消</button><button class="pri">删除</button></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 62 下拉菜单 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>62</em>下拉菜单</b><span>DROPDOWN</span></div>
+    <div class="mod-desc">放在 <span class="where">导航 / 文章操作</span>。点击触发的菜单列表，含分组分隔线。radix-ui DropdownMenu 封装好，主题切换、语言切换都能用。</div>
+    <div class="card dd">
+      <button class="trigger">文章操作 ▾</button>
+      <div class="menu">
+        <div class="m on">📄 编辑文章</div>
+        <div class="m">🔗 复制链接</div>
+        <div class="sep"></div>
+        <div class="m">🗑 移动到回收站</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 63 徽标 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>63</em>徽标集合</b><span>BADGES</span></div>
+    <div class="mod-desc">放在 <span class="where">导航 / 卡片角标</span>。NEW / BETA / 数量角标等带语义色的徽标，用于提示「有新东西」。</div>
+    <div class="card badges">
+      <span class="badge new">NEW</span>
+      <span class="badge beta">BETA</span>
+      <span class="badge">测试版</span>
+      <span class="badge">已归档</span>
+      <span class="badge">🔔 通知<span class="count">3</span></span>
+    </div>
+  </div>
+
+  <!-- 64 状态灯 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>64</em>服务状态灯</b><span>STATUS</span></div>
+    <div class="mod-desc">放在 <span class="where">页脚 / 项目卡片</span>。绿 / 黄 / 红 LED 表示服务运行状态，一眼判断「这个项目还活着吗」。</div>
+    <div class="card statuses">
+      <div><div class="led g"></div><b>正常运行</b><span>hhan.me</span></div>
+      <div><div class="led y"></div><b>维护中</b><span>blog</span></div>
+      <div><div class="led r"></div><b>已下线</b><span>legacy</span></div>
+    </div>
+  </div>
+
+  <!-- 65 倒计时 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>65</em>活动倒计时</b><span>COUNTDOWN</span></div>
+    <div class="mod-desc">放在 <span class="where">活动页 / 首页公告旁</span>。距某个日期的天 / 时 / 分 / 秒倒计时，等宽数字 + 冒号，JS 每秒刷新。</div>
+    <div class="card countdown">
+      <div class="cell"><div class="n">3<i>2</i></div><div class="k">DAYS</div></div>
+      <div class="colon">:</div>
+      <div class="cell"><div class="n">0<i>7</i></div><div class="k">HOURS</div></div>
+      <div class="colon">:</div>
+      <div class="cell"><div class="n">4<i>5</i></div><div class="k">MIN</div></div>
+      <div class="colon">:</div>
+      <div class="cell"><div class="n">1<i>2</i></div><div class="k">SEC</div></div>
+    </div>
+  </div>
+
+  <!-- 66 通知铃铛 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>66</em>通知铃铛</b><span>BELL</span></div>
+    <div class="mod-desc">放在 <span class="where">导航栏右侧</span>。带未读角标的铃铛 + 最近通知列表，角标数字用绿色填充。</div>
+    <div class="card bell">
+      <div class="ico">🔔<span class="dot">3</span></div>
+      <div class="list">
+        <div class="it"><b>有新评论</b>「写得真好！」<span class="t">2m</span></div>
+        <div class="it"><b>spark 获得 5 个 Star</b><span class="t">1h</span></div>
+        <div class="it"><b>构建成功</b> main@52db269<span class="t">3h</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 67 复制反馈 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>67</em>复制反馈按钮</b><span>COPY FEEDBACK</span></div>
+    <div class="mod-desc">放在 <span class="where">邮箱 / 订阅链接旁</span>。点击后按钮短暂变为绿色「✓ 已复制」再复原，Clipboard API 一行搞定。</div>
+    <div class="card copybtn"><input class="field" value="im@hhan.me" readonly><button class="done">✓ 已复制</button></div>
+  </div>
+
+  <!-- 68 弹窗拦截提示 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>68</em>弹窗拦截提示</b><span>POPUP BLOCKED</span></div>
+    <div class="mod-desc">放在 <span class="where">外链跳转时</span>。当浏览器拦截了本应打开的新窗口时，提示用户手动放行，避免「点了没反应」的困惑。</div>
+    <div class="card popblock">
+      <div class="box"><b>浏览器阻止了弹出窗口</b><br>本站需要打开新窗口来展示预览，请在地址栏允许弹出窗口后重试。</div>
+      <button>重试打开</button>
+    </div>
+  </div>
+
+  <!-- 69 深色模式预览 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>69</em>深色模式预览</b><span>DARK PREVIEW</span></div>
+    <div class="mod-desc">放在 <span class="where">主题设置演示</span>。同一个卡片在深色下的效果示意——现有站点已支持，这里是给设置面板做的预览框。</div>
+    <div class="card" style="padding:18px 24px;background:#171717;border-color:rgba(255,255,255,.12);">
+      <div style="color:#fafafa;font-size:13px;font-weight:600;">深色模式下的标题</div>
+      <div style="color:rgba(255,255,255,.55);font-size:12px;margin-top:4px;">次要文字用低透明度，卡片用深灰而非纯黑，保留层次。</div>
+      <div style="display:flex;gap:8px;margin-top:12px;"><span class="chip" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.8);">跟随系统</span><span class="chip" style="background:rgba(0,188,125,.2);border-color:var(--accent);color:#4adea0;">深色</span></div>
+    </div>
+  </div>
+
+  <!-- 70 待办清单 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>70</em>待办清单</b><span>TODO</span></div>
+    <div class="mod-desc">放在 <span class="where">「最近在做」板块</span>。勾选即划线的小清单，配完成度统计。localStorage 持久化，零后端，天然适合「当前任务」展示。</div>
+    <div class="card todos">
+      <div class="it done"><span class="cb">✓</span><span>完成个人主页 v2 重写</span><span class="pct">✓</span></div>
+      <div class="it done"><span class="cb">✓</span><span>给 spark 写 README</span><span class="pct">✓</span></div>
+      <div class="it"><span class="cb"></span><span>整理摄影集精选 10 张</span><span class="pct">2/4</span></div>
+      <div class="it"><span class="cb"></span><span>学习 Next.js 服务端组件</span><span class="pct"></span></div>
+    </div>
+  </div>
+
+  <!-- 71 番茄钟 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>71</em>番茄钟</b><span>POMODORO</span></div>
+    <div class="mod-desc">放在 <span class="where">首页小工具 / 新标签页</span>。25 分钟倒计时圆环 + 开始/暂停 + 轮次圆点，写完代码的人最需要它。</div>
+    <div class="card pomo">
+      <div class="ring">
+        <svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="48" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="7"/><circle cx="55" cy="55" r="48" fill="none" stroke="#00bc7d" stroke-width="7" stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="75.4" transform="rotate(-90 55 55)"/></svg>
+        <div class="v"><b>18:42</b><span>FOCUS</span></div>
+      </div>
+      <div class="ctl">
+        <button class="pri">开始专注</button>
+        <button>重置</button>
+        <div class="rounds"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 72 计算器 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>72</em>迷你计算器</b><span>CALCULATOR</span></div>
+    <div class="mod-desc">放在 <span class="where">小工具页</span>。复古按键布局的迷你计算器，纯前端，给「工具型页面」凑数的经典选择。</div>
+    <div class="calc">
+      <div class="scr"><small>MEMORY · 上次结果</small>1,024</div>
+      <div class="keys">
+        <button>C</button><button>±</button><button>%</button><button class="op">÷</button>
+        <button>7</button><button>8</button><button>9</button><button class="op">×</button>
+        <button>4</button><button>5</button><button>6</button><button class="op">−</button>
+        <button>1</button><button>2</button><button>3</button><button class="op">+</button>
+        <button>0</button><button>.</button><button class="eq">=</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 73 色板生成 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>73</em>配色板</b><span>PALETTE</span></div>
+    <div class="mod-desc">放在 <span class="where">设计工具页</span>。一键生成 5 色配色方案，悬停显示色值，点击复制。设计向主页的加分小工具。</div>
+    <div class="card palette">
+      <div class="sw">
+        <i style="background:#00bc7d"><small>#00BC7D</small></i>
+        <i style="background:#22d3ee"><small>#22D3EE</small></i>
+        <i style="background:#6366f1"><small>#6366F1</small></i>
+        <i style="background:#f59e0b"><small>#F59E0B</small></i>
+        <i style="background:#ef4444"><small>#EF4444</small></i>
+      </div>
+      <div class="copy-row"><input value="#00BC7D  #22D3EE  #6366F1  #F59E0B  #EF4444" readonly><button>复制全部</button></div>
+    </div>
+  </div>
+
+  <!-- 74 二维码 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>74</em>二维码生成</b><span>QR CODE</span></div>
+    <div class="mod-desc">放在 <span class="where">联系板块 / 打赏旁</span>。把当前页面链接生成二维码，手机扫码直达。接 qrcode 库约 10 分钟。</div>
+    <div class="card qr">
+      <div class="code"><svg viewBox="0 0 7 7" shape-rendering="crispEdges"><rect x="0" y="0" width="3" height="3" fill="#171717"/><rect x="1" y="1" width="1" height="1" fill="#fff"/><rect x="4" y="0" width="3" height="3" fill="#171717"/><rect x="5" y="1" width="1" height="1" fill="#fff"/><rect x="0" y="4" width="3" height="3" fill="#171717"/><rect x="1" y="5" width="1" height="1" fill="#fff"/><rect x="3" y="3" width="1" height="1" fill="#171717"/><rect x="4" y="4" width="1" height="1" fill="#171717"/><rect x="5" y="4" width="1" height="1" fill="#171717"/><rect x="3" y="5" width="1" height="1" fill="#171717"/><rect x="4" y="6" width="1" height="1" fill="#171717"/><rect x="6" y="3" width="1" height="1" fill="#171717"/><rect x="6" y="5" width="1" height="1" fill="#171717"/><rect x="2" y="4" width="1" height="1" fill="#171717"/><rect x="6" y="6" width="1" height="1" fill="#171717"/></svg></div>
+      <div class="txt"><b>扫码打开本站</b><span>https://www.hhan.me</span><button>下载 PNG</button></div>
+    </div>
+  </div>
+
+  <!-- 75 随机选择器 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>75</em>转盘随机器</b><span>PICKER</span></div>
+    <div class="mod-desc">放在 <span class="where">小工具页 / 娱乐区</span>。今天吃什么 / 用哪个方案，转盘一转出结果。conic-gradient 画扇区 + transform 旋转，纯 CSS 也能做。</div>
+    <div class="card picker">
+      <div class="wheel"><i style="transform:rotate(24deg)"></i><div class="hub"></div></div>
+      <button>转一下</button>
+    </div>
+  </div>
+
+  <!-- 76 密码强度 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>76</em>密码强度检测</b><span>PASSWORD</span></div>
+    <div class="mod-desc">放在 <span class="where">登录注册页</span>。输入即显示强度分段条与提示，纯前端正则判断，几行代码的实用组件。</div>
+    <div class="card pw">
+      <div class="row"><input value="Hhan#2026!"><button style="border:1px solid var(--border);background:#fff;border-radius:8px;padding:0 12px;font-size:12px;cursor:pointer;">👁</button></div>
+      <div class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+      <span class="hint">强度：强 · 建议偶尔更换，避免与其他站点重复</span>
+    </div>
+  </div>
+
+  <!-- 77 字数统计 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>77</em>字数统计</b><span>WORD COUNT</span></div>
+    <div class="mod-desc">放在 <span class="where">文章编辑页 / 文章头部</span>。字数、字符、阅读时长的实时统计，写作时看着数字增长很有成就感。</div>
+    <div class="card words">
+      <div><div class="n">3<i>,847</i></div><div class="k">字数</div></div>
+      <div><div class="n">4<i>,102</i></div><div class="k">字符</div></div>
+      <div><div class="n">1<i>2</i></div><div class="k">分钟阅读</div></div>
+    </div>
+  </div>
+
+  <!-- 78 单位换算 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>78</em>单位换算</b><span>CONVERTER</span></div>
+    <div class="mod-desc">放在 <span class="where">小工具页</span>。长度 / 重量 / 存储等常用换算，输入即算，等宽数字显示结果。</div>
+    <div class="card convert">
+      <div class="row"><input value="16"><select class="sel"><option>GB</option></select><span class="eq">→</span><input value="16384" readonly><select class="sel"><option>MB</option></select></div>
+      <div class="res">结果：<b>16 GB = 16,384 MB</b></div>
+    </div>
+  </div>
+
+  <!-- 79 摸鱼提醒 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>79</em>摸鱼提醒</b><span>BREAK</span></div>
+    <div class="mod-desc">放在 <span class="where">全局（定时弹提示）</span>。每 25 分钟提醒站起来、喝水、看远方，程序员自我关怀型小组件，可用 Notification API。</div>
+    <div class="card breaks">
+      <div><div class="ic">💧</div><b>喝水</b><span>每 40 分钟</span></div>
+      <div><div class="ic">🧍</div><b>站立</b><span>每 25 分钟</span></div>
+      <div><div class="ic">👀</div><b>远眺</b><span>每 60 分钟</span></div>
+    </div>
+  </div>
+
+  <!-- 80 评论区 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>80</em>评论区</b><span>COMMENTS</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页底部</span>。头像 + 昵称 + 时间 + 回复的完整评论流，可接 Giscus（GitHub Discussions）零后端。</div>
+    <div class="card comments">
+      <div class="cm"><span class="av">浩</span><div style="flex:1"><b>HanHanWeb <span class="t">2 小时前</span></b><p>这个设计提案页面本身就是个很好的作品，风格统一又克制。</p><span class="reply">回复</span></div></div>
+      <div class="cm"><span class="av">K</span><div style="flex:1"><b>Kirito <span class="t">昨天</span></b><p>已用你推荐的 shadcn 风格重写了主页，爱了。</p><span class="reply">回复</span></div></div>
+      <div class="input"><span class="av">我</span><input placeholder="写下你的评论…"><button>发送</button></div>
+    </div>
+  </div>
+
+  <!-- 81 点赞按钮 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>81</em>点赞按钮</b><span>LIKE</span></div>
+    <div class="mod-desc">放在 <span class="where">文章底部 / 项目卡片</span>。点击变红放大、再点取消，数字跳动更新。加个简单的溢出动画就很出效果。</div>
+    <div class="card like"><button class="on">♥</button><div class="cnt"><b>1,024</b>人觉得不错</div></div>
+  </div>
+
+  <!-- 82 分享按钮 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>82</em>分享按钮组</b><span>SHARE</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页 / 项目页</span>。微信 / 微博 / 复制链接等分享入口，hover 上浮并带各平台主题色。</div>
+    <div class="card shares"><button class="wx">💬</button><button class="wb">📣</button><button>🔗</button><button>✈️</button><button>🐦</button></div>
+  </div>
+
+  <!-- 83 留言板 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>83</em>留言板</b><span>GUESTBOOK</span></div>
+    <div class="mod-desc">放在 <span class="where">联系板块前</span>。一句留言 + 昵称即可，比完整评论更轻。可接 GitHub Issue 当存储，零服务器成本。</div>
+    <div class="card guest">
+      <div class="m"><span class="av">帆</span><div class="txt"><b>帆酱 <em>2026-09-10</em></b><p>从微博来的，主页好看，已加收藏夹。</p></div></div>
+      <div class="m"><span class="av">T</span><div class="txt"><b>Tim <em>2026-09-08</em></b><p>terminal 那个交互太酷了，抄了（不是）。</p></div></div>
+      <div class="write"><input placeholder="留下你的名字和想说的话…"><button>留言</button></div>
+    </div>
+  </div>
+
+  <!-- 84 打赏支持 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>84</em>打赏支持</b><span>SUPPORT</span></div>
+    <div class="mod-desc">放在 <span class="where">页脚 / 关于板块</span>。「请我喝杯咖啡」按钮 + 微信/支付宝二维码弹层，独立开发者主页的传统艺能。</div>
+    <div class="card support">
+      <div class="txt"><b>喜欢这些开源项目？</b><span>你的支持是持续更新的动力 ☕</span></div>
+      <div class="btns"><button class="pri">☕ 请我喝咖啡</button><button>💰 赞助</button></div>
+    </div>
+  </div>
+
+  <!-- 85 社交图标 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>85</em>社交图标墙</b><span>SOCIAL</span></div>
+    <div class="mod-desc">放在 <span class="where">联系板块 / 页脚</span>。GitHub / 微博 / B站 / 邮件等圆形图标排布，hover 变绿底白字。simple-icons 直接可用。</div>
+    <div class="card socialrow"><a href="#">G</a><a href="#">📖</a><a href="#">📺</a><a href="#">✉️</a><a href="#">🐦</a><a href="#">📷</a></div>
+  </div>
+
+  <!-- 86 GitHub 动态 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>86</em>GitHub 动态流</b><span>GH ACTIVITY</span></div>
+    <div class="mod-desc">放在 <span class="where">贡献板块旁</span>。Star / Push / Fork 事件时间流，构建时从 GitHub API 拉取，展示「最近在忙什么」。</div>
+    <div class="card gfeed">
+      <div class="it"><span class="ic star">★</span><div class="d"><b>starred</b> vercel/next.js<span class="t">2h</span></div></div>
+      <div class="it"><span class="ic push">▲</span><div class="d"><b>pushed</b> to HanHanWeb/homepage · 3 commits<span class="t">5h</span></div></div>
+      <div class="it"><span class="ic fork">⑂</span><div class="d"><b>forked</b> shadcn-ui/ui<span class="t">1d</span></div></div>
+    </div>
+  </div>
+
+  <!-- 87 访客头像 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>87</em>最近访客</b><span>AVATARS</span></div>
+    <div class="mod-desc">放在 <span class="where">留言板 / 页脚</span>。叠放头像 + 数字，「还有 20+ 位访客最近来过」，社交证明心理学的经典用法。</div>
+    <div class="card avatars">
+      <div class="stack"><i>H</i><i>K</i><i>F</i><i>T</i></div>
+      <div class="txt"><span><b>20+</b> 位访客最近来过</span><br><span style="font-size:11px;color:var(--muted2);">来自 6 个国家与地区</span></div>
+    </div>
+  </div>
+
+  <!-- 88 表情反应 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>88</em>表情反应</b><span>REACTIONS</span></div>
+    <div class="mod-desc">放在 <span class="where">文章底部</span>。😀 👍 ❤️ 等一排表情按钮 + 计数，点过的绿色高亮，比单独点赞更热闹。</div>
+    <div class="card reacts"><button class="on">👍 <span class="n">128</span></button><button>❤️ <span class="n">96</span></button><button>😮 <span class="n">24</span></button><button>🔥 <span class="n">41</span></button><button>🎉 <span class="n">12</span></button></div>
+  </div>
+
+  <!-- 89 关注按钮 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>89</em>关注按钮</b><span>FOLLOW</span></div>
+    <div class="mod-desc">放在 <span class="where">关于板块 / 侧边栏</span>。头像 + 简介 + 关注/已关注切换，状态存 localStorage。为以后接入账号体系预留。</div>
+    <div class="card follow">
+      <div class="av">H</div>
+      <div class="txt"><b>Han · 学生开发者</b><span>分享开发、设计与摄影</span></div>
+      <button class="followed">已关注</button>
+    </div>
+  </div>
+
+  <!-- 90 相关文章 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>90</em>相关文章推荐</b><span>RELATED</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页底部</span>。按标签相似度推荐 3 篇相关文章，读完自动引导继续阅读，静态构建时即可算好。</div>
+    <div class="card related">
+      <a href="#"><b>给主页加一个 ⌘K 命令面板</b><span class="m mono">React · 2026-09-06</span></a>
+      <a href="#"><b>Tailwind CSS 4 的 oklch 颜色</b><span class="m mono">CSS · 2026-08-12</span></a>
+      <a href="#"><b>从 0 到 1：spark 便签工具</b><span class="m mono">Design · 2026-09-10</span></a>
+    </div>
+  </div>
+
+  <!-- 91 上下篇导航 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>91</em>上一篇 / 下一篇</b><span>PREV / NEXT</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页底部</span>。左右两半的翻页卡，带小标签与标题，移动端自动变成上下堆叠。</div>
+    <div class="card pn">
+      <a href="#"><span class="k">← 上一篇</span><b>给主页加一个 ⌘K 命令面板</b></a>
+      <a href="#"><span class="k">下一篇 →</span><b>从 0 到 1：spark 便签工具的设计笔记</b></a>
+    </div>
+  </div>
+
+  <!-- 92 文章标签 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>92</em>文章标签</b><span>TAGS</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页头部 / 底部</span>。当前文章的标签胶囊排，点击进入标签归档页。</div>
+    <div class="card posttags"><span class="t"># Next.js</span><span class="t"># 前端</span><span class="t"># 重写</span><span class="t"># 踩坑</span></div>
+  </div>
+
+  <!-- 93 热度榜 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>93</em>热门文章榜</b><span>HOT POSTS</span></div>
+    <div class="mod-desc">放在 <span class="where">博客侧边栏</span>。按浏览量排行的 Top 列表，前三名绿色徽章，数字用等宽字体。</div>
+    <div class="card hot">
+      <div class="it"><span class="rank">1</span>用 Next.js 16 + Turbopack 重写主页<span class="cnt">2.4k</span></div>
+      <div class="it"><span class="rank">2</span>给主页加一个 ⌘K 命令面板<span class="cnt">1.8k</span></div>
+      <div class="it"><span class="rank">3</span>Tailwind CSS 4 新特性一览<span class="cnt">1.2k</span></div>
+      <div class="it"><span class="rank">4</span>我的摄影装备清单<span class="cnt">860</span></div>
+    </div>
+  </div>
+
+  <!-- 94 搜索高亮 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>94</em>搜索结果高亮</b><span>HIGHLIGHT</span></div>
+    <div class="mod-desc">放在 <span class="where">站内搜索</span>。匹配关键词以绿色底色标出，让访客一眼看到「为什么这条匹配」。</div>
+    <div class="card hilite">
+      在搜索结果中，匹配的关键词会用绿色底纹<em>高亮</em>显示。例如搜索「<em>next</em>」时，所有包含 next 的位置都会被标记出来。<br><span class="hint">← 匹配文字以绿色底纹显示（示意）</span>
+    </div>
+  </div>
+
+  <!-- 95 代码主题切换 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>95</em>代码主题切换</b><span>CODE THEME</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页代码块</span>。深 / 浅两档代码配色随站点主题联动，也可独立切换。shiki 双主题输出即可。</div>
+    <div class="card codetheme">
+      <div class="seg2"><button>浅色</button><button class="on">深色</button></div>
+      <div class="mini dark"></div>
+    </div>
+  </div>
+
+  <!-- 96 阅读进度 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>96</em>阅读进度百分比</b><span>READING %</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页侧边 / 顶部</span>。显示「已读 64%」的数字 + 进度条，长文读者的定心丸。</div>
+    <div class="card readpct"><div class="p">64<small>%</small></div><div class="bar"><i></i></div><span class="mono" style="font-size:11px;color:var(--muted2);">4:12 / 6:30</span></div>
+  </div>
+
+  <!-- 97 引用生成 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>97</em>引用生成器</b><span>CITATION</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页</span>。一键生成 APA / GB/T 7714 格式引用文本并复制，写论文查资料时会被感激的。</div>
+    <div class="card cite"><input value="Han. 用 Next.js 16 重写个人主页 [EB/OL]. (2026-08-30). https://www.hhan.me." readonly><button>复制</button></div>
+  </div>
+
+  <!-- 98 阅读模式 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>98</em>阅读模式</b><span>READER</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页工具栏</span>。一键隐藏装饰、放大正文字号、居中限宽的沉浸阅读视图，点击再恢复。</div>
+    <div class="card reader">
+      <div class="prev"><b>正文预览</b><br>这是阅读模式下的正文样式：更大字号、更宽行距、专注内容本身，所有装饰元素被暂时隐藏。</div>
+      <div class="ctl"><button class="on">阅读模式</button><button>退出</button></div>
+    </div>
+  </div>
+
+  <!-- 99 文章操作条 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>99</em>文章操作条</b><span>POST BAR</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页底部</span>。收藏 / 分享 / 复制链接 / 打印一组操作按钮，收藏状态绿色高亮。</div>
+    <div class="card postbar"><button>☆ 收藏</button><button>🔗 复制链接</button><button class="on">♥ 已赞</button><button>🖨 打印</button></div>
+  </div>
+
+  <!-- 100 字体切换 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>100</em>字体切换</b><span>FONT SWITCHER</span></div>
+    <div class="mod-desc">放在 <span class="where">设置面板</span>。衬线 / 无衬线 / 等宽三档正文预览切换，选择存 localStorage。本站已有衬线标题字体，扩展很自然。</div>
+    <div class="card fontsw">
+      <div class="row">
+        <div class="opt f-serif on"><b>衬线</b><span>Georgia</span></div>
+        <div class="opt"><b>无衬线</b><span>Geist Sans</span></div>
+        <div class="opt f-mono"><b>等宽</b><span>JetBrains Mono</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 101 字号调节 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>101</em>字号调节</b><span>FONT SIZE</span></div>
+    <div class="mod-desc">放在 <span class="where">文章页工具栏 / 设置</span>。A− / A / A+ 三档，正文实时预览变化，适配不同视力与屏幕。</div>
+    <div class="card sizes">
+      <div class="ctl"><button>−</button><button style="font-weight:700;">A</button><button>+</button></div>
+      <div class="preview"><b>正文字号预览</b><br>调整字号不会影响布局结构，仅改变阅读区域。</div>
+    </div>
+  </div>
+
+  <!-- 102 行距调节 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>102</em>行距调节</b><span>LINE SPACING</span></div>
+    <div class="mod-desc">放在 <span class="where">阅读设置</span>。紧凑 / 舒适 / 宽松三档行距，长文阅读者喜欢自己掌控密度。</div>
+    <div class="card spacing">
+      <div class="ctl"><button>紧凑</button><button class="on">舒适</button><button>宽松</button></div>
+      <div class="demo"><p>这是一段正文示例文字，用于展示行距差异。舒适档（1.75）是最适合中文长文阅读的密度。</p></div>
+    </div>
+  </div>
+
+  <!-- 103 反色模式 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>103</em>反色 / 高对比</b><span>INVERT</span></div>
+    <div class="mod-desc">放在 <span class="where">无障碍设置</span>。一键反色 + 提高对比度，照顾低视力用户，符合 WCAG 精神。</div>
+    <div class="card invert">
+      <div class="switch off"><i></i></div>
+      <div class="preview">开启后：深色底白字、对比度增强（示意）</div>
+    </div>
+  </div>
+
+  <!-- 104 圆角调节 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>104</em>圆角调节</b><span>RADIUS</span></div>
+    <div class="mod-desc">放在 <span class="where">设置面板</span>。滑杆调全局圆角，三个预览方块实时变化。本站卡片圆角 12px，可调范围 0–24px。</div>
+    <div class="card radius">
+      <div class="row"><input type="range" min="0" max="24" value="12"><span class="v">12px</span></div>
+      <div class="shapes"><div class="shape r1">4</div><div class="shape r2">12</div><div class="shape r3">24</div></div>
+    </div>
+  </div>
+
+  <!-- 105 主题色选择 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>105</em>主题色选择</b><span>ACCENT</span></div>
+    <div class="mod-desc">放在 <span class="where">设置面板</span>。品牌绿之外再给几个可选主题色（蓝 / 紫 / 橙），通过 CSS 变量一键换肤。</div>
+    <div class="card accent">
+      <div class="swatches">
+        <i class="on" style="background:#00bc7d;"></i>
+        <i style="background:#3b82f6;"></i>
+        <i style="background:#8b5cf6;"></i>
+        <i style="background:#f97316;"></i>
+        <i style="background:#ec4899;"></i>
+      </div>
+      <span class="hint">当前：品牌绿 #00BC7D · 换肤只需覆盖 --accent 变量</span>
+    </div>
+  </div>
+
+  <!-- 106 界面密度 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>106</em>界面密度</b><span>DENSITY</span></div>
+    <div class="mod-desc">放在 <span class="where">设置面板</span>。紧凑 / 舒适两档间距，用 CSS 变量控制 padding，适合信息量大的列表页。</div>
+    <div class="card density">
+      <div class="opt cozy"><div class="rows"><i></i><i></i><i></i><i></i></div><b>紧凑</b></div>
+      <div class="opt on"><div class="rows" style="gap:6px;"><i></i><i></i><i></i></div><b>舒适</b></div>
+    </div>
+  </div>
+
+  <!-- 107 背景选择 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>107</em>自定义背景</b><span>BG PICKER</span></div>
+    <div class="mod-desc">放在 <span class="where">设置面板</span>。纯白 / 浅灰 / 点阵 / 渐变四种背景预设，静态站也能有点「个性化」。</div>
+    <div class="card bgpick">
+      <div class="opts">
+        <i class="on" style="background:#fff;border-color:var(--border);"></i>
+        <i style="background:#fafafa;border-color:var(--border);"></i>
+        <i style="background:radial-gradient(rgba(0,0,0,.1) 1px, transparent 1px);background-size:18px 18px;border-color:var(--border);"></i>
+        <i style="background:linear-gradient(135deg,#f0fdf9,#e0f2fe);"></i>
+      </div>
+      <span class="hint">背景仅作氛围，不干扰内容可读性（示意）</span>
+    </div>
+  </div>
+
+  <!-- 108 布局切换 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>108</em>布局切换</b><span>LAYOUT</span></div>
+    <div class="mod-desc">放在 <span class="where">设置面板</span>。单栏 / 双栏两套布局预览，双栏可放「目录 + 正文」或「侧边栏 + 内容」。</div>
+    <div class="card layout2">
+      <div class="opt"><div class="mock col"><i></i><i></i></div><b>单栏</b></div>
+      <div class="opt on"><div class="mock"><i class="side"></i><i class="main"></i></div><b>双栏</b></div>
+    </div>
+  </div>
+
+  <!-- 109 数据导出 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>109</em>数据导出</b><span>EXPORT</span></div>
+    <div class="mod-desc">放在 <span class="where">设置面板底部</span>。把主题 / 语言 / 偏好导出为 JSON，或一键导出全部文章为 Markdown 压缩包，静态站的「数据主权」。</div>
+    <div class="card export">
+      <div class="row"><span>导出设置与偏好</span><b>settings.json</b><button>导出</button></div>
+      <div class="row"><span>导出全部文章</span><b>posts.zip</b><button>导出</button></div>
+    </div>
+  </div>
+
+  <!-- 110 月历 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>110</em>月历卡片</b><span>CALENDAR</span></div>
+    <div class="mod-desc">放在 <span class="where">「最近更新」区</span>。当月日历 + 发文日绿色标记 + 今日高亮，一眼看清更新节奏。</div>
+    <div class="card cal">
+      <div class="hd"><b>2026 年 9 月</b><div class="nav"><button>‹</button><button>›</button></div></div>
+      <div class="grid">
+        <span class="wd">一</span><span class="wd">二</span><span class="wd">三</span><span class="wd">四</span><span class="wd">五</span><span class="wd">六</span><span class="wd">日</span>
+        <span class="d other">31</span><span class="d">1</span><span class="d">2</span><span class="d">3</span><span class="d">4</span><span class="d">5</span><span class="d">6</span>
+        <span class="d">7</span><span class="d">8</span><span class="d">9</span><span class="d act">10</span><span class="d">11</span><span class="d">12</span><span class="d">13</span>
+        <span class="d today">14</span><span class="d">15</span><span class="d act">16</span><span class="d">17</span><span class="d">18</span><span class="d">19</span><span class="d">20</span>
+        <span class="d">21</span><span class="d act">22</span><span class="d">23</span><span class="d">24</span><span class="d">25</span><span class="d">26</span><span class="d">27</span>
+        <span class="d">28</span><span class="d">29</span><span class="d">30</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 111 一周天气 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>111</em>一周天气</b><span>WEEK FORECAST</span></div>
+    <div class="mod-desc">放在 <span class="where">天气卡片展开态</span>。7 天温度趋势小格子，今天绿色高亮，配天气图标。</div>
+    <div class="card week">
+      <div class="d"><span class="wico">☀️</span>一<b>28°</b></div>
+      <div class="d"><span class="wico">☁️</span>二<b>26°</b></div>
+      <div class="d today"><span class="wico">🌧️</span>三<b>22°</b></div>
+      <div class="d"><span class="wico">🌤️</span>四<b>24°</b></div>
+      <div class="d"><span class="wico">☀️</span>五<b>27°</b></div>
+      <div class="d"><span class="wico">☀️</span>六<b>29°</b></div>
+      <div class="d"><span class="wico">⛅</span>日<b>26°</b></div>
+    </div>
+  </div>
+
+  <!-- 112 世界时钟 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>112</em>世界时钟</b><span>WORLD CLOCK</span></div>
+    <div class="mod-desc">放在 <span class="where">状态栏 / 页脚</span>。西安 / 东京 / 伦敦 / 纽约四个时区实时时钟，Intl API 即可，国际化访客的贴心细节。</div>
+    <div class="card world">
+      <div><b>14:<i>32</i></b><div class="k mono">XI'AN</div><div class="d2">UTC+8</div></div>
+      <div><b>15:<i>32</i></b><div class="k mono">TOKYO</div><div class="d2">UTC+9</div></div>
+      <div><b>07:<i>32</i></b><div class="k mono">LONDON</div><div class="d2">UTC+1</div></div>
+      <div><b>02:<i>32</i></b><div class="k mono">NEW YORK</div><div class="d2">UTC-4</div></div>
+    </div>
+  </div>
+
+  <!-- 113 网络状态 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>113</em>网络状态</b><span>NETWORK</span></div>
+    <div class="mod-desc">放在 <span class="where">离线提示 / 状态栏</span>。在线状态 + 信号强度条，断网时自动弹「当前离线」提示并缓存页面。</div>
+    <div class="card network">
+      <div class="ic">📶</div>
+      <div class="txt"><b>网络正常</b><span>在线 · 延迟 12ms · Wi-Fi</span></div>
+      <div class="meter"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+  </div>
+
+  <!-- 114 电池电量 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>114</em>电池电量</b><span>BATTERY</span></div>
+    <div class="mod-desc">放在 <span class="where">状态栏（桌面端小趣味）</span>。读取设备电池 API 显示电量与充电状态，低于 20% 变红提醒。</div>
+    <div class="card battery">
+      <div class="cell"><div class="fill"></div></div>
+      <div class="txt"><b>86%</b><span>已连接电源 · 正在充电</span></div>
+    </div>
+  </div>
+
+  <!-- 115 系统信息 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>115</em>系统信息</b><span>SYS INFO</span></div>
+    <div class="mod-desc">放在 <span class="where">「关于本站」区</span>。浏览器 / 系统 / 分辨率等环境信息，终端风的开发者彩蛋，navigator API 一行获取。</div>
+    <div class="card sysinfo">
+      <div class="row"><span class="k">浏览器</span><span class="v">Chrome 130.0</span></div>
+      <div class="row"><span class="k">系统</span><span class="v">Windows 11</span></div>
+      <div class="row"><span class="k">屏幕</span><span class="v">2560 × 1440 · 150%</span></div>
+      <div class="row"><span class="k">语言</span><span class="v">zh-CN</span></div>
+    </div>
+  </div>
+
+  <!-- 116 语言占比 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>116</em>代码语言占比</b><span>LANG MIX</span></div>
+    <div class="mod-desc">放在 <span class="where">GitHub 数据区</span>。各仓库语言占比汇总条形图，构建时从 GitHub API 拉取，颜色用官方语言色。</div>
+    <div class="card langmix">
+      <div class="it"><span class="n">TypeScript</span><div class="bar"><i style="width:58%;background:#3178c6;"></i></div><span class="pct">58%</span></div>
+      <div class="it"><span class="n">CSS</span><div class="bar"><i style="width:22%;background:#663399;"></i></div><span class="pct">22%</span></div>
+      <div class="it"><span class="n">JavaScript</span><div class="bar"><i style="width:14%;background:#f1e05a;"></i></div><span class="pct">14%</span></div>
+      <div class="it"><span class="n">其他</span><div class="bar"><i style="width:6%;background:#a3a3a3;"></i></div><span class="pct">6%</span></div>
+    </div>
+  </div>
+
+  <!-- 117 技能雷达图 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>117</em>技能雷达图</b><span>RADAR</span></div>
+    <div class="mod-desc">放在 <span class="where">技能区（与技能条二选一）</span>。五维雷达图展示能力画像，SVG 手写即可，比条形图更有「评测感」。</div>
+    <div class="card radar">
+      <div class="svg">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <polygon points="60,14 104,40 92,94 28,94 16,40" fill="none" stroke="rgba(0,0,0,.12)"/>
+          <polygon points="60,14 104,40 92,94 28,94 16,40" fill="rgba(0,188,125,.16)" stroke="#00bc7d" stroke-width="1.5"/>
+          <polygon points="60,34 86,50 80,82 40,82 34,50" fill="none" stroke="rgba(0,0,0,.1)"/>
+          <polygon points="60,52 72,60 70,74 50,74 48,60" fill="none" stroke="rgba(0,0,0,.1)"/>
+          <line x1="60" y1="14" x2="60" y2="106" stroke="rgba(0,0,0,.06)"/>
+          <line x1="16" y1="40" x2="104" y2="40" stroke="rgba(0,0,0,.06)"/>
+          <line x1="28" y1="94" x2="92" y2="94" stroke="rgba(0,0,0,.06)"/>
+        </svg>
+      </div>
+      <div class="list">
+        <div class="it"><i></i><span>前端开发 85</span></div>
+        <div class="it"><i></i><span>UI 设计 78</span></div>
+        <div class="it"><i></i><span>后端服务 62</span></div>
+        <div class="it"><i></i><span>运维部署 58</span></div>
+        <div class="it"><i></i><span>影像创作 72</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 118 徽章墙 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>118</em>项目徽章墙</b><span>BADGES WALL</span></div>
+    <div class="mod-desc">放在 <span class="where">README / 项目卡片</span>。shields.io 风格的构建状态、版本、许可徽章排，开源项目的门面。</div>
+    <div class="card badgeswall">
+      <span class="b"><em>build</em><span class="ok">passing</span></span>
+      <span class="b"><em>version</em><span>2.4.0</span></span>
+      <span class="b"><em>license</em><span>MIT</span></span>
+      <span class="b"><em>stars</em><span class="ok">1.2k</span></span>
+      <span class="b"><em>next</em><span>16.3</span></span>
+      <span class="b"><em>pnpm</em><span>11</span></span>
+    </div>
+  </div>
+
+  <!-- 119 订阅统计 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>119</em>订阅 / 粉丝统计</b><span>SUBSCRIBERS</span></div>
+    <div class="mod-desc">放在 <span class="where">页脚 / 关注区</span>。RSS 订阅数、GitHub 关注者、社交粉丝数 + 涨跌趋势，数字等宽字体。</div>
+    <div class="card subs">
+      <div><div class="num">1<i>,284</i></div><div class="k">GitHub Stars</div><div class="trend">▲ +32 本周</div></div>
+      <div><div class="num">8<i>6</i></div><div class="k">Followers</div><div class="trend">▲ +5 本周</div></div>
+      <div><div class="num">3<i>2</i>1</div><div class="k">RSS 订阅</div><div class="trend">▲ +8 本周</div></div>
+    </div>
+  </div>
+
+  <!-- 120 彩蛋小游戏 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>120</em>彩蛋小游戏</b><span>MINI GAME</span></div>
+    <div class="mod-desc">放在 <span class="where">页脚「按 F 进入游戏」彩蛋</span>。2048 / 贪吃蛇的极简版，藏在页面角落，发现的人会心一笑。</div>
+    <div class="card game">
+      <div class="board">
+        <i>2</i><i></i><i>4</i><i></i>
+        <i></i><i class="big">8</i><i></i><i>2</i>
+        <i>4</i><i></i><i></i><i></i>
+        <i></i><i>2</i><i class="big">16</i><i></i>
+      </div>
+      <div class="score">SCORE <b>2,048</b></div>
+    </div>
+  </div>
+
+  <!-- 121 打字测试 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>121</em>打字速度测试</b><span>TYPING TEST</span></div>
+    <div class="mod-desc">放在 <span class="where">小工具页</span>。60 秒限时打字，统计 WPM 与正确率，实时标出已打 / 打错字符。开发者们的最爱。</div>
+    <div class="card typingtest">
+      <div class="text"><em>the quick brown fox</em><b> jumps</b> over the lazy dog — 用你的键盘输入这段文字，实时显示速度与错误。</div>
+      <div class="stats"><span>速度 <b>64</b> WPM</span><span>正确率 <b>98%</b></span><span>时间 <b>42s</b></span></div>
+    </div>
+  </div>
+
+  <!-- 122 点击粒子 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>122</em>点击粒子特效</b><span>CLICK FX</span></div>
+    <div class="mod-desc">放在 <span class="where">Hero / 背景（可选）</span>。点击处爆开 6 粒小圆点向四周扩散消散，JS 20 行，桌面端限定。下方方块为示意。</div>
+    <div class="card clickfx">
+      <div class="area">点击这里<span class="fx" style="left:60px;top:30px;"></span><span class="fx" style="left:120px;top:60px;"></span><span class="fx" style="left:90px;top:80px;"></span><span class="fx" style="left:150px;top:40px;"></span></div>
+      <div class="legend"><span>● 点击产生粒子</span><span>● 扩散后消失</span><span>● 移动端关闭</span></div>
+    </div>
+  </div>
+
+  <!-- 123 鼠标星轨 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>123</em>鼠标星轨</b><span>STAR TRAIL</span></div>
+    <div class="mod-desc">放在 <span class="where">全局（可选）</span>。鼠标拖出渐隐的绿色小星星轨迹，canvas 实现，注意与「鼠标光晕」二选一避免叠加。</div>
+    <div class="card" style="padding:18px 24px;">
+      <div class="trail"><span class="t"></span><span class="t"></span><span class="t"></span><span class="t"></span><span class="t"></span><span class="t"></span><span class="cursor">🖱</span><span class="chip" style="position:relative;z-index:1;">← 鼠标移动拖出星轨（示意）</span></div>
+    </div>
+  </div>
+
+  <!-- 124 花瓣飘落 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>124</em>花瓣飘落</b><span>PETALS</span></div>
+    <div class="mod-desc">放在 <span class="where">主题日 / 樱花季彩蛋</span>。粉色花瓣缓缓飘落循环动画，纯 CSS 就能做，节日限定使用更有惊喜感。</div>
+    <div class="card" style="padding:18px 24px;">
+      <div class="petals"><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><span class="label chip">🌸 花瓣飘落 · CSS 动画（示意）</span></div>
+    </div>
+  </div>
+
+  <!-- 125 萤火虫背景 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>125</em>萤火虫背景</b><span>FIREFLIES</span></div>
+    <div class="mod-desc">放在 <span class="where">深色模式背景（可选）</span>。暗色底上游动的荧光小点，缓慢明灭。性能开销小，纯 CSS keyframes 即可。</div>
+    <div class="card" style="padding:18px 24px;">
+      <div class="fireflies"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><span class="label">萤火虫 · 深色模式限定</span></div>
+    </div>
+  </div>
+
+  <!-- 126 庆祝彩带 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>126</em>庆祝彩带</b><span>CONFETTI</span></div>
+    <div class="mod-desc">放在 <span class="where">发布成功 / 达成成就时</span>。点击按钮撒一把彩带，canvas-confetti 约 5KB，用在对的时刻（比如「spark 破 1k Star」）。</div>
+    <div class="card confetti">
+      <button>🎉 庆祝一下</button>
+      <div class="pieces"><i style="background:#00bc7d;"></i><i style="background:#22d3ee;"></i><i style="background:#f59e0b;"></i><i style="background:#ef4444;"></i><i style="background:#8b5cf6;"></i><i style="background:#ec4899;"></i><i style="background:#00bc7d;"></i><i style="background:#f59e0b;"></i></div>
+      <span class="hint">canvas-confetti · 关键节点才用</span>
+    </div>
+  </div>
+
+  <!-- 127 CRT 复古屏 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>127</em>CRT 复古屏</b><span>CRT</span></div>
+    <div class="mod-desc">放在 <span class="where">终端卡片的可选皮肤</span>。扫描线 + 荧光绿的复古显示器效果，怀旧向用户的可选开关。</div>
+    <div class="card crt">
+      <div class="screen">&gt; 加载复古终端…<br>&gt; CRT 扫描线已启用 ✓<br>&gt; 显示模式：PAL 60Hz</div>
+      <div class="ctl"><button class="on">CRT 开</button><button>关</button></div>
+    </div>
+  </div>
+
+  <!-- 128 音效开关 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>128</em>界面音效</b><span>SFX</span></div>
+    <div class="mod-desc">放在 <span class="where">设置面板</span>。悬停 / 点击 / 成功三档轻音效开关，Web Audio 合成或预置短音频，默认关闭不打扰。</div>
+    <div class="card sfx">
+      <div class="row">悬停音效<div class="bars"><i></i><i></i><i></i><i></i><i></i></div></div>
+      <div class="row">点击音效<span style="font-size:11px;color:var(--muted2);">已开启</span></div>
+      <div class="row">成功提示音<span style="font-size:11px;color:var(--muted2);">已开启</span></div>
+    </div>
+  </div>
+
+  <!-- 129 控制台彩蛋 -->
+  <div class="mod">
+    <div class="mod-label"><b><em>129</em>控制台彩蛋</b><span>KONAMI</span></div>
+    <div class="mod-desc">放在 <span class="where">开发者专属彩蛋</span>。按上上下下左右左右 BA 触发隐藏特效；F12 打开控制台还会打印 ASCII 艺术字欢迎语。</div>
+    <div class="card konami">
+      <div class="keys"><kbd>↑</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd><kbd>←</kbd><kbd>→</kbd><kbd>B</kbd><kbd>A</kbd></div>
+      <div class="art"> ____   __  __   ____   _   _    ___    ____   _   _
+|  _ \ |  \/  | / ___| | \ | |  / _ \  |  _ \ | | | |
+| |_) || |\/| || |     |  \| | | | | | | |_) || |_| |
+|  __/ | |  | || |___  | |\  | | |_| | |  _ &lt; |  _  |
+|_|    |_|  |_| \____| |_| \_|  \___/  |_| \_\|_| |_|</div>
+      <div class="hint">console.log 里的小彩蛋 · 按 ↑↑↓↓←→←→BA 试试</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px;color:var(--muted2);text-align:center;margin-top:70px;">
+    右下角<b>回到顶部按钮</b>已实现上线（即右下角示意）；RSS 订阅见上方第 21 项。其余模块按优先级挑着做即可。
+  </p>
+</div>
+
+<!-- 回到顶部示意 -->
+<div class="totop" title="回到顶部（示意）">
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+</div>
+
+<script>
+  // 实时时钟（UTC+8 西安）
+  function tick() {
+    const now = new Date(Date.now() + (480 + new Date().getTimezoneOffset()) * 60000);
+    const p = (n) => String(n).padStart(2, "0");
+    document.getElementById("clock").textContent =
+      p(now.getHours()) + ":" + p(now.getMinutes()) + ":" + p(now.getSeconds());
+  }
+  tick(); setInterval(tick, 1000);
+
+  // 今年进度
+  (function () {
+    const start = new Date(new Date().getFullYear(), 0, 1);
+    const end = new Date(new Date().getFullYear() + 1, 0, 1);
+    const pct = ((Date.now() - start) / (end - start) * 100);
+    document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById("yearbar").style.width = pct.toFixed(1) + "%";
+    document.getElementById("yearpct").textContent = pct.toFixed(1) + "% · Day " + Math.ceil((Date.now() - start) / 86400000);
+  })();
+
+  // 一言轮换（示例句子池）
+  const quotes = [
+    ["把喜欢的事做到极致，时间自然会给你答案。", "— 示例句子"],
+    ["简单，比复杂更难，但你必须努力让它简单。", "— Steve Jobs"],
+    ["Talk is cheap. Show me the code.", "— Linus Torvalds"],
+    ["设计不是看起来如何，而是如何运作。", "— Steve Jobs"],
+  ];
+  let qi = 0;
+  document.getElementById("hk-btn").addEventListener("click", () => {
+    qi = (qi + 1) % quotes.length;
+    document.getElementById("hk-txt").textContent = quotes[qi][0];
+    document.getElementById("hk-from").textContent = quotes[qi][1];
+  });
+
+  // 打字机效果（11 号模块演示）
+  const phrases = ["Hi, I'm Han.", "A student, developer & designer.", "Building things that feel alive."];
+  let pi = 0, ci = 0, deleting = false;
+  function type() {
+    const el = document.getElementById("type-text");
+    const cur = phrases[pi];
+    if (!deleting) {
+      ci++;
+      el.textContent = cur.slice(0, ci);
+      if (ci >= cur.length) { deleting = true; setTimeout(type, 1800); return; }
+      setTimeout(type, 75);
+    } else {
+      ci--;
+      el.textContent = cur.slice(0, ci);
+      if (ci <= 0) { deleting = false; pi = (pi + 1) % phrases.length; }
+      setTimeout(type, 32);
+    }
+  }
+  setTimeout(type, 500);
+
+  // 鼠标跟随光晕（15 号模块演示）
+  const glow = document.querySelector(".glowdemo");
+  if (glow) glow.addEventListener("mousemove", (e) => {
+    const r = glow.getBoundingClientRect();
+    glow.style.setProperty("--gx", (e.clientX - r.left) + "px");
+    glow.style.setProperty("--gy", (e.clientY - r.top) + "px");
+  });
+</script>
+</body>
+</html>

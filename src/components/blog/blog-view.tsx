@@ -18,7 +18,7 @@ import { HitokotoCard } from "@/components/hitokoto-card";
 import { BlogBadges } from "@/components/blog-badges";
 import { BlogNav } from "@/components/blog/blog-nav";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export function BlogView({ posts }: { posts: Post[] }) {
@@ -67,9 +67,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
       />
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
         <SheetContent side="right" className="w-80 gap-4 overflow-y-auto p-4">
-          <SheetHeader>
-            <SheetTitle>博客侧边栏</SheetTitle>
-          </SheetHeader>
+          <SheetTitle className="sr-only">博客侧边栏</SheetTitle>
           <div className="space-y-4">
             <section className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3">
               <Rss className="size-4 shrink-0 text-[#00bc7d]" />

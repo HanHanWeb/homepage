@@ -10,12 +10,7 @@ import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { ReadingBgPicker } from "@/components/reading-bg";
 import { BlogBadges } from "@/components/blog-badges";
 import { BlogNav } from "@/components/blog/blog-nav";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 const FONT_STEPS = ["14px", "15px", "17px"];
 const FONT_LABELS = ["A-", "A", "A+"];
@@ -214,9 +209,7 @@ export function PostView({ post }: { post: Post }) {
       />
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
         <SheetContent side="right" className="w-80 gap-4 overflow-y-auto p-4">
-          <SheetHeader>
-            <SheetTitle>文章侧边栏</SheetTitle>
-          </SheetHeader>
+          <SheetTitle className="sr-only">文章侧边栏</SheetTitle>
           <div className="space-y-4">
             {tocCard(true)}
             <ReadingBgPicker />

@@ -31,7 +31,11 @@ function parseBlocks(content: string): Block[] {
 
 export function PostView({ post }: { post: Post }) {
   const blocks = parseBlocks(post.content ?? post.description ?? "");
-  const showToc = blocks.length >= 3;
+  // 目录只索引章节标题
+  const headings = blocks
+    .map((b, i) => ({ b, i }))
+    .filter(({ b }) => b.kind === "heading");
+  const showToc = headings.length >= 2;
   const [fontStep, setFontStep] = useState(1);
   const [active, setActive] = useState(0);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -48,19 +52,21 @@ export function PostView({ post }: { post: Post }) {
     localStorage.setItem("post-font-size", String(step));
   };
 
-  // 滚动时高亮视口顶附近的段落
+  // 滚动时高亮视口顶附近的章节标题
   useEffect(() => {
     if (!showToc) return;
     let raf = 0;
     const onScroll = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        const ps =
-          contentRef.current?.querySelectorAll<HTMLElement>("p[data-toc]") ??
+        const hs =
+          contentRef.current?.querySelectorAll<HTMLElement>("h2[data-toc]") ??
           [];
-        let current = 0;
-        ps.forEach((p, i) => {
-          if (p.getBoundingClientRect().top <= 120) current = i;
+        let current = headings[0]?.i ?? 0;
+        hs.forEach((h) => {
+          if (h.getBoundingClientRect().top <= 130) {
+            current = Number((h.id ?? "").replace("toc-b-", "")) || current;
+          }
         });
         setActive(current);
       });
@@ -71,6 +77,7 @@ export function PostView({ post }: { post: Post }) {
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showToc]);
 
   return (
@@ -135,7 +142,7 @@ export function PostView({ post }: { post: Post }) {
                     key={i}
                     id={showToc ? `toc-b-${i}` : undefined}
                     data-toc={showToc ? "" : undefined}
-                    className="font-serif-sc mt-9 text-xl tracking-tight"
+                    className="font-serif-sc mt-9 scroll-mt-24 text-xl tracking-tight"
                   >
                     {b.text}
                   </h2>
@@ -155,12 +162,7 @@ export function PostView({ post }: { post: Post }) {
                 );
               }
               return (
-                <p
-                  key={i}
-                  id={showToc ? `toc-b-${i}` : undefined}
-                  data-toc={showToc ? "" : undefined}
-                  className="whitespace-pre-line"
-                >
+                <p key={i} className="whitespace-pre-line">
                   {b.text}
                 </p>
               );
@@ -208,14 +210,8 @@ export function PostView({ post }: { post: Post }) {
                 </span>
               </div>
               <div>
-                {blocks.map((b, i) => {
-                  if (b.kind === "image") return null;
-                  const label =
-                    b.kind === "heading"
-                      ? b.text
-                      : b.text.length > 14
-                        ? `${b.text.slice(0, 14)}…`
-                        : b.text;
+                {headings.map(({ b, i }) => {
+                  const text = b.kind === "heading" ? b.text : "";
                   return (
                     <button
                       key={i}
@@ -240,7 +236,7 @@ export function PostView({ post }: { post: Post }) {
                           active === i ? "bg-[#00bc7d]" : "bg-border"
                         }`}
                       />
-                      <span className="truncate">{label}</span>
+                      <span className="truncate">{text}</span>
                     </button>
                   );
                 })}

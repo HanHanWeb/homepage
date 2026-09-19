@@ -27,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="zh-CN"
       suppressHydrationWarning
-      className={`${jetbrainsMono.variable} h-full scroll-smooth antialiased`}
+      className={`${jetbrainsMono.variable} h-full antialiased`}
     >
       <head>
         {/* MiSans 全站默认字体，CDN 直连 */}

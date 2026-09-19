@@ -18,8 +18,6 @@ const BGS: {
   { key: "default", label: "默认", light: "", dark: "" },
   { key: "paper", label: "纸质", light: "#f5f0e6", dark: "#1e1b16", grain: true },
   { key: "eye", label: "护眼", light: "#e3ede3", dark: "#16201a" },
-  { key: "kraft", label: "牛皮", light: "#efe3ca", dark: "#272017", grain: true },
-  { key: "ink", label: "墨蓝", light: "#e8edf4", dark: "#141824" },
 ];
 
 const STORAGE_KEY = "post-bg";
@@ -77,41 +75,38 @@ export function ReadingBgPicker() {
     <section className="rounded-xl border bg-card px-4 py-3">
       <div className="flex items-center gap-3">
         <p className="min-w-0 flex-1 text-sm font-medium">页面背景</p>
-        <span className="text-[11px] text-muted-foreground">
-          {BGS.find((b) => b.key === bg)?.label}
-        </span>
-      </div>
-      <div className="mt-2.5 flex items-center gap-2">
-        {BGS.map((b) => (
-          <button
-            key={b.key}
-            type="button"
-            onClick={() => choose(b.key)}
-            aria-label={`页面背景：${b.label}`}
-            aria-pressed={bg === b.key}
-            title={b.label}
-            className={`h-6 w-6 rounded-md border transition-all ${
-              bg === b.key
-                ? "border-[#00bc7d] ring-2 ring-[#00bc7d]/25"
-                : "border-border hover:scale-105"
-            }`}
-            style={{
-              background:
-                b.key === "default"
-                  ? "var(--background)"
-                  : dark
-                    ? b.dark
-                    : b.light,
-            }}
-          >
-            {b.key === "default" && (
-              <span
-                aria-hidden
-                className="mx-auto mt-[9px] block h-px w-3.5 -rotate-45 bg-muted-foreground/50"
-              />
-            )}
-          </button>
-        ))}
+        <div className="flex items-center gap-2">
+          {BGS.map((b) => (
+            <button
+              key={b.key}
+              type="button"
+              onClick={() => choose(b.key)}
+              aria-label={`页面背景：${b.label}`}
+              aria-pressed={bg === b.key}
+              title={b.label}
+              className={`h-6 w-6 rounded-md border transition-all ${
+                bg === b.key
+                  ? "border-[#00bc7d] ring-2 ring-[#00bc7d]/25"
+                  : "border-border hover:scale-105"
+              }`}
+              style={{
+                background:
+                  b.key === "default"
+                    ? "var(--background)"
+                    : dark
+                      ? b.dark
+                      : b.light,
+              }}
+            >
+              {b.key === "default" && (
+                <span
+                  aria-hidden
+                  className="mx-auto mt-[9px] block h-px w-3.5 -rotate-45 bg-muted-foreground/50"
+                />
+              )}
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );

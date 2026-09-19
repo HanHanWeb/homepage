@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { ReadingBgPicker } from "@/components/reading-bg";
+import { BlogBadges } from "@/components/blog-badges";
 
 const FONT_STEPS = ["14px", "15px", "17px"];
 const FONT_LABELS = ["A-", "A", "A+"];
@@ -289,6 +290,7 @@ export function PostView({ post }: { post: Post }) {
               </div>
             </div>
           </section>
+          <BlogBadges />
         </aside>
       </div>
     </main>

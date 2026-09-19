@@ -14,7 +14,7 @@ import { useState } from "react";
 
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { HitokotoCard } from "@/components/hitokoto-card";
-import { LicenseCard } from "@/components/license-card";
+import { BlogBadges } from "@/components/blog-badges";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -176,24 +176,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
             </button>
           </section>
           <HitokotoCard />
-          <div className="flex items-center gap-2.5">
-            <LicenseCard />
-            <a
-              href="https://www.travellings.cn/go.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="开往 · 去往下一个博客"
-              className="inline-flex h-4 w-fit items-center"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://www.travellings.cn/assets/logo.svg"
-                alt="开往 · Travellings"
-                className="h-4 w-auto"
-                loading="lazy"
-              />
-            </a>
-          </div>
+          <BlogBadges />
         </aside>
       </div>
     </main>

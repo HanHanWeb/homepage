@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useScroll, useSpring } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 
@@ -13,6 +14,12 @@ export function BlogNav({
   menu?: ReactNode;
 }) {
   const [passed, setPassed] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 30,
+    mass: 0.5,
+  });
 
   useEffect(() => {
     if (!title) return;
@@ -63,7 +70,33 @@ export function BlogNav({
             </span>
           )}
         </div>
-        {menu && <div className="lg:hidden">{menu}</div>}
+        <div className="flex items-center gap-2.5">
+          {title && (
+            <div aria-hidden className="relative flex size-8 items-center justify-center">
+              <svg viewBox="0 0 36 36" className="absolute size-7 -rotate-90">
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  strokeWidth="3.5"
+                  className="stroke-border"
+                />
+                <motion.circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  className="stroke-[#00bc7d]"
+                  style={{ pathLength: progress }}
+                />
+              </svg>
+            </div>
+          )}
+          {menu && <div className="lg:hidden">{menu}</div>}
+        </div>
       </div>
     </header>
   );

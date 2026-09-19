@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 import { BackToTop } from "@/components/back-to-top";
 import { BlogView } from "@/components/blog/blog-view";
-import { ScrollProgress } from "@/components/scroll-progress";
 import { listPosts } from "@/lib/blog";
 
 export const revalidate = 300;
@@ -28,7 +27,6 @@ export default async function BlogPage() {
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.3.0/chinese-simplified-400.css"
       />
-      <ScrollProgress />
       <BackToTop />
       <BlogView posts={posts} />
     </>

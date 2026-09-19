@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   title: "Han — Student · Developer · Designer",
   description:
     "一名来自中国的学生、开发者与设计师的个人主页。学生 · 开发者 · 设计师，记录学习与创作。",
+  alternates: {
+    types: { "application/rss+xml": "/feed.xml" },
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

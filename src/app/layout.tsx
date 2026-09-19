@@ -38,7 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* 预加载标题字体，避免 font swap 在入场动画中途改变字形 */}
         <link
           rel="preload"
-          href="/fonts/CorpSrcWinSong-slim.woff2"
+          href="/fonts/CorpSrcWinSong-.4.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"

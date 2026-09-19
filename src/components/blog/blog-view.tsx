@@ -25,8 +25,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
     <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 pt-20 pb-16">
       <nav
         aria-label="面包屑"
-        className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground animate-blur-in"
-        style={{ "--blur-delay": "0.05s" } as React.CSSProperties}
+        className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground"
       >
         <Link
           href="/"
@@ -40,10 +39,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
         <span aria-current="page">博客</span>
       </nav>
 
-      <div
-        className="mt-6 flex items-baseline justify-between gap-4 animate-blur-in"
-        style={{ "--blur-delay": "0.15s" } as React.CSSProperties}
-      >
+      <div className="mt-6 flex items-baseline justify-between gap-4">
         <h1 className="font-serif-sc relative inline-block text-3xl tracking-tight sm:text-4xl">
           博客
           <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-[#00bc7d]" aria-hidden />

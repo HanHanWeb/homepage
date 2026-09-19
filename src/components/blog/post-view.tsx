@@ -21,7 +21,7 @@ export function PostView({ post }: { post: Post }) {
         className="mt-8 animate-blur-in"
         style={{ "--blur-delay": "0.15s" } as React.CSSProperties}
       >
-        <h1 className="font-serif-song mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h1 className="font-serif-sc mt-4 text-3xl tracking-tight sm:text-4xl">
           {post.title}
         </h1>
         <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">

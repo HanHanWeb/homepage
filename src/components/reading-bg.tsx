@@ -89,22 +89,11 @@ export function ReadingBgPicker() {
                   ? "border-[#00bc7d] ring-2 ring-[#00bc7d]/25"
                   : "border-border hover:scale-105"
               }`}
-              style={{
-                background:
-                  b.key === "default"
-                    ? "var(--background)"
-                    : dark
-                      ? b.dark
-                      : b.light,
-              }}
-            >
-              {b.key === "default" && (
-                <span
-                  aria-hidden
-                  className="mx-auto mt-[9px] block h-px w-3.5 -rotate-45 bg-muted-foreground/50"
-                />
-              )}
-            </button>
+            style={{
+              background:
+                b.key === "default" ? "var(--background)" : dark ? b.dark : b.light,
+            }}
+          />
           ))}
         </div>
       </div>

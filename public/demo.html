@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>博客侧边栏组件提案 · 100</title>
+<link rel="stylesheet" href="https://cdn-font.hyperos.mi.com/font/css?family=MiSans:100,200,300,400,500,600:Chinese_Simplify,Latin&display=swap">
+<style>
+@font-face {
+  font-family: "CorpSrcWinSong";
+  src: url("/fonts/CorpSrcWinSong-.4.woff2") format("woff2");
+  font-display: swap;
+}
+:root {
+  --bg: #ffffff;
+  --fg: oklch(0.145 0 0);
+  --card: #ffffff;
+  --muted: oklch(0.97 0 0);
+  --muted-fg: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+  --border-soft: oklch(0.922 0 0 / 60%);
+  --accent: #00bc7d;
+  --accent-soft: rgb(0 188 125 / 10%);
+  --glow: rgb(0 188 125 / 6%);
+  --shadow: 0 1px 2px rgb(0 0 0 / 4%);
+}
+.dark {
+  --bg: oklch(0.182 0 0);
+  --fg: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --muted: oklch(0.235 0 0);
+  --muted-fg: oklch(0.708 0 0);
+  --border: rgb(255 255 255 / 10%);
+  --border-soft: rgb(255 255 255 / 7%);
+  --accent-soft: rgb(0 188 125 / 12%);
+  --glow: rgb(0 188 125 / 8%);
+  --shadow: none;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "MiSans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: background .2s, color .2s;
+  min-height: 100vh;
+}
+.wrap { max-width: 1200px; margin: 0 auto; padding: 48px 24px 80px; }
+a { color: inherit; text-decoration: none; }
+
+/* ---------- 页头 ---------- */
+.page-head { padding: 8px 4px 28px; border-bottom: 1px solid var(--border); }
+.page-kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px; letter-spacing: .18em; color: var(--muted-fg); margin-bottom: 10px;
+}
+.page-kicker b { color: var(--accent); font-weight: 500; }
+h1.page-title {
+  font-family: "CorpSrcWinSong", serif;
+  font-size: 34px; font-weight: 400; letter-spacing: .01em; margin-bottom: 8px;
+}
+.page-sub { color: var(--muted-fg); font-size: 13px; max-width: 46em; }
+.controls {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 20px;
+}
+.tabs { display: flex; gap: 2px; border: 1px solid var(--border); border-radius: 999px; padding: 3px; background: var(--card); }
+.tabs button {
+  border: 0; background: transparent; color: var(--muted-fg);
+  font: 500 12.5px/1 "MiSans", sans-serif; padding: 7px 14px; border-radius: 999px; cursor: pointer;
+  transition: color .15s, background .15s;
+}
+.tabs button:hover { color: var(--fg); }
+.tabs button.on { background: var(--accent-soft); color: var(--accent); }
+.search {
+  flex: 0 1 220px; display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border); border-radius: 999px; background: var(--card); padding: 8px 14px;
+}
+.search input {
+  border: 0; outline: 0; background: transparent; color: var(--fg);
+  font: 13px "MiSans", sans-serif; width: 100%;
+}
+.search input::placeholder { color: var(--muted-fg); }
+.theme-btn {
+  margin-left: auto; border: 1px solid var(--border); background: var(--card); color: var(--muted-fg);
+  font: 12.5px "MiSans", sans-serif; padding: 8px 14px; border-radius: 999px; cursor: pointer;
+}
+.theme-btn:hover { color: var(--fg); border-color: var(--muted-fg); }
+.count-hint { font: 11px "JetBrains Mono", monospace; color: var(--muted-fg); letter-spacing: .1em; }
+
+/* ---------- 模块网格 ---------- */
+.grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(316px, 1fr));
+  gap: 28px 20px; padding-top: 32px;
+  background:
+    radial-gradient(600px 220px at 50% 108%, var(--glow), transparent 70%);
+}
+.mod { display: flex; flex-direction: column; gap: 8px; }
+.mod.hidden { display: none; }
+.mod-head { display: flex; align-items: center; gap: 8px; padding: 0 2px; }
+.mod-no { font: 11px "JetBrains Mono", monospace; color: var(--muted-fg); letter-spacing: .08em; }
+.mod-head h3 { font: 500 13.5px/1.3 "MiSans", sans-serif; flex: 1; min-width: 0; }
+.badge {
+  flex-shrink: 0; font: 500 10px/1 "MiSans", sans-serif; letter-spacing: .06em;
+  padding: 4px 8px; border-radius: 999px;
+}
+.b-func { color: var(--accent); background: var(--accent-soft); }
+.b-data { color: var(--fg); background: var(--muted); }
+.b-social { color: var(--muted-fg); border: 1px solid var(--border); }
+.b-show { color: var(--muted-fg); border: 1px dashed var(--border); }
+.mod-desc { font-size: 12px; color: var(--muted-fg); padding: 0 2px; min-height: 2.6em; }
+.preview {
+  width: 268px; padding: 13px; border: 1px dashed var(--border);
+  border-radius: 16px; background: var(--muted);
+  transition: border-color .15s;
+}
+.mod:hover .preview { border-color: var(--muted-fg); }
+
+/* ---------- 侧边栏小部件通用样式（240px = 真实侧边栏宽度） ---------- */
+.sb { width: 240px; display: flex; flex-direction: column; gap: 8px; }
+.sb-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 13px 14px; box-shadow: var(--shadow);
+}
+.sb-head { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.sb-title { font: 500 13px/1 "MiSans", sans-serif; flex: 1; }
+.sb-tag { font: 10px "JetBrains Mono", monospace; letter-spacing: .14em; color: var(--muted-fg); }
+.sb-tag b { color: var(--accent); font-weight: 500; }
+.dot { width: 6px; height: 6px; border-radius: 99px; background: var(--accent); flex-shrink: 0; }
+.row {
+  display: flex; align-items: center; gap: 8px; padding: 5px 0;
+  font-size: 12.5px; color: var(--fg); min-width: 0;
+}
+.row + .row { border-top: 1px dashed var(--border-soft); }
+.row .grow { flex: 1; min-width: 0; }
+.row .ellip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dim { color: var(--muted-fg); }
+.num { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--muted-fg); }
+.num.acc { color: var(--accent); }
+.chip {
+  font: 11px/1 "JetBrains Mono", monospace; border: 1px solid var(--border);
+  padding: 3px 9px; border-radius: 999px; color: var(--muted-fg); background: var(--card);
+  cursor: default; white-space: nowrap;
+}
+.chip:hover { color: var(--accent); border-color: var(--accent); }
+.chip.on { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.bar { height: 5px; border-radius: 3px; background: var(--border-soft); overflow: hidden; flex: 1; }
+.bar i { display: block; height: 100%; border-radius: 3px; background: var(--accent); }
+.bar.full i { width: 100%; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font: 500 12.5px/1 "MiSans", sans-serif; border-radius: 10px; padding: 8px 12px;
+  border: 1px solid var(--border); background: var(--card); color: var(--fg); cursor: pointer;
+}
+.btn:hover { border-color: var(--muted-fg); }
+.btn.acc { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.input {
+  display: flex; align-items: center; gap: 8px; border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 11px; background: var(--card); font-size: 12.5px; color: var(--muted-fg);
+}
+.sep { border: 0; border-top: 1px solid var(--border-soft); margin: 4px 0; }
+.kbd {
+  font: 11px "JetBrains Mono", monospace; border: 1px solid var(--border); border-bottom-width: 2px;
+  border-radius: 6px; padding: 2px 6px; color: var(--muted-fg); background: var(--card);
+}
+.switch {
+  width: 34px; height: 19px; border-radius: 99px; background: var(--border);
+  position: relative; flex-shrink: 0;
+}
+.switch::after {
+  content: ""; position: absolute; top: 2.5px; left: 2.5px; width: 14px; height: 14px;
+  border-radius: 99px; background: var(--card); border: 1px solid var(--border);
+}
+.switch.on { background: var(--accent); }
+.switch.on::after { left: auto; right: 2.5px; border-color: transparent; }
+.seg { display: flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+.seg span { flex: 1; text-align: center; font-size: 11.5px; padding: 6px 0; color: var(--muted-fg); }
+.seg span + span { border-left: 1px solid var(--border); }
+.seg span.on { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.heat { display: grid; grid-template-columns: repeat(auto-fill, 9px); gap: 2.5px; }
+.heat i { width: 9px; height: 9px; border-radius: 2px; background: var(--border-soft); }
+.heat i.l1 { background: rgb(0 188 125 / 22%); }
+.heat i.l2 { background: rgb(0 188 125 / 45%); }
+.heat i.l3 { background: rgb(0 188 125 / 70%); }
+.heat i.l4 { background: var(--accent); }
+.av {
+  width: 24px; height: 24px; border-radius: 99px; flex-shrink: 0; display: flex;
+  align-items: center; justify-content: center; font-size: 10px; font-weight: 500; color: #fff;
+}
+.avatar-row { display: flex; }
+.avatar-row .av { margin-left: -6px; border: 2px solid var(--card); }
+.avatar-row .av:first-child { margin-left: 0; }
+.star { color: var(--accent); font-size: 11px; letter-spacing: 1px; }
+.serif { font-family: "CorpSrcWinSong", serif; font-weight: 400; }
+.ring {
+  width: 52px; height: 52px; border-radius: 99px; flex-shrink: 0;
+  background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--border-soft) 0);
+  display: flex; align-items: center; justify-content: center;
+}
+.ring::before { content: ""; position: absolute; }
+.ring i {
+  width: 40px; height: 40px; border-radius: 99px; background: var(--card);
+  display: flex; align-items: center; justify-content: center;
+  font: 11px "JetBrains Mono", monospace; font-style: normal; color: var(--accent);
+}
+.img {
+  border-radius: 8px; background: linear-gradient(135deg, oklch(0.35 0.03 160), oklch(0.25 0.02 200));
+  min-height: 40px; display: flex; align-items: center; justify-content: center;
+  color: rgb(255 255 255 / 35%); font: 10px "JetBrains Mono", monospace; letter-spacing: .12em;
+}
+.img.g1 { background: linear-gradient(135deg, #0e3b2e, #10343f); }
+.img.g2 { background: linear-gradient(135deg, #123324, #274156); }
+.img.g3 { background: linear-gradient(135deg, #2d3a2f, #0f2d3d); }
+.img.g4 { background: linear-gradient(135deg, #1d3a33, #3a2d3f); }
+.img.g5 { background: linear-gradient(135deg, #0f2f2a, #233b2f); }
+.empty-hint { font-size: 11px; color: var(--muted-fg); text-align: center; padding: 8px 0 2px; }
+
+/* ---------- 页脚 ---------- */
+.foot { margin-top: 48px; padding: 20px 4px 0; border-top: 1px solid var(--border); }
+.foot p { font-size: 12px; color: var(--muted-fg); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page-head">
+    <p class="page-kicker"><b>#SIDEBAR</b> PROPOSALS — /demo.html</p>
+    <h1 class="page-title">博客侧边栏组件提案</h1>
+    <p class="page-sub">100 个候选小部件，按真实侧边栏宽度（240px）等比渲染：功能类让读者动起来，数据类让站点有分量，社交类让博客有人气，展示类让角落有气质。筛选后可直接整合进 /blog 的 aside。</p>
+    <div class="controls">
+      <div class="tabs" id="tabs">
+        <button class="on" data-f="all">全部</button>
+        <button data-f="func">功能</button>
+        <button data-f="data">数据</button>
+        <button data-f="social">社交</button>
+        <button data-f="show">展示</button>
+      </div>
+      <label class="search"><span class="num">⌕</span><input id="q" type="search" placeholder="搜索组件名…"></label>
+      <span class="count-hint" id="count"></span>
+      <button class="theme-btn" id="theme">🌙 深色预览</button>
+    </div>
+  </header>
+  <main class="grid" id="grid">
+<!-- ================= 功能 001-030 ================= -->
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">001</span><h3>站内搜索</h3><span class="badge b-func">功能</span></header><p class="mod-desc">即输即筛的全站文章搜索框。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="input">⌕ 搜索文章…<span class="kbd" style="margin-left:auto">⌘K</span></div></div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">002</span><h3>热门搜索</h3><span class="badge b-func">功能</span></header><p class="mod-desc">读者常搜的关键词，点击即查。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">热门搜索</span><span class="sb-tag"><b>#</b>TREND</span></div><div style="display:flex;flex-wrap:wrap;gap:5px"><span class="chip on">Next.js</span><span class="chip">Turbopack</span><span class="chip">WOFF2</span><span class="chip">oklch</span><span class="chip">航拍</span></div></div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">003</span><h3>文章目录 TOC</h3><span class="badge b-func">功能</span></header><p class="mod-desc">详情页滚动高亮的章节导航。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">本文目录</span><span class="sb-tag"><b>#</b>TOC</span></div>
+<div class="row"><span style="width:3px;height:14px;border-radius:2px;background:var(--accent)"></span><span class="grow ellip" style="font-weight:500">为什么要换字体</span></div>
+<div class="row" style="padding-left:18px"><span class="grow ellip dim">字体子集的取舍</span></div>
+<div class="row" style="padding-left:18px"><span class="grow ellip dim">WOFF2 压缩实践</span></div>
+<div class="row"><span style="width:3px;height:14px;border-radius:2px;background:var(--border)"></span><span class="grow ellip dim">结语</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">004</span><h3>分类目录</h3><span class="badge b-func">功能</span></header><p class="mod-desc">按分类浏览，右侧计数。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">分类</span><span class="sb-tag"><b>#</b>CAT</span></div>
+<div class="row"><span class="dot"></span><span class="grow">开发运维</span><span class="num">12</span></div>
+<div class="row"><span class="dot" style="background:var(--border)"></span><span class="grow">科技数码</span><span class="num">8</span></div>
+<div class="row"><span class="dot" style="background:var(--border)"></span><span class="grow">创意设计</span><span class="num">6</span></div>
+<div class="row"><span class="dot" style="background:var(--border)"></span><span class="grow">影像创作</span><span class="num">4</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">005</span><h3>标签云</h3><span class="badge b-func">功能</span></header><p class="mod-desc">频次越高颜色越绿。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div style="display:flex;flex-wrap:wrap;gap:5px">
+<span class="chip on">Next.js</span><span class="chip on">字体</span><span class="chip">CSS</span><span class="chip">摄影</span><span class="chip on">运维</span><span class="chip">Linux</span><span class="chip">UI</span><span class="chip">航拍</span><span class="chip">Turbopack</span><span class="chip">DJI</span>
+</div></div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">006</span><h3>归档折叠</h3><span class="badge b-func">功能</span></header><p class="mod-desc">按年-月折叠的文章归档。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div class="row" style="border:0;padding-bottom:2px"><span class="num acc">2026</span><span class="grow ellip dim">9 月 · 4 篇</span><span class="num">▾</span></div>
+<div class="row" style="padding-left:14px"><span class="grow ellip">WOFF2 子集化实战</span><span class="num">09.19</span></div>
+<div class="row" style="padding-left:14px"><span class="grow ellip">给博客换上 MiSans</span><span class="num">09.12</span></div>
+<div class="row"><span class="num">2025</span><span class="grow ellip dim">14 篇</span><span class="num">▸</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">007</span><h3>最新文章</h3><span class="badge b-func">功能</span></header><p class="mod-desc">最近更新的 5 篇，带日期。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">最新文章</span><span class="sb-tag"><b>#</b>NEW</span></div>
+<div class="row"><span class="grow ellip">字体子集化的取舍</span><span class="num">09.19</span></div>
+<div class="row"><span class="grow ellip">给博客换上 MiSans</span><span class="num">09.12</span></div>
+<div class="row"><span class="grow ellip">Turbopack 构建踩坑记</span><span class="num">09.08</span></div>
+<div class="row"><span class="grow ellip">航拍视角下的武汉</span><span class="num">08.30</span></div>
+<div class="row"><span class="grow ellip">oklch 配色入门</span><span class="num">08.21</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">008</span><h3>热门 TOP5</h3><span class="badge b-func">功能</span></header><p class="mod-desc">按阅读量排行的周榜。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">本周热门</span><span class="sb-tag"><b>#</b>TOP</span></div>
+<div class="row"><span class="num acc" style="font-size:13px">1</span><span class="grow ellip">WOFF2 子集化实战</span><span class="num">8.2k</span></div>
+<div class="row"><span class="num acc" style="font-size:13px">2</span><span class="grow ellip">oklch 配色入门</span><span class="num">5.1k</span></div>
+<div class="row"><span class="num acc" style="font-size:13px">3</span><span class="grow ellip">Turbopack 踩坑记</span><span class="num">3.9k</span></div>
+<div class="row"><span class="num dim">4</span><span class="grow ellip">给博客换上 MiSans</span><span class="num">2.4k</span></div>
+<div class="row"><span class="num dim">5</span><span class="grow ellip">航拍视角下的武汉</span><span class="num">1.8k</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">009</span><h3>置顶精选</h3><span class="badge b-func">功能</span></header><p class="mod-desc">作者手动置顶的代表作。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">精选</span><span class="sb-tag"><b>#</b>PIN</span></div>
+<div class="row"><span class="dot"></span><span class="grow ellip" style="font-weight:500">从零搭建个人主页</span></div>
+<div class="row dim" style="padding-top:0"><span class="grow ellip">架构 · 字体 · 部署，一篇讲完</span></div>
+<div class="row"><span class="dot" style="background:var(--border)"></span><span class="grow ellip">我的 2025 书单</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">010</span><h3>系列连载进度</h3><span class="badge b-func">功能</span></header><p class="mod-desc">当前文章在某系列中的位置。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">系列 · 字体工程</span><span class="num">3/6</span></div>
+<div class="bar full" style="margin-bottom:8px"><i style="width:50%"></i></div>
+<div class="row"><span class="num acc">03</span><span class="grow ellip" style="font-weight:500">本篇 · WOFF2 压缩</span></div>
+<div class="row dim"><span class="num">04</span><span class="grow ellip">字体加载策略</span><span class="num">未发布</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">011</span><h3>上一篇 / 下一篇</h3><span class="badge b-func">功能</span></header><p class="mod-desc">时间线上的相邻文章。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div class="row" style="border:0"><span class="num">←</span><span class="grow ellip dim">上一篇 · oklch 配色入门</span></div>
+<div class="sep"></div>
+<div class="row" style="border:0"><span class="num">→</span><span class="grow ellip">下一篇 · 字体加载策略</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">012</span><h3>随机逛逛</h3><span class="badge b-func">功能</span></header><p class="mod-desc">随手抽一篇旧文，对抗遗忘。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="text-align:center;padding:18px 14px">
+<p class="serif" style="font-size:15px">《 Vue 3 组合式 API 初体验 》</p>
+<p class="num" style="margin:4px 0 10px">2024.06 · 4 min</p>
+<button class="btn acc" style="margin:0 auto">🎲 换一篇</button>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">013</span><h3>邮件订阅</h3><span class="badge b-func">功能</span></header><p class="mod-desc">新文章邮件推送入口。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">订阅更新</span></div>
+<div class="input" style="margin-bottom:7px">✉ you@example.com</div>
+<button class="btn acc" style="width:100%">订阅 · 每周一封</button>
+<p class="num" style="margin-top:7px">已有 328 位读者</p>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">014</span><h3>RSS 订阅组</h3><span class="badge b-func">功能</span></header><p class="mod-desc">RSS / Atom / JSON Feed 三入口。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">订阅本站</span><span class="sb-tag"><b>#</b>RSS</span></div>
+<div class="row"><span class="grow">RSS 2.0</span><span class="num">/feed.xml</span></div>
+<div class="row"><span class="grow">Atom</span><span class="num">/atom.xml</span></div>
+<div class="row"><span class="grow">JSON Feed</span><span class="num">/feed.json</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">015</span><h3>分享按钮组</h3><span class="badge b-func">功能</span></header><p class="mod-desc">分享到各平台的一排小圆钮。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">分享这篇文章</span></div>
+<div style="display:flex;gap:7px">
+<span class="chip" style="padding:6px 11px">X</span><span class="chip" style="padding:6px 11px">微博</span><span class="chip" style="padding:6px 11px">小红书</span><span class="chip" style="padding:6px 11px">复制</span>
+</div></div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">016</span><h3>复制本文链接</h3><span class="badge b-func">功能</span></header><p class="mod-desc">一键复制，成功后变绿打勾。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;gap:10px">
+<span class="num" style="flex:1;overflow:hidden;text-overflow:ellipsis">hhan.me/blog/woff2</span><button class="btn acc" style="padding:6px 10px">✓ 已复制</button>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">017</span><h3>字号调节</h3><span class="badge b-func">功能</span></header><p class="mod-desc">正文阅读舒适度三档可调。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">阅读字号</span></div>
+<div class="seg"><span>A-</span><span class="on">A</span><span>A+</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">018</span><h3>阅读进度环</h3><span class="badge b-func">功能</span></header><p class="mod-desc">环形进度显示读到哪儿了。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;gap:12px">
+<div class="ring" style="--p:62;position:relative"><i>62%</i></div>
+<div><p style="font:500 13px MiSans">阅读进度</p><p class="num">剩 1,240 字 · 约 4 min</p></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">019</span><h3>剩余阅读时间</h3><span class="badge b-func">功能</span></header><p class="mod-desc">极简一行：还需几分钟读完。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;padding:11px 14px">
+<span class="dot"></span><span style="font:500 13px MiSans;flex:1">剩余阅读时间</span><span class="num acc">4 min</span>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">020</span><h3>深浅色切换</h3><span class="badge b-func">功能</span></header><p class="mod-desc">跟随站点主题的开关。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="row" style="border:0"><span class="grow">深色模式</span><span class="switch on"></span></div></div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">021</span><h3>中英切换</h3><span class="badge b-func">功能</span></header><p class="mod-desc">与全站语言状态联动的开关。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="row" style="border:0"><span class="grow">Language</span><div class="seg" style="width:92px"><span class="on">中</span><span>EN</span></div></div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">022</span><h3>本地书签</h3><span class="badge b-func">功能</span></header><p class="mod-desc">存 localStorage 的稍后再读。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">我的书签</span><span class="num">2</span></div>
+<div class="row"><span class="grow ellip">字体加载策略（未发布）</span><span class="num">✕</span></div>
+<div class="row"><span class="grow ellip">航拍视角下的武汉</span><span class="num">✕</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">023</span><h3>点赞喜欢</h3><span class="badge b-func">功能</span></header><p class="mod-desc">匿名点赞，数字实时 +1。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;padding:11px 14px">
+<span style="font-size:14px">♡</span><span class="grow" style="font:500 13px MiSans">喜欢这篇</span><span class="num acc">128</span>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">024</span><h3>评论入口</h3><span class="badge b-func">功能</span></header><p class="mod-desc">直达评论区并显示条数。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;padding:11px 14px">
+<span>💬</span><span class="grow" style="font:500 13px MiSans">前往评论</span><span class="num">6 条</span>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">025</span><h3>打赏二维码</h3><span class="badge b-func">功能</span></header><p class="mod-desc">展开式打赏：微信 / 支付宝。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">请作者喝杯咖啡</span><span class="sb-tag">☕</span></div>
+<div style="display:flex;gap:8px"><div class="img g1" style="flex:1;aspect-ratio:1">WX</div><div class="img g3" style="flex:1;aspect-ratio:1">Ali</div></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">026</span><h3>快捷键速查</h3><span class="badge b-func">功能</span></header><p class="mod-desc">提示 ⌘K 命令面板等快捷键。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div class="row" style="border:0"><span class="grow dim">打开命令面板</span><span class="kbd">⌘</span><span class="kbd">K</span></div>
+<div class="row"><span class="grow dim">切换深浅色</span><span class="kbd">⌘</span><span class="kbd">J</span></div>
+<div class="row"><span class="grow dim">回到顶部</span><span class="kbd">G</span><span class="kbd">T</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">027</span><h3>站内导航</h3><span class="badge b-func">功能</span></header><p class="mod-desc">全站主要板块的迷你入口。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div class="row" style="border:0"><span class="num acc">01</span><span class="grow">首页</span></div>
+<div class="row"><span class="num">02</span><span class="grow">项目</span></div>
+<div class="row"><span class="num">03</span><span class="grow" style="font-weight:500;color:var(--accent)">博客 ←</span></div>
+<div class="row"><span class="num">04</span><span class="grow">联系</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">028</span><h3>文章筛选器</h3><span class="badge b-func">功能</span></header><p class="mod-desc">按分类过滤右侧列表。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">筛选</span></div>
+<div class="seg"><span class="on">全部</span><span>教程</span><span>随笔</span><span>影记</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">029</span><h3>下载清单</h3><span class="badge b-func">功能</span></header><p class="mod-desc">文章配套资源的下载列表。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">本文附件</span><span class="sb-tag"><b>#</b>DL</span></div>
+<div class="row"><span class="grow ellip">demo.woff2</span><span class="num acc">↓ 81KB</span></div>
+<div class="row"><span class="grow ellip">subset.mjs</span><span class="num acc">↓ 2KB</span></div>
+<div class="row"><span class="grow ellip">对比截图.zip</span><span class="num acc">↓ 4.3MB</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="func"><header class="mod-head"><span class="mod-no">030</span><h3>组合筛选</h3><span class="badge b-func">功能</span></header><p class="mod-desc">分类 × 排序两段式联动。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<p class="num" style="margin-bottom:5px">分类</p>
+<div class="seg" style="margin-bottom:8px"><span class="on">全部</span><span>前端</span><span>影像</span></div>
+<p class="num" style="margin-bottom:5px">排序</p>
+<div class="seg"><span class="on">最新</span><span>最热</span><span>字数</span></div>
+</div></div></div></section>
+<!-- ================= 数据 031-055 ================= -->
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">031</span><h3>站点统计</h3><span class="badge b-data">数据</span></header><p class="mod-desc">文章数 / 总字数 / 评论数三格。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;padding:0;overflow:hidden">
+<div style="flex:1;text-align:center;padding:12px 4px"><p class="num acc" style="font-size:17px">30</p><p class="num">文章</p></div>
+<div style="flex:1;text-align:center;padding:12px 4px;border-left:1px solid var(--border)"><p class="num acc" style="font-size:17px">8.6w</p><p class="num">字数</p></div>
+<div style="flex:1;text-align:center;padding:12px 4px;border-left:1px solid var(--border)"><p class="num acc" style="font-size:17px">214</p><p class="num">评论</p></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">032</span><h3>建站天数</h3><span class="badge b-data">数据</span></header><p class="mod-desc">“本站已运行 x 天”的极简卡。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center;text-align:center">
+<p class="num" style="font-size:26px;letter-spacing:.04em">1,286 <span style="font-size:12px">天</span></p>
+<p class="num" style="margin-top:2px">SINCE 2023.03.11</p>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">033</span><h3>写作热力图</h3><span class="badge b-data">数据</span></header><p class="mod-desc">GitHub 风格的全年发布热力格。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">写作热力</span><span class="sb-tag"><b>#</b>2026</span></div>
+<div class="heat" data-heat="98"></div>
+<p class="num" style="margin-top:6px">全年 30 篇 · 最高产 9 月</p>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">034</span><h3>本月概览</h3><span class="badge b-data">数据</span></header><p class="mod-desc">本月发布数与写作字数。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">九月概览</span><span class="sb-tag"><b>#</b>SEP</span></div>
+<div class="row" style="border:0"><span class="grow dim">发布</span><span class="num">4 篇</span></div>
+<div class="row"><span class="grow dim">字数</span><span class="num">1.9w</span></div>
+<div class="row"><span class="grow dim">目标</span><span class="bar"><i style="width:80%"></i></span><span class="num">80%</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">035</span><h3>分类占比</h3><span class="badge b-data">数据</span></header><p class="mod-desc">单条堆叠条显示内容结构。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">内容构成</span></div>
+<div style="display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:8px">
+<span style="flex:5;background:var(--accent)"></span><span style="flex:3;background:rgb(0 188 125 / 45%)"></span><span style="flex:2;background:rgb(0 188 125 / 22%)"></span>
+</div>
+<div class="row" style="border:0;padding-top:0"><span class="dot"></span><span class="grow dim">开发 50%</span><span class="dot" style="background:rgb(0 188 125 / 45%)"></span><span class="grow dim">设计 30%</span><span class="dot" style="background:rgb(0 188 125 / 22%)"></span><span class="dim">影像 20%</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">036</span><h3>标签频次 TOP</h3><span class="badge b-data">数据</span></header><p class="mod-desc">前 4 个标签的使用条形。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div class="row" style="border:0"><span class="grow ellip">Next.js</span><span class="bar"><i style="width:90%"></i></span><span class="num">14</span></div>
+<div class="row"><span class="grow ellip">字体工程</span><span class="bar"><i style="width:70%"></i></span><span class="num">11</span></div>
+<div class="row"><span class="grow ellip">摄影</span><span class="bar"><i style="width:45%"></i></span><span class="num">7</span></div>
+<div class="row"><span class="grow ellip">运维</span><span class="bar"><i style="width:30%"></i></span><span class="num">5</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">037</span><h3>年度写作目标</h3><span class="badge b-data">数据</span></header><p class="mod-desc">52 篇年度目标完成 30 篇。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;gap:12px">
+<div class="ring" style="--p:58;position:relative"><i>58%</i></div>
+<div><p style="font:500 13px MiSans">2026 · 30/52 篇</p><p class="num">按当前节奏可提前 3 周完成</p></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">038</span><h3>字数里程碑</h3><span class="badge b-data">数据</span></header><p class="mod-desc">距“累计十万字”还差一点。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div class="row" style="border:0"><span class="sb-title">累计字数</span><span class="num acc">86,000 / 100,000</span></div>
+<div class="bar full" style="margin-top:6px"><i style="width:86%"></i></div>
+<p class="num" style="margin-top:6px">再写约 5 篇长文达成 🎉</p>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">039</span><h3>最近更新</h3><span class="badge b-data">数据</span></header><p class="mod-desc">站点最近一次变动的时间。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;padding:11px 14px">
+<span class="dot"></span><span class="grow" style="font:500 13px MiSans">最近更新</span><span class="num">3 小时前</span>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">040</span><h3>长度分布</h3><span class="badge b-data">数据</span></header><p class="mod-desc">文章字数区间的迷你直方条。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">篇幅分布</span></div>
+<div style="display:flex;align-items:flex-end;gap:4px;height:44px;padding:0 2px">
+<span style="flex:1;height:30%;background:rgb(0 188 125 / 22%);border-radius:3px 3px 0 0"></span>
+<span style="flex:1;height:55%;background:rgb(0 188 125 / 45%);border-radius:3px 3px 0 0"></span>
+<span style="flex:1;height:100%;background:var(--accent);border-radius:3px 3px 0 0"></span>
+<span style="flex:1;height:65%;background:rgb(0 188 125 / 45%);border-radius:3px 3px 0 0"></span>
+<span style="flex:1;height:35%;background:rgb(0 188 125 / 22%);border-radius:3px 3px 0 0"></span>
+</div>
+<div style="display:flex;gap:4px;padding:4px 2px 0"><span class="num" style="flex:1;text-align:center">短</span><span class="num" style="flex:1;text-align:center"></span><span class="num" style="flex:1;text-align:center">中</span><span class="num" style="flex:1;text-align:center"></span><span class="num" style="flex:1;text-align:center">长</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">041</span><h3>GitHub 热力图</h3><span class="badge b-data">数据</span></header><p class="mod-desc">与主站贡献图同源的迷你版。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">GitHub</span><span class="num">@HanHanWeb</span></div>
+<div class="heat" data-heat="84"></div>
+<p class="num" style="margin-top:6px">642 contributions this year</p>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">042</span><h3>GitHub 仓库卡</h3><span class="badge b-data">数据</span></header><p class="mod-desc">置顶仓库的 star / fork 卡。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<p class="num" style="margin-bottom:3px">HanHanWeb / <b style="color:var(--accent)">homepage</b></p>
+<p class="dim" style="font-size:12px">我的个人主页 · Next.js 16</p>
+<div class="row" style="border:0;padding-top:7px"><span class="num">★ 128</span><span class="num">⑂ 24</span><span class="chip" style="margin-left:auto">TypeScript</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">043</span><h3>语言占比</h3><span class="badge b-data">数据</span></header><p class="mod-desc">GitHub 语言构成的色条。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div style="display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:8px">
+<span style="flex:7;background:var(--accent)"></span><span style="flex:2;background:rgb(0 188 125 / 40%)"></span><span style="flex:1;background:var(--border)"></span>
+</div>
+<div class="row" style="border:0;padding-top:0"><span class="dot"></span><span class="grow dim">TS 70%</span><span class="dot" style="background:rgb(0 188 125 / 40%)"></span><span class="grow dim">CSS 20%</span><span class="dot" style="background:var(--border)"></span><span class="dim">其他 10%</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">044</span><h3>刷题进度</h3><span class="badge b-data">数据</span></header><p class="mod-desc">算法刷题打卡与连胜。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">刷题</span><span class="num acc">🔥 12 天</span></div>
+<div class="row" style="border:0"><span class="grow dim">今年累计</span><span class="num">148 / 300</span></div>
+<div class="bar full" style="margin-top:6px"><i style="width:49%"></i></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">045</span><h3>Steam 时长</h3><span class="badge b-data">数据</span></header><p class="mod-desc">最近在玩的游戏时长卡。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;gap:10px;align-items:center">
+<div class="img g4" style="width:52px;height:52px;flex-shrink:0">GAME</div>
+<div style="min-width:0;flex:1"><p style="font:500 13px MiSans">戴森球计划</p><p class="num">最近 2 周 · 36.4 hrs</p></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">046</span><h3>豆瓣标记</h3><span class="badge b-data">数据</span></header><p class="mod-desc">今年读过 / 看过的计数。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;padding:0;overflow:hidden">
+<div style="flex:1;text-align:center;padding:12px 4px"><p class="num acc" style="font-size:17px">18</p><p class="num">读书</p></div>
+<div style="flex:1;text-align:center;padding:12px 4px;border-left:1px solid var(--border)"><p class="num acc" style="font-size:17px">42</p><p class="num">观影</p></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">047</span><h3>B站数据</h3><span class="badge b-data">数据</span></header><p class="mod-desc">粉丝与最新投稿入口。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;padding:11px 14px">
+<span class="av" style="background:linear-gradient(135deg,#fb7299,#ff5c8a)">B</span>
+<div class="grow" style="min-width:0"><p style="font:500 13px MiSans">哔哩哔哩</p><p class="num">1.2k 粉丝</p></div>
+<span class="num">→</span>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">048</span><h3>社媒动态</h3><span class="badge b-data">数据</span></header><p class="mod-desc">聚合各平台最新一条动态。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div class="row" style="border:0"><span class="num">X</span><span class="grow ellip dim">刚更新了博客字体…</span><span class="num">2h</span></div>
+<div class="row"><span class="num">GH</span><span class="grow ellip dim">pushed to main</span><span class="num">5h</span></div>
+<div class="row"><span class="num">VD</span><span class="grow ellip dim">新航拍素材入库</span><span class="num">1d</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">049</span><h3>友站排行</h3><span class="badge b-data">数据</span></header><p class="mod-desc">互推友链的本周访问排行。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">友友动态</span></div>
+<div class="row"><span class="num acc">1</span><span class="grow ellip">阿超的博客</span><span class="num">↑3</span></div>
+<div class="row"><span class="num">2</span><span class="grow ellip">小林Coding</span><span class="num">—</span></div>
+<div class="row"><span class="num">3</span><span class="grow ellip">云云的实验室</span><span class="num">↓1</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">050</span><h3>访客计数器</h3><span class="badge b-data">数据</span></header><p class="mod-desc">复古像素风的累计访客。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center;text-align:center">
+<p class="num" style="font-size:22px;letter-spacing:.28em;background:var(--muted);border:1px solid var(--border);border-radius:6px;padding:6px 12px">032041</p>
+<p class="num" style="margin-top:6px">VISITORS · TODAY 128</p>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">051</span><h3>订阅人数</h3><span class="badge b-data">数据</span></header><p class="mod-desc">RSS / 邮件订阅者合计。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;padding:11px 14px">
+<span class="avatar-row"><span class="av" style="background:#0e3b2e">H</span><span class="av" style="background:#1d4a44">L</span><span class="av" style="background:#2d5a4f">W</span></span>
+<span class="grow" style="font:500 13px MiSans">328 位订阅者</span><span class="num">+6 本周</span>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">052</span><h3>评论趋势</h3><span class="badge b-data">数据</span></header><p class="mod-desc">近 8 周评论数折线。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">评论趋势</span><span class="num acc">↗ 23%</span></div>
+<svg viewBox="0 0 200 44" width="100%" height="44" preserveAspectRatio="none"><polyline points="0,34 28,30 56,32 84,22 112,25 140,14 168,18 200,8" fill="none" stroke="#00bc7d" stroke-width="2" stroke-linecap="round"/><polyline points="0,34 28,30 56,32 84,22 112,25 140,14 168,18 200,8 200,44 0,44" fill="rgb(0 188 125 / 10%)" stroke="none"/></svg>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">053</span><h3>周更徽章</h3><span class="badge b-data">数据</span></header><p class="mod-desc">连续更新的周数徽章。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;gap:10px">
+<span style="width:38px;height:38px;border-radius:10px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:17px">🏅</span>
+<div><p style="font:500 13px MiSans">连续周更 14 周</p><p class="num">最长纪录 21 周</p></div>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">054</span><h3>全站词频</h3><span class="badge b-data">数据</span></header><p class="mod-desc">博客最常写到的主题词。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center;line-height:2.1">
+<span class="serif" style="font-size:17px;color:var(--accent)">性能</span> <span class="dim" style="font-size:12px">字体</span> <span class="serif" style="font-size:14px">部署</span> <span class="dim" style="font-size:11px">摄影</span> <span class="serif" style="font-size:15px">开源</span> <span class="dim" style="font-size:12px">Vue</span> <span class="serif" style="font-size:13px;color:var(--accent)">Next.js</span> <span class="dim" style="font-size:11px">航拍</span>
+</div></div></div></section>
+
+<section class="mod" data-t="data"><header class="mod-head"><span class="mod-no">055</span><h3>版本日志</h3><span class="badge b-data">数据</span></header><p class="mod-desc">站点自身的 changelog。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div class="row" style="border:0"><span class="chip on">v2.4</span><span class="grow ellip">接入 MiSans 字体</span></div>
+<div class="row"><span class="chip">v2.3</span><span class="grow ellip">博客面包屑导航</span></div>
+<div class="row"><span class="chip">v2.2</span><span class="grow ellip">JetBrains Mono</span></div>
+</div></div></div></section>
+
+<!-- ================= 社交 056-065 ================= -->
+<section class="mod" data-t="social"><header class="mod-head"><span class="mod-no">056</span><h3>最新评论</h3><span class="badge b-social">社交</span></header><p class="mod-desc">全站最新的读者评论。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">最新评论</span></div>
+<div class="row" style="border:0;align-items:flex-start"><span class="av" style="background:#0e3b2e">柚</span><div class="grow" style="min-width:0"><p style="font-size:12px">这篇讲得太清楚了！<span class="num">· 2h</span></p><p class="num">来自《WOFF2 子集化实战》</p></div></div>
+<div class="row" style="align-items:flex-start"><span class="av" style="background:#2d5a4f">K</span><div class="grow" style="min-width:0"><p style="font-size:12px">求问 font-display swap 兼容性？</p><p class="num">来自《给博客换上 MiSans》</p></div></div>
+</div></div></div></section>
+
+<section class="mod" data-t="social"><header class="mod-head"><span class="mod-no">057</span><h3>热评精选</h3><span class="badge b-social">社交</span></header><p class="mod-desc">点赞最高的读者留言。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<p style="font-size:12.5px;line-height:1.7">“把字体当成工程问题来对待，这个思路值得学习。”</p>
+<div class="row" style="border:0;padding-top:6px"><span class="av" style="background:#1d4a44">林</span><span class="num grow">林深见鹿</span><span class="num acc">▲ 42</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="social"><header class="mod-head"><span class="mod-no">058</span><h3>友情链接</h3><span class="badge b-social">社交</span></header><p class="mod-desc">头像网格形式的友链墙。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">友情链接</span><span class="num">16</span></div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px">
+<span class="av" style="background:#0e3b2e">柚</span><span class="av" style="background:#1d4a44">林</span><span class="av" style="background:#2d5a4f">K</span><span class="av" style="background:#173a4a">云</span><span class="av" style="background:#254435">M</span>
+<span class="av" style="background:#173a4a">阿</span><span class="av" style="background:#254435">C</span><span class="av" style="background:#0e3b2e">宋</span><span class="av" style="background:#2d5a4f">Y</span><span class="av" style="background:#1d4a44">·</span>
+</div>
+<p class="num" style="margin-top:8px;text-align:center">→ 全部友链</p>
+</div></div></div></section>
+
+<section class="mod" data-t="social"><header class="mod-head"><span class="mod-no">059</span><h3>友链申请</h3><span class="badge b-social">社交</span></header><p class="mod-desc">互换链接的说明与入口。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="text-align:center">
+<p class="dim" style="font-size:12px;margin-bottom:9px">本站已就绪，欢迎交换链接</p>
+<button class="btn" style="width:100%">申请友链 →</button>
+</div></div></div></section>
+
+<section class="mod" data-t="social"><header class="mod-head"><span class="mod-no">060</span><h3>留言墙</h3><span class="badge b-social">社交</span></header><p class="mod-desc">滚动播报的彩色便签墙。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="gap:6px">
+<div style="background:var(--accent-soft);border-radius:8px;padding:7px 10px;font-size:11.5px;color:var(--accent)">博客做得真好看 ✨</div>
+<div style="background:var(--muted);border-radius:8px;padding:7px 10px;font-size:11.5px;color:var(--muted-fg)">来学习字体知识！</div>
+<div style="background:var(--muted);border-radius:8px;padding:7px 10px;font-size:11.5px;color:var(--muted-fg)">西安老乡+1</div>
+</div></div></div></section>
+
+<section class="mod" data-t="social"><header class="mod-head"><span class="mod-no">061</span><h3>问答箱</h3><span class="badge b-social">社交</span></header><p class="mod-desc">匿名提问入口与精选问答。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<p style="font-size:12.5px;margin-bottom:6px">Q：大一怎么平衡课业和做项目？</p>
+<p class="dim" style="font-size:12px;line-height:1.6">A：我一般把项目拆到周末的上午……</p>
+<div class="sep"></div>
+<button class="btn" style="width:100%">去提问（匿名）</button>
+</div></div></div></section>
+
+<section class="mod" data-t="social"><header class="mod-head"><span class="mod-no">062</span><h3>下期主题投票</h3><span class="badge b-social">社交</span></header><p class="mod-desc">让读者决定下一篇写什么。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">下期写什么？</span><span class="num">216 票</span></div>
+<div class="row" style="border:0"><span class="grow ellip">字体加载策略</span><span class="num acc">47%</span></div>
+<div class="row"><span class="grow ellip">NAS 折腾记</span><span class="num">31%</span></div>
+<div class="row"><span class="grow ellip">航拍后期流程</span><span class="num">22%</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="social"><header class="mod-head"><span class="mod-no">063</span><h3>读者来源</h3><span class="badge b-social">社交</span></header><p class="mod-desc">访问者城市的实时列表。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">此刻有读者来自</span><span class="dot"></span></div>
+<div class="row" style="border:0"><span class="grow">武汉</span><span class="num">刚刚</span></div>
+<div class="row"><span class="grow">上海</span><span class="num">1 分钟前</span></div>
+<div class="row"><span class="grow">San Jose</span><span class="num">3 分钟前</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="social"><header class="mod-head"><span class="mod-no">064</span><h3>打卡日历</h3><span class="badge b-social">社交</span></header><p class="mod-desc">读者连续到访打卡的小日历。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">本月打卡</span><span class="num acc">🔥 9 天</span></div>
+<div id="cal" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
+</div></div></div></section>
+
+<section class="mod" data-t="social"><header class="mod-head"><span class="mod-no">065</span><h3>更新提醒</h3><span class="badge b-social">社交</span></header><p class="mod-desc">微信 / TG 更新通知群入口。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;padding:11px 14px">
+<span>🔔</span><span class="grow" style="font:500 13px MiSans">加入更新提醒群</span><span class="num">↗</span>
+</div></div></div></section>
+<!-- ================= 展示 066-100 ================= -->
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">066</span><h3>一言卡</h3><span class="badge b-show">展示</span></header><p class="mod-desc">每次刷新随机换一句话。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<p class="serif" style="font-size:14.5px;line-height:1.8">「我们都在阴沟里，但仍有人仰望星空。」</p>
+<p class="num" style="margin-top:6px;text-align:right">—— 王尔德</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">067</span><h3>每日诗词</h3><span class="badge b-show">展示</span></header><p class="mod-desc">每天一首诗的垂直排版卡。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center;text-align:center;padding:18px 14px">
+<p class="serif" style="font-size:15px;letter-spacing:.3em">海上生明月</p>
+<p class="serif" style="font-size:15px;letter-spacing:.3em;margin-top:4px">天涯共此时</p>
+<p class="num" style="margin-top:10px">张九龄 · 望月怀远</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">068</span><h3>签名卡</h3><span class="badge b-show">展示</span></header><p class="mod-desc">衬线字的作者署名卡。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center">
+<p class="serif" style="font-size:30px">Han</p>
+<p class="num" style="letter-spacing:.18em;margin-top:2px">STUDENT · DEV · DESIGNER</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">069</span><h3>座右铭</h3><span class="badge b-show">展示</span></header><p class="mod-desc">放在侧栏顶部的一句话。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="border-left:2px solid var(--accent)">
+<p class="serif" style="font-size:14px;line-height:1.8">把喜欢的事做到能被人看见的程度。</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">070</span><h3>引言轮播</h3><span class="badge b-show">展示</span></header><p class="mod-desc">自动淡入淡出的多条引言。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div style="display:flex;gap:4px;margin-bottom:7px"><span class="dot"></span><span class="dot" style="background:var(--border)"></span><span class="dot" style="background:var(--border)"></span></div>
+<p class="serif" style="font-size:14px;line-height:1.8">「设计不是看起来如何，而是如何运作。」</p>
+<p class="num" style="margin-top:6px">Steve Jobs</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">071</span><h3>书摘卡</h3><span class="badge b-show">展示</span></header><p class="mod-desc">近期读到想抄下来的一段。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<p style="font-size:12.5px;line-height:1.75">“凡是过往，皆为序章。”</p>
+<p class="num" style="margin-top:7px">—— 莎士比亚《暴风雨》 · 摘于 09.14</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">072</span><h3>在读的书</h3><span class="badge b-show">展示</span></header><p class="mod-desc">带阅读进度条的书封卡。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;gap:10px;align-items:center">
+<div class="img g2" style="width:46px;height:62px;flex-shrink:0">BOOK</div>
+<div style="flex:1;min-width:0"><p class="ellip" style="font:500 13px MiSans">设计中的设计</p><p class="num" style="margin:2px 0 7px">原研哉</p><div class="bar"><i style="width:64%"></i></div><p class="num" style="margin-top:4px">读到 64% · 还差 3 章</p></div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">073</span><h3>最近观影</h3><span class="badge b-show">展示</span></header><p class="mod-desc">两三部最近标记的影片。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">最近在看</span><span class="sb-tag"><b>#</b>FILM</span></div>
+<div class="row" style="border:0"><span class="grow ellip">沙丘 3</span><span class="star">★★★★★</span></div>
+<div class="row"><span class="grow ellip">奥本海默</span><span class="star">★★★★☆</span></div>
+<div class="row"><span class="grow ellip">长安三万里</span><span class="star">★★★★☆</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">074</span><h3>正在听</h3><span class="badge b-show">展示</span></header><p class="mod-desc">实时歌曲与播放进度。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;gap:10px;align-items:center">
+<div class="img g1" style="width:44px;height:44px;flex-shrink:0">♫</div>
+<div style="flex:1;min-width:0"><p class="ellip" style="font:500 13px MiSans">Nightcall</p><p class="num">Kavinsky</p><div class="bar" style="margin-top:6px"><i style="width:38%"></i></div></div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">075</span><h3>唱片卡</h3><span class="badge b-show">展示</span></header><p class="mod-desc">缓缓旋转的黑胶唱片。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center;padding:18px 14px">
+<div style="width:88px;height:88px;border-radius:99px;background:repeating-radial-gradient(circle at center, #111 0 2px, #1b1b1b 2px 4px);display:flex;align-items:center;justify-content:center;animation:spin 6s linear infinite">
+<span style="width:26px;height:26px;border-radius:99px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">HAN</span>
+</div>
+<p class="num" style="margin-top:10px">NOW PLAYING · LOFI MIX</p>
+</div></div></div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">076</span><h3>每日壁纸</h3><span class="badge b-show">展示</span></header><p class="mod-desc">一张每天更换的摄影壁纸。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="padding:8px">
+<div class="img g3" style="aspect-ratio:16/10">WALLPAPER · 09.19</div>
+<p class="num" style="margin-top:7px;padding:0 4px 2px">武汉 · 江边的晚霞</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">077</span><h3>照片墙</h3><span class="badge b-show">展示</span></header><p class="mod-desc">3×2 的最近照片宫格。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="padding:8px"><div class="sb-head" style="padding:2px 6px 8px"><span class="sb-title">最近的照片</span><span class="num">/gallery</span></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+<div class="img g1" style="aspect-ratio:1;border-radius:6px">01</div><div class="img g4" style="aspect-ratio:1;border-radius:6px">02</div><div class="img g3" style="aspect-ratio:1;border-radius:6px">03</div>
+<div class="img g5" style="aspect-ratio:1;border-radius:6px">04</div><div class="img g2" style="aspect-ratio:1;border-radius:6px">05</div><div class="img g1" style="aspect-ratio:1;border-radius:6px">06</div>
+</div></div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">078</span><h3>倒计时</h3><span class="badge b-show">展示</span></header><p class="mod-desc">期末 / 纪念日的倒数。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center;text-align:center">
+<p class="num" style="font-size:11px;letter-spacing:.2em">期末考试 · DAYS LEFT</p>
+<p class="serif" style="font-size:34px;margin:2px 0">D-42</p>
+<p class="num">2027.01.11</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">079</span><h3>节气卡</h3><span class="badge b-show">展示</span></header><p class="mod-desc">今天是秋分，昼夜平分。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center;text-align:center;background:linear-gradient(180deg, var(--card), var(--accent-soft))">
+<p class="serif" style="font-size:24px;letter-spacing:.24em">秋 分</p>
+<p class="num" style="margin-top:4px">昼夜均而寒暑平</p>
+<p class="num" style="margin-top:2px">农历七月廿八</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">080</span><h3>时间天气</h3><span class="badge b-show">展示</span></header><p class="mod-desc">本地时间与当前天气。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;padding:12px 14px">
+<div style="flex:1"><p class="num" style="font-size:19px;letter-spacing:.05em" id="clock">14:32</p><p class="num">SAT 09.19</p></div>
+<div style="text-align:right"><p style="font-size:15px">⛅ 24°</p><p class="num">西安 · 晴</p></div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">081</span><h3>位置卡</h3><span class="badge b-show">展示</span></header><p class="mod-desc">我在哪：城市 + 坐标。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="padding:0;overflow:hidden">
+<div class="img g5" style="border-radius:0;aspect-ratio:16/7;border:0">MAP</div>
+<div style="display:flex;align-items:center;gap:8px;padding:10px 14px"><span class="dot"></span><span style="font:500 13px MiSans;flex:1">中国 · 西安</span><span class="num">34.34°N 108.94°E</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">082</span><h3>状态卡</h3><span class="badge b-show">展示</span></header><p class="mod-desc">此刻在忙什么（手动更新）。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;gap:10px;padding:11px 14px">
+<span style="width:8px;height:8px;border-radius:99px;background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)"></span>
+<div style="flex:1;min-width:0"><p style="font:500 13px MiSans">在赶数据库作业</p><p class="num">状态更新于 1 小时前</p></div>
+</div></div></div></section>
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">083</span><h3>emoji 状态</h3><span class="badge b-show">展示</span></header><p class="mod-desc">Discord 风格的今日心情。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;padding:11px 14px">
+<span style="font-size:18px">🎧</span><span class="grow" style="font-size:13px">边听歌边写代码</span><span class="num">今天</span>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">084</span><h3>年份印章</h3><span class="badge b-show">展示</span></header><p class="mod-desc">篆刻感的年份+干方印章。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center">
+<div style="width:56px;height:56px;border:2px solid var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center">
+<p class="serif" style="color:var(--accent);font-size:15px;line-height:1.25;text-align:center">丙午<br>之年</p>
+</div>
+<p class="num" style="margin-top:8px">2026 · 篆印</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">085</span><h3>模拟时钟</h3><span class="badge b-show">展示</span></header><p class="mod-desc">指针实时走动的极简表盘。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center;padding:18px 14px">
+<svg width="96" height="96" viewBox="0 0 96 96">
+<circle cx="48" cy="48" r="44" fill="none" stroke="var(--border)" stroke-width="2"/>
+<circle cx="48" cy="48" r="3" fill="var(--accent)"/>
+<line x1="48" y1="48" x2="48" y2="20" stroke="var(--fg)" stroke-width="3" stroke-linecap="round"/>
+<line x1="48" y1="48" x2="68" y2="56" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"/>
+<line x1="48" y1="48" x2="30" y2="70" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
+<p class="num" style="margin-top:8px">XI'AN · GMT+8</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">086</span><h3>噪点渐变卡</h3><span class="badge b-show">展示</span></header><p class="mod-desc">纯装饰的质感色卡。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="padding:8px">
+<div style="height:88px;border-radius:8px;background:radial-gradient(120% 140% at 20% 10%, rgb(0 188 125 / 35%), transparent 55%), radial-gradient(120% 140% at 85% 90%, rgb(0 188 125 / 18%), transparent 50%), var(--muted)"></div>
+<p class="num" style="margin-top:7px;padding:0 4px 2px">AMBIENT · NO.7</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">087</span><h3>渐变海报卡</h3><span class="badge b-show">展示</span></header><p class="mod-desc">衬线大字 + 渐变的海报感。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="padding:8px">
+<div style="border-radius:8px;overflow:hidden;background:linear-gradient(150deg,#0e3b2e,#123a4a);padding:22px 16px">
+<p class="serif" style="color:#fff;font-size:19px;line-height:1.5">Make it<br>simple.</p>
+<p class="num" style="color:rgb(255 255 255 / 55%);margin-top:8px">HAN · 2026</p>
+</div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">088</span><h3>徽章墙</h3><span class="badge b-show">展示</span></header><p class="mod-desc">认证 / 赛事 / 荣誉小徽章。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">徽章</span><span class="num">8/24</span></div>
+<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;justify-items:center">
+<span style="font-size:16px">🏆</span><span style="font-size:16px">📷</span><span style="font-size:16px">🚁</span><span style="font-size:16px;filter:grayscale(1);opacity:.3">💻</span><span style="font-size:16px;filter:grayscale(1);opacity:.3">✍️</span><span style="font-size:16px;filter:grayscale(1);opacity:.3">🎓</span>
+</div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">089</span><h3>写作成就</h3><span class="badge b-show">展示</span></header><p class="mod-desc">游戏化写作里程碑。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div class="row" style="border:0"><span style="font-size:15px">🥇</span><div class="grow"><p style="font-size:12.5px;font-weight:500">首篇破万阅读</p><p class="num">2026.06</p></div></div>
+<div class="row"><span style="font-size:15px">🖋</span><div class="grow"><p style="font-size:12.5px;font-weight:500">连续写作 100 天</p><p class="num">2026.03</p></div></div>
+<div class="row"><span style="font-size:15px;filter:grayscale(1);opacity:.35">📚</span><div class="grow"><p style="font-size:12.5px;font-weight:500;color:var(--muted-fg)">百篇俱乐部</p><p class="num">进度 30/100</p></div></div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">090</span><h3>大事记时间线</h3><span class="badge b-show">展示</span></header><p class="mod-desc">竖向时间线的个人里程碑。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div style="border-left:1px solid var(--border);padding-left:12px;display:flex;flex-direction:column;gap:9px">
+<div style="position:relative"><span style="position:absolute;left:-15.5px;top:5px;width:6px;height:6px;border-radius:99px;background:var(--accent)"></span><p class="num">2026.09</p><p style="font-size:12.5px">博客 v2 上线</p></div>
+<div style="position:relative"><span style="position:absolute;left:-15.5px;top:5px;width:6px;height:6px;border-radius:99px;background:var(--border)"></span><p class="num">2026.06</p><p style="font-size:12.5px">高考毕业季影集</p></div>
+<div style="position:relative"><span style="position:absolute;left:-15.5px;top:5px;width:6px;height:6px;border-radius:99px;background:var(--border)"></span><p class="num">2025.03</p><p style="font-size:12.5px">第一篇博客发布</p></div>
+</div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">091</span><h3>技术栈卡</h3><span class="badge b-show">展示</span></header><p class="mod-desc">“本站由这些技术驱动”。</p>
+<div class="preview"><div class="sb"><div class="sb-card"><div class="sb-head"><span class="sb-title">POWERED BY</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:5px">
+<span class="chip">Next.js 16</span><span class="chip">Tailwind 4</span><span class="chip">Turbopack</span><span class="chip">LibSQL</span><span class="chip">Vercel</span>
+</div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">092</span><h3>每日运势</h3><span class="badge b-show">展示</span></header><p class="mod-desc">娱乐向的今日代码运。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center;text-align:center">
+<p style="font-size:18px">🍀</p>
+<p style="font:500 13px MiSans;margin:3px 0 2px">今日宜重构</p>
+<p class="num">运气指数 82 · 适合提交代码</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">093</span><h3>RSS 内容预览</h3><span class="badge b-show">展示</span></header><p class="mod-desc">让订阅者看到 feed 长什么样。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="padding:0;overflow:hidden">
+<div style="padding:9px 12px;border-bottom:1px solid var(--border);font:11px 'JetBrains Mono',monospace;color:var(--muted-fg)">feed://hhan.me</div>
+<div style="padding:9px 12px;border-bottom:1px solid var(--border)"><p style="font-size:12.5px;font-weight:500">WOFF2 子集化实战</p><p class="num" style="margin-top:1px">2 小时前</p></div>
+<div style="padding:9px 12px"><p style="font-size:12.5px;font-weight:500">给博客换上 MiSans</p><p class="num" style="margin-top:1px">7 天前</p></div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">094</span><h3>密码文章入口</h3><span class="badge b-show">展示</span></header><p class="mod-desc">私密内容的解锁入口。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<p style="font:500 13px MiSans;margin-bottom:7px">🔒 私密文章区</p>
+<div class="input" style="margin-bottom:7px">输入密码…</div>
+<button class="btn" style="width:100%">解锁</button>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">095</span><h3>名片二维码</h3><span class="badge b-show">展示</span></header><p class="mod-desc">扫码加微信 / 公众号。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center">
+<svg width="84" height="84" viewBox="0 0 21 21" style="border-radius:8px;background:var(--card);border:1px solid var(--border)">
+<g fill="currentColor" style="color:var(--fg)">
+<rect x="1" y="1" width="5" height="5"/><rect x="2.5" y="2.5" width="2" height="2" fill="var(--card)"/><rect x="15" y="1" width="5" height="5"/><rect x="16.5" y="2.5" width="2" height="2" fill="var(--card)"/><rect x="1" y="15" width="5" height="5"/><rect x="2.5" y="16.5" width="2" height="2" fill="var(--card)"/>
+<rect x="8" y="1" width="1.5" height="1.5"/><rect x="11" y="2" width="1.5" height="1.5"/><rect x="8" y="4" width="1.5" height="1.5"/><rect x="12" y="5" width="1.5" height="1.5"/><rect x="1" y="8" width="1.5" height="1.5"/><rect x="4" y="9" width="1.5" height="1.5"/><rect x="7" y="8" width="1.5" height="1.5"/><rect x="10" y="8.5" width="1.5" height="1.5"/><rect x="14" y="9" width="1.5" height="1.5"/><rect x="17" y="7.5" width="1.5" height="1.5"/><rect x="2" y="12" width="1.5" height="1.5"/><rect x="6" y="13" width="1.5" height="1.5"/><rect x="9" y="12" width="1.5" height="1.5"/><rect x="13" y="13" width="1.5" height="1.5"/><rect x="16" y="12" width="1.5" height="1.5"/><rect x="9" y="16" width="1.5" height="1.5"/><rect x="12" y="17" width="1.5" height="1.5"/><rect x="15" y="15.5" width="1.5" height="1.5"/><rect x="8" y="19" width="1.5" height="1.5"/><rect x="18" y="18" width="1.5" height="1.5"/>
+</g></svg>
+<p class="num" style="margin-top:8px">扫码加微信 · 备注来意</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">096</span><h3>联系名片</h3><span class="badge b-show">展示</span></header><p class="mod-desc">邮箱 / GitHub / 社区汇总。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<div class="row" style="border:0"><span class="num">✉</span><span class="grow ellip">hi@hhan.me</span></div>
+<div class="row"><span class="num">GH</span><span class="grow ellip">@HanHanWeb</span></div>
+<div class="row"><span class="num">Bilibili</span><span class="grow ellip">@Han的设计手记</span></div>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">097</span><h3>季节装饰</h3><span class="badge b-show">展示</span></header><p class="mod-desc">随四季变化的氛围小卡。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="align-items:center;position:relative;overflow:hidden">
+<p class="num" style="letter-spacing:.2em;z-index:1">AUTUMN IN XI'AN</p>
+<p style="font-size:20px;z-index:1;margin-top:4px">🍂 🍂 🍁</p>
+<span style="position:absolute;top:8px;left:14px;font-size:11px;opacity:.7">🍁</span>
+<span style="position:absolute;bottom:10px;right:18px;font-size:10px;opacity:.5">🍂</span>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">098</span><h3>页脚声明</h3><span class="badge b-show">展示</span></header><p class="mod-desc">版权与署名要求的迷你声明。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<p class="num" style="line-height:1.8">© 2023-2026 HAN<br>CC BY-NC-SA 4.0 · 转载请署名</p>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">099</span><h3>开往之旅</h3><span class="badge b-show">展示</span></header><p class="mod-desc">加入开往计划，去往下一个博客。</p>
+<div class="preview"><div class="sb"><div class="sb-card" style="flex-direction:row;align-items:center;gap:10px;padding:11px 14px">
+<span style="font-size:15px">🚂</span><div style="flex:1"><p style="font:500 13px MiSans">开往 · Travellings</p><p class="num">已搭载 2,381 位旅友</p></div>
+<span class="num">→</span>
+</div></div></div></section>
+
+<section class="mod" data-t="show"><header class="mod-head"><span class="mod-no">100</span><h3>双语日签</h3><span class="badge b-show">展示</span></header><p class="mod-desc">中英对照的每日一句。</p>
+<div class="preview"><div class="sb"><div class="sb-card">
+<p class="num" style="letter-spacing:.18em;margin-bottom:6px">DAILY QUOTE · 09.19</p>
+<p class="serif" style="font-size:14px;line-height:1.7">慢慢来，比较快。</p>
+<p style="font-size:12px;color:var(--muted-fg);font-style:italic;margin-top:4px">Slow is smooth, smooth is fast.</p>
+</div></div></div></section>
+  </main>
+
+  <footer class="foot">
+    <p>#SIDEBAR PROPOSALS — 筛选你喜欢的编号，之后我会把它们做成真正的 React 组件接进 /blog 的侧边栏。此页仅供预览（noindex），定稿后可删除。</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var grid = document.getElementById("grid");
+  var countEl = document.getElementById("count");
+  var mods = Array.prototype.slice.call(grid.querySelectorAll(".mod"));
+  var filter = "all";
+  var query = "";
+
+  function apply() {
+    var shown = 0;
+    mods.forEach(function (m) {
+      var okType = filter === "all" || m.getAttribute("data-t") === filter;
+      var okText = !query || m.textContent.toLowerCase().indexOf(query) !== -1;
+      var on = okType && okText;
+      m.classList.toggle("hidden", !on);
+      if (on) shown++;
+    });
+    countEl.textContent = shown + " / " + mods.length;
+  }
+
+  document.getElementById("tabs").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    this.querySelectorAll("button").forEach(function (x) { x.classList.remove("on"); });
+    b.classList.add("on");
+    filter = b.getAttribute("data-f");
+    apply();
+  });
+
+  document.getElementById("q").addEventListener("input", function () {
+    query = this.value.trim().toLowerCase();
+    apply();
+  });
+
+  document.getElementById("theme").addEventListener("click", function () {
+    var dark = document.documentElement.classList.toggle("dark");
+    this.textContent = dark ? "☀️ 浅色预览" : "🌙 深色预览";
+  });
+
+  // 热力图：确定性伪随机填充
+  grid.querySelectorAll("[data-heat]").forEach(function (el) {
+    var n = parseInt(el.getAttribute("data-heat"), 10) || 90;
+    var seed = n;
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    var html = "";
+    for (var i = 0; i < n; i++) {
+      var r = rnd();
+      var lv = r > 0.82 ? "l4" : r > 0.66 ? "l3" : r > 0.42 ? "l2" : r > 0.24 ? "l1" : "";
+      html += "<i" + (lv ? ' class="' + lv + '"' : "") + "></i>";
+    }
+    el.innerHTML = html;
+  });
+
+  // 打卡日历：周一到周日格子，部分标绿
+  var cal = document.getElementById("cal");
+  if (cal) {
+    var weekdays = ["一", "二", "三", "四", "五", "六", "日"];
+    var html = "";
+    weekdays.forEach(function (w) { html += '<span class="num" style="text-align:center">' + w + "</span>"; });
+    for (var d = 1; d <= 30; d++) {
+      var hit = d % 3 === 0 || d % 7 === 2 || d < 6;
+      html += '<span style="text-align:center;font-size:10.5px;padding:2.5px 0;border-radius:6px;' + (hit ? "background:var(--accent-soft);color:var(--accent);font-weight:500" : "color:var(--muted-fg)") + '">' + d + "</span>";
+    }
+    cal.innerHTML = html;
+  }
+
+  apply();
+})();
+</script>
+</body>
+</html>

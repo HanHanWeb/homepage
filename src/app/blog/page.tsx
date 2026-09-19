@@ -19,14 +19,6 @@ export default async function BlogPage() {
 
   return (
     <>
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.3.0/chinese-simplified-600.css"
-      />
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.3.0/chinese-simplified-400.css"
-      />
       <BackToTop />
       <BlogView posts={posts} />
     </>

@@ -27,10 +27,6 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
 
   return (
     <>
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.3.0/chinese-simplified-600.css"
-      />
       <BackToTop />
       <PostView post={post} />
     </>

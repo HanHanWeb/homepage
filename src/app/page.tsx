@@ -24,11 +24,7 @@ export default async function Home() {
         aria-hidden
         className="pointer-events-none fixed inset-x-0 top-0 z-40"
       >
-        <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.3.0/chinese-simplified-400.css"
-      />
-      <ProgressiveBlur position="top" height="10vh" />
+        <ProgressiveBlur position="top" height="10vh" />
       </div>
       <FlickeringGridTop />
       <ScrollProgress />

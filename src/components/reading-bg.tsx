@@ -25,10 +25,48 @@ const STORAGE_KEY = "post-bg";
 // 同页可能有桌面侧栏与抽屉两个实例，最后一个卸载时才清理全局背景
 let instanceCount = 0;
 
+// 主题切换观察器全局共享一份，所有实例统一响应
+const watchers = new Set<() => void>();
+let themeObserver: MutationObserver | null = null;
+
+function ensureThemeObserver() {
+  if (themeObserver) return;
+  themeObserver = new MutationObserver(() => {
+    watchers.forEach((fn) => fn());
+  });
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+}
+
+function releaseThemeObserver() {
+  if (watchers.size === 0 && themeObserver) {
+    themeObserver.disconnect();
+    themeObserver = null;
+  }
+}
+
 function clearBodyBg() {
   document.body.style.backgroundColor = "";
   document.body.style.backgroundImage = "";
   document.documentElement.style.backgroundColor = "";
+}
+
+/** 应用背景并返回当前是否深色主题（供色块预览同步） */
+function applyBg(key: BgKey): boolean {
+  const conf = BGS.find((b) => b.key === key);
+  const isDark = document.documentElement.classList.contains("dark");
+  if (!conf || key === "default") {
+    clearBodyBg();
+    return isDark;
+  }
+  const color = isDark ? conf.dark : conf.light;
+  // 同步设到 html，避免 iOS 橡皮筋回弹露出默认底色
+  document.body.style.backgroundColor = color;
+  document.body.style.backgroundImage = conf.grain ? `url("${NOISE}")` : "";
+  document.documentElement.style.backgroundColor = color;
+  return isDark;
 }
 
 export function ReadingBgPicker({ onSelect }: { onSelect?: () => void }) {
@@ -36,49 +74,35 @@ export function ReadingBgPicker({ onSelect }: { onSelect?: () => void }) {
   const [dark, setDark] = useState(false);
   const keyRef = useRef<BgKey>("default");
 
-  const apply = (key: BgKey) => {
-    const conf = BGS.find((b) => b.key === key);
-    const isDark = document.documentElement.classList.contains("dark");
-    setDark(isDark);
-    if (!conf || key === "default") {
-      clearBodyBg();
-      return;
-    }
-    const color = isDark ? conf.dark : conf.light;
-    // 同步设到 html，避免 iOS 橡皮筋回弹露出默认底色
-    document.body.style.backgroundColor = color;
-    document.body.style.backgroundImage = conf.grain ? `url("${NOISE}")` : "";
-    document.documentElement.style.backgroundColor = color;
-  };
-
   const choose = (key: BgKey) => {
     keyRef.current = key;
     setBg(key);
     localStorage.setItem(STORAGE_KEY, key);
-    apply(key);
+    setDark(applyBg(key));
     onSelect?.();
   };
 
   useEffect(() => {
     instanceCount += 1;
+    ensureThemeObserver();
+    const onThemeChange = () => {
+      setDark(applyBg(keyRef.current));
+    };
+    watchers.add(onThemeChange);
+
     const saved = localStorage.getItem(STORAGE_KEY) as BgKey | null;
     if (saved && BGS.some((b) => b.key === saved)) {
       keyRef.current = saved;
       setBg(saved);
-      apply(saved);
-    }
-    // 切换深浅色主题时按新主题重新着色
-    const observer = new MutationObserver(() => {
+      setDark(applyBg(saved));
+    } else {
       setDark(document.documentElement.classList.contains("dark"));
-      apply(keyRef.current);
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
+    }
+
     return () => {
+      watchers.delete(onThemeChange);
       instanceCount -= 1;
-      observer.disconnect();
+      releaseThemeObserver();
       if (instanceCount === 0) clearBodyBg();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,11 +126,11 @@ export function ReadingBgPicker({ onSelect }: { onSelect?: () => void }) {
                   ? "border-[#00bc7d] ring-2 ring-[#00bc7d]/25"
                   : "border-border hover:scale-105"
               }`}
-            style={{
-              background:
-                b.key === "default" ? "var(--background)" : dark ? b.dark : b.light,
-            }}
-          />
+              style={{
+                background:
+                  b.key === "default" ? "var(--background)" : dark ? b.dark : b.light,
+              }}
+            />
           ))}
         </div>
       </div>

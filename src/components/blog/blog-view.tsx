@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Calendar, Check, Copy, FileText, Rss } from "lucide-react";
+import { Calendar, Check, Copy, FileText, Rss } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -21,14 +21,22 @@ export function BlogView({ posts }: { posts: Post[] }) {
 
   return (
     <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 pt-20 pb-16">
-      <Link
-        href="/"
-        className="group inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground animate-blur-in"
+      <nav
+        aria-label="面包屑"
+        className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground animate-blur-in"
         style={{ "--blur-delay": "0.05s" } as React.CSSProperties}
       >
-        <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
-        返回首页
-      </Link>
+        <Link
+          href="/"
+          className="shrink-0 transition-colors hover:text-foreground"
+        >
+          主页
+        </Link>
+        <span aria-hidden className="select-none opacity-50">
+          /
+        </span>
+        <span aria-current="page">博客</span>
+      </nav>
 
       <div
         className="mt-6 flex items-baseline justify-between gap-4 animate-blur-in"

@@ -34,17 +34,15 @@ export function BlogPreview({ posts }: { posts: Post[] }) {
           <Reveal key={post.slug} delay={`${2.4 + i * 0.08}s`} direction="down">
             <Link
               href={`/blog/${post.slug}`}
-              className="block rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50"
+              className="relative block rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50"
             >
-              <div className="flex items-baseline justify-between gap-4">
-                <h3 className="font-serif-song text-lg tracking-tight">
-                  {post.title}
-                </h3>
-                <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="size-3" strokeWidth={1.5} />
-                  {post.createdAt.slice(0, 10)}
-                </span>
-              </div>
+              <span className="absolute top-4 right-4 flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="size-3" strokeWidth={1.5} />
+                {post.createdAt.slice(0, 10)}
+              </span>
+              <h3 className="font-serif-song pr-20 text-lg tracking-tight">
+                {post.title}
+              </h3>
               <p className="mt-1.5 line-clamp-2 text-sm leading-6 text-muted-foreground">
                 {post.description}
               </p>

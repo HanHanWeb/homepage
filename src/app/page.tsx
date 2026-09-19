@@ -1,5 +1,6 @@
 import { About } from "@/components/about";
 import { BackToTop } from "@/components/back-to-top";
+import { BlogPreview } from "@/components/blog-preview";
 import { CommandPalette } from "@/components/command-palette";
 import { Contact } from "@/components/contact";
 import { Contributions } from "@/components/contributions";
@@ -11,8 +12,12 @@ import { LanguageToggle } from "@/components/language-toggle";
 import { BottomGlow } from "@/components/ui/bottom-glow";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { ScrollProgress } from "@/components/scroll-progress";
+import { listPosts } from "@/lib/blog";
 
-export default function Home() {
+export const revalidate = 300;
+
+export default async function Home() {
+  const posts = await listPosts();
   return (
     <>
       <div
@@ -34,6 +39,7 @@ export default function Home() {
         <Hero />
         <About />
         <Focus />
+        <BlogPreview posts={posts} />
         <Projects />
         <Contributions />
         <Contact />

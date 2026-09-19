@@ -2,7 +2,7 @@
 
 import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
-import { Calendar, Clock, Menu } from "lucide-react";
+import { Calendar, Clock, Menu, Triangle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -62,6 +62,8 @@ export function PostView({ post }: { post: Post }) {
   const [fontStep, setFontStep] = useState(1);
   const [active, setActive] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const contentRef = useRef<HTMLDivElement | null>(null);
   // 点击目录后的平滑滚动期间锁定高亮，避免路过中间章节时闪烁
   const clickLockRef = useRef(false);
@@ -72,7 +74,31 @@ export function PostView({ post }: { post: Post }) {
     if (Number.isInteger(saved) && saved >= 0 && saved < FONT_STEPS.length) {
       setFontStep(saved);
     }
-  }, []);
+    try {
+      const store = JSON.parse(localStorage.getItem("post-likes") ?? "{}");
+      if (store[post.slug]) {
+        setLiked(true);
+        setLikeCount(Number(store[post.slug]));
+      }
+    } catch {
+      // 存储不可用时忽略
+    }
+  }, [post.slug]);
+
+  const markUseful = () => {
+    if (liked) return;
+    let count = 1;
+    try {
+      const store = JSON.parse(localStorage.getItem("post-likes") ?? "{}");
+      count = (Number(store[post.slug]) || 0) + 1;
+      store[post.slug] = count;
+      localStorage.setItem("post-likes", JSON.stringify(store));
+    } catch {
+      // 存储不可用时仅本次会话生效
+    }
+    setLiked(true);
+    setLikeCount(count);
+  };
 
   // 正文图片灯箱
   useEffect(() => {
@@ -328,6 +354,26 @@ export function PostView({ post }: { post: Post }) {
                 </p>
               );
             })}
+          </div>
+
+          <div className="mt-10 flex justify-center">
+            <button
+              type="button"
+              onClick={markUseful}
+              disabled={liked}
+              aria-pressed={liked}
+              className={`inline-flex items-center gap-2 rounded-full border px-5 py-2 text-sm transition-colors ${
+                liked
+                  ? "border-[#00bc7d]/60 bg-[#00bc7d]/10 text-[#00bc7d]"
+                  : "border-border bg-card text-muted-foreground hover:border-[#00bc7d]/50 hover:text-[#00bc7d]"
+              }`}
+            >
+              <Triangle
+                className={`size-4 ${liked ? "fill-[#00bc7d] text-[#00bc7d]" : ""}`}
+                strokeWidth={1.5}
+              />
+              有用{liked ? likeCount : ""}
+            </button>
           </div>
         </article>
 

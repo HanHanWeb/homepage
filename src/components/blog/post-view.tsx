@@ -372,7 +372,7 @@ export function PostView({ post }: { post: Post }) {
                 className={`size-4 ${liked ? "fill-[#00bc7d] text-[#00bc7d]" : ""}`}
                 strokeWidth={1.5}
               />
-              有用{liked ? likeCount : ""}
+              有用{liked ? ` ${likeCount}` : ""}
             </button>
           </div>
         </article>

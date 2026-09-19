@@ -1,6 +1,13 @@
 "use client";
 
-import { Calendar, Check, Copy, FileText, Rss } from "lucide-react";
+import {
+  Calendar,
+  Check,
+  Copy,
+  FileText,
+  Rss,
+  TrainFront,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -117,6 +124,21 @@ export function BlogView({ posts }: { posts: Post[] }) {
           </section>
           <HitokotoCard />
           <LicenseCard />
+          <a
+            href="https://www.travellings.cn/go.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="开往 · 去往下一个博客"
+            className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3 transition-colors hover:border-[#00bc7d]/50"
+          >
+            <TrainFront className="size-4 shrink-0 text-[#00bc7d]" />
+            <p className="min-w-0 flex-1 text-sm font-medium">
+              开往 · Travellings
+            </p>
+            <span aria-hidden className="shrink-0 text-xs text-muted-foreground">
+              →
+            </span>
+          </a>
         </aside>
       </div>
     </main>

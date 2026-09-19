@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { HitokotoCard } from "@/components/hitokoto-card";
+import { LicenseCard } from "@/components/license-card";
 
 export function BlogView({ posts }: { posts: Post[] }) {
   const [copied, setCopied] = useState(false);
@@ -115,6 +116,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
             </button>
           </section>
           <HitokotoCard />
+          <LicenseCard />
         </aside>
       </div>
     </main>

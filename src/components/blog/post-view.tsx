@@ -63,7 +63,7 @@ export function PostView({ post }: { post: Post }) {
   const [active, setActive] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
+  const [likeCount, setLikeCount] = useState<number | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   // 点击目录后的平滑滚动期间锁定高亮，避免路过中间章节时闪烁
   const clickLockRef = useRef(false);
@@ -75,35 +75,56 @@ export function PostView({ post }: { post: Post }) {
       setFontStep(saved);
     }
     try {
+      // localStorage 只记「我是否标记过」，真实计数以服务端为准
       const store = JSON.parse(localStorage.getItem("post-likes") ?? "{}");
-      if (store[post.slug]) {
-        setLiked(true);
-        setLikeCount(Number(store[post.slug]));
-      }
+      setLiked(Boolean(store[post.slug]));
     } catch {
       // 存储不可用时忽略
     }
+    let cancelled = false;
+    fetch(`/api/posts/${post.slug}/like`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data) => {
+        if (!cancelled && typeof data?.count === "number") {
+          setLikeCount(data.count);
+        }
+      })
+      .catch(() => {
+        // 数据库不可用时不显示数字
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [post.slug]);
 
   const toggleUseful = () => {
-    let count = likeCount;
+    const nextLiked = !liked;
+    const method = nextLiked ? "POST" : "DELETE";
+    const prevCount = likeCount;
+    // 乐观更新：本地先加/减 1，以服务端返回值为准
+    const optimistic = nextLiked
+      ? (likeCount ?? 0) + 1
+      : Math.max(0, (likeCount ?? 1) - 1);
+    setLiked(nextLiked);
+    setLikeCount(optimistic);
     try {
       const store = JSON.parse(localStorage.getItem("post-likes") ?? "{}");
-      if (liked) {
-        // 撤销
-        count = Math.max(0, (Number(store[post.slug]) || 0) - 1);
-        if (count > 0) store[post.slug] = count;
-        else delete store[post.slug];
-      } else {
-        count = (Number(store[post.slug]) || 0) + 1;
-        store[post.slug] = count;
-      }
+      if (nextLiked) store[post.slug] = true;
+      else delete store[post.slug];
       localStorage.setItem("post-likes", JSON.stringify(store));
-      setLikeCount(count);
     } catch {
-      // 存储不可用时仅本次会话生效
+      // 存储不可用时忽略
     }
-    setLiked(!liked);
+    fetch(`/api/posts/${post.slug}/like`, { method })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data) => {
+        if (typeof data?.count === "number") setLikeCount(data.count);
+      })
+      .catch(() => {
+        // 接口失败时回滚 UI，保持与服务端一致
+        setLiked(!nextLiked);
+        setLikeCount(prevCount);
+      });
   };
 
   // 正文图片灯箱
@@ -377,7 +398,7 @@ export function PostView({ post }: { post: Post }) {
                 className={`size-4 ${liked ? "fill-[#00bc7d] text-[#00bc7d]" : ""}`}
                 strokeWidth={1.5}
               />
-              有用{liked ? ` ${likeCount}` : ""}
+              有用{likeCount !== null ? ` ${likeCount}` : ""}
             </button>
           </div>
         </article>

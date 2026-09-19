@@ -68,6 +68,53 @@ function getClient(): Client | null {
   return client;
 }
 
+/** 文章「有用」计数表：首次访问时懒建表 */
+let likesTableEnsured = false;
+async function ensureLikesTable(db: Client) {
+  if (likesTableEnsured) return;
+  await db.execute(
+    "CREATE TABLE IF NOT EXISTS post_likes (slug TEXT PRIMARY KEY, count INTEGER NOT NULL DEFAULT 0)",
+  );
+  likesTableEnsured = true;
+}
+
+/** 读取某篇文章的「有用」总数；数据库不可用时返回 null */
+export async function getPostLikes(slug: string): Promise<number | null> {
+  const db = getClient();
+  if (!db) return null;
+  try {
+    await ensureLikesTable(db);
+    const result = await db.execute({
+      sql: "SELECT count FROM post_likes WHERE slug = ?",
+      args: [slug],
+    });
+    return Number(result.rows[0]?.count ?? 0);
+  } catch {
+    return null;
+  }
+}
+
+/** 增/减「有用」计数（delta 为 1 或 -1），返回更新后的总数 */
+export async function changePostLikes(
+  slug: string,
+  delta: 1 | -1,
+): Promise<number | null> {
+  const db = getClient();
+  if (!db) return null;
+  try {
+    await ensureLikesTable(db);
+    const result = await db.execute({
+      sql: `INSERT INTO post_likes (slug, count) VALUES (?, 1)
+            ON CONFLICT(slug) DO UPDATE SET count = MAX(0, count + ?)
+            RETURNING count`,
+      args: [slug, delta],
+    });
+    return Number(result.rows[0]?.count ?? 0);
+  } catch {
+    return null;
+  }
+}
+
 /** 供 /blog 列表页使用：内置示例文章 + 库内文章按时间倒序；库不可达时仅返回内置文章 */
 export async function listPosts(): Promise<Post[]> {
   const db = getClient();

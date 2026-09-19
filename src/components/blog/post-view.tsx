@@ -41,6 +41,9 @@ export function PostView({ post }: { post: Post }) {
   const [fontStep, setFontStep] = useState(1);
   const [active, setActive] = useState(0);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  // 点击目录后的平滑滚动期间锁定高亮，避免路过中间章节时闪烁
+  const clickLockRef = useRef(false);
+  const lockTimerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const saved = Number(localStorage.getItem("post-font-size"));
@@ -66,6 +69,7 @@ export function PostView({ post }: { post: Post }) {
   useEffect(() => {
     if (!showToc) return;
     const update = () => {
+      if (clickLockRef.current) return;
       const hs =
         contentRef.current?.querySelectorAll<HTMLElement>("h2[data-toc]") ??
         [];
@@ -82,6 +86,18 @@ export function PostView({ post }: { post: Post }) {
     return () => window.removeEventListener("scroll", update);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showToc]);
+
+  const choose = (i: number) => {
+    setActive(i);
+    clickLockRef.current = true;
+    window.clearTimeout(lockTimerRef.current);
+    lockTimerRef.current = window.setTimeout(() => {
+      clickLockRef.current = false;
+    }, 1000);
+    document
+      .getElementById(`toc-b-${i}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 pt-20 pb-16">
@@ -222,15 +238,7 @@ export function PostView({ post }: { post: Post }) {
                     <button
                       key={i}
                       type="button"
-                      onClick={() => {
-                        setActive(i);
-                        document
-                          .getElementById(`toc-b-${i}`)
-                          ?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          });
-                      }}
+                      onClick={() => choose(i)}
                       className={`flex w-full items-center gap-2 py-1 text-left text-xs transition-colors ${
                         active === i
                           ? "font-medium text-foreground"

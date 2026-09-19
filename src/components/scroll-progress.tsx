@@ -2,7 +2,6 @@
 
 import { motion, useScroll, useSpring } from "motion/react";
 
-/** 右上角滚动进度环:useScroll 跟踪页面滚动,spring 平滑数值,pathLength 驱动圆环描边 */
 export function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const smooth = useSpring(scrollYProgress, {

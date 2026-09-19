@@ -1,15 +1,10 @@
 /** 项目数据:从 GitHub (HanHanWeb) 拉取的公开仓库快照,无国内实时接口故静态维护 */
 
 export type Project = {
-  /** 仓库名 */
   name: string;
-  /** 仓库链接 */
   url: string;
-  /** 中文简介(取自仓库 description) */
   descZh: string;
-  /** 英文简介 */
   descEn: string;
-  /** 主要技术栈 */
   stack: string[];
 };
 

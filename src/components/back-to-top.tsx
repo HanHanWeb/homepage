@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 
-/** 右下角返回顶部按钮:滚动超过阈值后淡入,点击平滑回到顶部 */
 export function BackToTop() {
   const { t } = useLanguage();
   const [visible, setVisible] = useState(false);

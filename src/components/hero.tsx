@@ -30,7 +30,7 @@ export function Hero() {
         <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
           <InstallBadge className="w-fit animate-blur-in" />
 
-          {/* 逐字符浮现：纯 CSS 合成器驱动（见 globals.css 的 .hero-char），与 motion 版视觉一致 */}
+          {/* 逐字符浮现：纯 CSS 合成器驱动，见 globals.css 的 .hero-char */}
           <h1
             aria-label={t.hero.title}
             className="font-serif-sc mt-4 text-3xl font-semibold tracking-tight sm:text-5xl"

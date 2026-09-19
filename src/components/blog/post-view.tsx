@@ -276,7 +276,7 @@ export function PostView({ post }: { post: Post }) {
                     type="button"
                     onClick={() => changeFont(i)}
                     aria-pressed={fontStep === i}
-                    className={`w-9 py-1.5 text-center text-xs transition-colors ${
+                    className={`flex h-6 w-9 items-center justify-center text-center text-xs transition-colors ${
                       i > 0 ? "border-l" : ""
                     } ${
                       fontStep === i

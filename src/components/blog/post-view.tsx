@@ -10,17 +10,28 @@ import { ReadingBgPicker } from "@/components/reading-bg";
 const FONT_STEPS = ["14px", "15px", "17px"];
 const FONT_LABELS = ["A-", "A", "A+"];
 
-/** 纯文本按空行切段，用于目录锚点；单换行仍由 whitespace-pre-line 保留 */
-function splitParagraphs(post: Post): string[] {
-  return (post.content ?? post.description ?? "")
+type Block =
+  | { kind: "heading"; text: string }
+  | { kind: "image"; alt: string; src: string }
+  | { kind: "para"; text: string };
+
+/** 轻量块解析：空行分段，## 开头为小标题，![alt](src) 整行为图片 */
+function parseBlocks(content: string): Block[] {
+  return content
     .split(/\n{2,}/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .map<Block>((t) => {
+      if (t.startsWith("## ")) return { kind: "heading", text: t.slice(3) };
+      const img = t.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+      if (img) return { kind: "image", alt: img[1], src: img[2] };
+      return { kind: "para", text: t };
+    });
 }
 
 export function PostView({ post }: { post: Post }) {
-  const paragraphs = splitParagraphs(post);
-  const showToc = paragraphs.length >= 3;
+  const blocks = parseBlocks(post.content ?? post.description ?? "");
+  const showToc = blocks.length >= 3;
   const [fontStep, setFontStep] = useState(1);
   const [active, setActive] = useState(0);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -117,16 +128,43 @@ export function PostView({ post }: { post: Post }) {
             className="mt-8 space-y-4 leading-8 text-foreground/90"
             style={{ fontSize: FONT_STEPS[fontStep] }}
           >
-            {paragraphs.map((text, i) => (
-              <p
-                key={i}
-                id={showToc ? `toc-p-${i}` : undefined}
-                data-toc={showToc ? "" : undefined}
-                className="whitespace-pre-line"
-              >
-                {text}
-              </p>
-            ))}
+            {blocks.map((b, i) => {
+              if (b.kind === "heading") {
+                return (
+                  <h2
+                    key={i}
+                    id={showToc ? `toc-b-${i}` : undefined}
+                    data-toc={showToc ? "" : undefined}
+                    className="font-serif-sc mt-9 text-xl tracking-tight"
+                  >
+                    {b.text}
+                  </h2>
+                );
+              }
+              if (b.kind === "image") {
+                return (
+                  <span key={i} className="block">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={b.src}
+                      alt={b.alt}
+                      loading="lazy"
+                      className="w-full rounded-xl border"
+                    />
+                  </span>
+                );
+              }
+              return (
+                <p
+                  key={i}
+                  id={showToc ? `toc-b-${i}` : undefined}
+                  data-toc={showToc ? "" : undefined}
+                  className="whitespace-pre-line"
+                >
+                  {b.text}
+                </p>
+              );
+            })}
           </div>
         </article>
 
@@ -170,32 +208,42 @@ export function PostView({ post }: { post: Post }) {
                 </span>
               </div>
               <div>
-                {paragraphs.map((text, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() =>
-                      document
-                        .getElementById(`toc-p-${i}`)
-                        ?.scrollIntoView({ behavior: "smooth", block: "start" })
-                    }
-                    className={`flex w-full items-center gap-2 py-1 text-left text-xs transition-colors ${
-                      active === i
-                        ? "font-medium text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <span
-                      aria-hidden
-                      className={`h-3.5 w-[3px] shrink-0 rounded-full ${
-                        active === i ? "bg-[#00bc7d]" : "bg-border"
+                {blocks.map((b, i) => {
+                  if (b.kind === "image") return null;
+                  const label =
+                    b.kind === "heading"
+                      ? b.text
+                      : b.text.length > 14
+                        ? `${b.text.slice(0, 14)}…`
+                        : b.text;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() =>
+                        document
+                          .getElementById(`toc-b-${i}`)
+                          ?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          })
+                      }
+                      className={`flex w-full items-center gap-2 py-1 text-left text-xs transition-colors ${
+                        active === i
+                          ? "font-medium text-foreground"
+                          : "text-muted-foreground hover:text-foreground"
                       }`}
-                    />
-                    <span className="truncate">
-                      {text.length > 14 ? `${text.slice(0, 14)}…` : text}
-                    </span>
-                  </button>
-                ))}
+                    >
+                      <span
+                        aria-hidden
+                        className={`h-3.5 w-[3px] shrink-0 rounded-full ${
+                          active === i ? "bg-[#00bc7d]" : "bg-border"
+                        }`}
+                      />
+                      <span className="truncate">{label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </section>
           )}

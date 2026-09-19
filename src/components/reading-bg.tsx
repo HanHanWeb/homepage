@@ -22,7 +22,16 @@ const BGS: {
 
 const STORAGE_KEY = "post-bg";
 
-export function ReadingBgPicker() {
+// 同页可能有桌面侧栏与抽屉两个实例，最后一个卸载时才清理全局背景
+let instanceCount = 0;
+
+function clearBodyBg() {
+  document.body.style.backgroundColor = "";
+  document.body.style.backgroundImage = "";
+  document.documentElement.style.backgroundColor = "";
+}
+
+export function ReadingBgPicker({ onSelect }: { onSelect?: () => void }) {
   const [bg, setBg] = useState<BgKey>("default");
   const [dark, setDark] = useState(false);
   const keyRef = useRef<BgKey>("default");
@@ -32,12 +41,14 @@ export function ReadingBgPicker() {
     const isDark = document.documentElement.classList.contains("dark");
     setDark(isDark);
     if (!conf || key === "default") {
-      document.body.style.backgroundColor = "";
-      document.body.style.backgroundImage = "";
+      clearBodyBg();
       return;
     }
-    document.body.style.backgroundColor = isDark ? conf.dark : conf.light;
+    const color = isDark ? conf.dark : conf.light;
+    // 同步设到 html，避免 iOS 橡皮筋回弹露出默认底色
+    document.body.style.backgroundColor = color;
     document.body.style.backgroundImage = conf.grain ? `url("${NOISE}")` : "";
+    document.documentElement.style.backgroundColor = color;
   };
 
   const choose = (key: BgKey) => {
@@ -45,9 +56,11 @@ export function ReadingBgPicker() {
     setBg(key);
     localStorage.setItem(STORAGE_KEY, key);
     apply(key);
+    onSelect?.();
   };
 
   useEffect(() => {
+    instanceCount += 1;
     const saved = localStorage.getItem(STORAGE_KEY) as BgKey | null;
     if (saved && BGS.some((b) => b.key === saved)) {
       keyRef.current = saved;
@@ -64,9 +77,9 @@ export function ReadingBgPicker() {
       attributeFilter: ["class"],
     });
     return () => {
+      instanceCount -= 1;
       observer.disconnect();
-      document.body.style.backgroundColor = "";
-      document.body.style.backgroundImage = "";
+      if (instanceCount === 0) clearBodyBg();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -215,7 +215,7 @@ export function PostView({ post }: { post: Post }) {
           <SheetTitle className="sr-only">文章侧边栏</SheetTitle>
           <div className="space-y-4">
             {tocCard(true)}
-            <ReadingBgPicker />
+            <ReadingBgPicker onSelect={() => setMenuOpen(false)} />
             {fontSizeCard}
             <BlogBadges />
           </div>

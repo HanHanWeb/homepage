@@ -7,6 +7,7 @@ import {
   Copy,
   FileText,
   Rss,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -17,6 +18,22 @@ import { LicenseCard } from "@/components/license-card";
 
 export function BlogView({ posts }: { posts: Post[] }) {
   const [copied, setCopied] = useState(false);
+  const [category, setCategory] = useState("全部");
+  const [query, setQuery] = useState("");
+
+  const categories = [
+    "全部",
+    ...new Set(posts.map((p) => p.category).filter(Boolean)),
+  ];
+  const filtered = posts.filter((p) => {
+    const okCategory = category === "全部" || p.category === category;
+    const q = query.trim().toLowerCase();
+    const okQuery =
+      !q ||
+      p.title.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q);
+    return okCategory && okQuery;
+  });
 
   const copyFeedUrl = async () => {
     try {
@@ -54,18 +71,57 @@ export function BlogView({ posts }: { posts: Post[] }) {
         <span className="text-sm font-normal tracking-widest text-muted-foreground/40">#BLOG</span>
       </div>
 
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div
+          className="flex items-center gap-1 rounded-full border bg-card p-1"
+          role="tablist"
+          aria-label="文章分类"
+        >
+          {categories.map((c) => (
+            <button
+              key={c}
+              type="button"
+              role="tab"
+              aria-selected={category === c}
+              onClick={() => setCategory(c)}
+              className={`rounded-full px-4 py-1.5 text-sm transition-colors ${
+                category === c
+                  ? "bg-[#00bc7d]/10 font-medium text-[#00bc7d]"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+        <label className="flex w-full max-w-64 items-center gap-2 rounded-full border bg-card px-4 py-2 text-sm sm:w-64">
+          <Search
+            className="size-3.5 shrink-0 text-muted-foreground"
+            strokeWidth={1.5}
+          />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="搜索文章…"
+            className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
+          />
+        </label>
+      </div>
+
       <div
         className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_15rem]"
         style={{ "--blur-delay": "0.3s" } as React.CSSProperties}
       >
         <div className="min-w-0 space-y-3 animate-blur-in">
-          {posts.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-16 text-muted-foreground">
               <FileText className="size-8 opacity-40" strokeWidth={1.5} />
-              <p className="text-sm">还没有文章</p>
+              <p className="text-sm">
+                {posts.length === 0 ? "还没有文章" : "没有找到匹配的文章"}
+              </p>
             </div>
           ) : (
-            posts.map((post) => (
+            filtered.map((post) => (
               <article
                 key={post.slug}
                 id={`post-${post.slug}`}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Clock } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
 import type { Post } from "@/lib/blog";
@@ -36,10 +37,11 @@ export function BlogPreview({ posts }: { posts: Post[] }) {
               className="block rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50"
             >
               <div className="flex items-baseline justify-between gap-4">
-                <h3 className="font-serif-sc text-lg tracking-tight">
+                <h3 className="font-serif-song text-lg tracking-tight">
                   {post.title}
                 </h3>
-                <span className="shrink-0 text-xs text-muted-foreground">
+                <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="size-3" strokeWidth={1.5} />
                   {post.createdAt.slice(0, 10)}
                 </span>
               </div>
@@ -52,7 +54,7 @@ export function BlogPreview({ posts }: { posts: Post[] }) {
         <Reveal delay={`${2.4 + latest.length * 0.08}s`} direction="down">
           <Link
             href="/blog"
-            className="block rounded-xl border border-dashed p-3 text-center text-sm text-muted-foreground transition-colors hover:border-[#00bc7d]/50 hover:text-[#00bc7d]"
+            className="mx-auto mt-1 block w-fit rounded-full border bg-card px-5 py-2 text-sm text-muted-foreground transition-colors hover:border-[#00bc7d]/60 hover:text-[#00bc7d]"
           >
             查看全部文章 →
           </Link>

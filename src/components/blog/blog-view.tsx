@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import type { Post } from "@/lib/blog";
+import { HitokotoCard } from "@/components/hitokoto-card";
 
 export function BlogView({ posts }: { posts: Post[] }) {
   const [copied, setCopied] = useState(false);
@@ -113,6 +114,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
               )}
             </button>
           </section>
+          <HitokotoCard />
         </aside>
       </div>
     </main>

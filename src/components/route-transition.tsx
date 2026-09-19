@@ -9,14 +9,8 @@ type VTDocument = Document & {
   };
 };
 
-/** 路径层级越深视为“前进”，反之“返回”，决定浮入方向 */
-function getDirection(to: string): "forward" | "back" {
-  const depth = (p: string) => new URL(p, window.location.href).pathname.split("/").filter(Boolean).length;
-  return depth(to) > depth(window.location.pathname) ? "forward" : "back";
-}
-
 let navigateImpl: ((href: string) => void) | null = null;
-// 导航序号：只有最新一次导航有权做收尾清理，防止旧过渡的 finished 误删新导航的方向属性
+// 导航序号：只有最新一次导航有权做收尾滚顶，防止旧过渡的 finished 抢跑新导航
 let navSeq = 0;
 
 /** 供非链接场景（如命令面板）使用的带过渡导航 */
@@ -27,7 +21,7 @@ export function navigateWithTransition(href: string) {
 /**
  * 全局路由切换过渡：
  * 捕获内部 <a> 点击，用 View Transitions API 包裹 router.push，
- * 等新页面 commit 后播放左右浮入浮出动画（方向由路径深浅决定）。
+ * 等新页面 commit 后播放由 data-vt-effect 指定的过渡动画。
  */
 export function RouteTransition() {
   const router = useRouter();
@@ -49,6 +43,16 @@ export function RouteTransition() {
   }, [pathname]);
 
   useEffect(() => {
+    // 过渡效果由 localStorage 记忆，默认缩放，历史值一律回落
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem("vtEffect");
+    } catch {
+      // localStorage 不可用时用默认值
+    }
+    document.documentElement.dataset.vtEffect =
+      saved === "zoom" || saved === "fade" ? saved : "zoom";
+
     const nav = (href: string) => {
       const doc = document as VTDocument;
       if (typeof doc.startViewTransition !== "function") {
@@ -56,7 +60,6 @@ export function RouteTransition() {
         return;
       }
       const seq = ++navSeq;
-      document.documentElement.dataset.vtDirection = getDirection(href);
       // 有挂起的过渡先放行（新的 startViewTransition 会 skip 它），避免 promise 悬挂到 2s 超时
       pendingResolve.current?.();
       const transition = doc.startViewTransition(
@@ -71,12 +74,10 @@ export function RouteTransition() {
             router.push(href);
           }),
       );
-      // 动画播完后回顶兜底并清理方向标记；seq 不匹配说明期间已发生更新的导航，
-      // 此时属性归属新导航，不能删，否则新导航的动画会因选择器失配而失效
+      // 动画播完后回顶兜底；seq 不匹配说明期间已发生更新的导航，收尾归属新导航
       void transition.finished?.finally(() => {
         if (seq !== navSeq) return;
         window.scrollTo(0, 0);
-        delete document.documentElement.dataset.vtDirection;
       });
     };
     navigateImpl = nav;

@@ -337,57 +337,47 @@ html::-webkit-scrollbar {
   }
 }
 
-/* ===== 路由切换过渡（View Transitions API，快照合成层动画）===== */
-/* antd 风格推屏转场：新页作为遮挡层从侧边完整滑入，旧页视差位移并渐隐 */
-/* 位移时露出的边缘用主题背景兜底，避免闪出黑/白边 */
+/* ===== 路由切换过渡（View Transitions API）===== */
+/* 过渡中露出的边缘用主题背景兜底，避免闪出黑/白边 */
 ::view-transition-group(root) {
   background: var(--background);
 }
 
-/* 前进（进子页面）：新页自右滑入盖住，旧页向左视差淡出 */
-html[data-vt-direction="forward"]::view-transition-old(root) {
-  animation: vt-forward-old 0.4s cubic-bezier(0.645, 0.045, 0.355, 1) both;
+/* 缩放：旧页轻微缩小淡出，新页从 103% 缩回原位 */
+html[data-vt-effect="zoom"]::view-transition-old(root) {
+  animation: vt-zoom-old 0.3s ease both;
 }
-html[data-vt-direction="forward"]::view-transition-new(root) {
-  animation: vt-forward-new 0.4s cubic-bezier(0.645, 0.045, 0.355, 1) both;
+html[data-vt-effect="zoom"]::view-transition-new(root) {
+  animation: vt-zoom-new 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes vt-zoom-old {
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+@keyframes vt-zoom-new {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
 }
 
-/* 返回（回上级页面）：新页自左滑入盖住，旧页向右视差淡出 */
-html[data-vt-direction="back"]::view-transition-old(root) {
-  animation: vt-back-old 0.4s cubic-bezier(0.645, 0.045, 0.355, 1) both;
+/* 淡入淡出：新旧页面原位交叉淡入淡出 */
+html[data-vt-effect="fade"]::view-transition-old(root) {
+  animation: vt-fade-old 0.3s ease both;
 }
-html[data-vt-direction="back"]::view-transition-new(root) {
-  animation: vt-back-new 0.4s cubic-bezier(0.645, 0.045, 0.355, 1) both;
+html[data-vt-effect="fade"]::view-transition-new(root) {
+  animation: vt-fade-new 0.3s ease both;
 }
-
-@keyframes vt-forward-old {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
+@keyframes vt-fade-old {
   to {
-    transform: translateX(-22%);
-    opacity: 0.4;
+    opacity: 0;
   }
 }
-@keyframes vt-forward-new {
+@keyframes vt-fade-new {
   from {
-    transform: translateX(100%);
-  }
-}
-@keyframes vt-back-old {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(22%);
-    opacity: 0.4;
-  }
-}
-@keyframes vt-back-new {
-  from {
-    transform: translateX(-100%);
+    opacity: 0;
   }
 }
 

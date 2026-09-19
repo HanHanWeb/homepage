@@ -31,7 +31,7 @@ export function Hero() {
           {/* 逐字符浮现：纯 CSS 合成器驱动，见 globals.css 的 .hero-char */}
           <h1
             aria-label={t.hero.title}
-            className="font-serif-sc mt-4 text-3xl font-semibold tracking-tight sm:text-5xl"
+            className="font-serif-sc mt-4 text-3xl tracking-tight sm:text-5xl"
           >
             <span className="sr-only">{t.hero.title}</span>
             {t.hero.title.split("").map((ch, i) => (

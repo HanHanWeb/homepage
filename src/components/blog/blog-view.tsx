@@ -34,7 +34,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
         className="mt-6 flex items-baseline justify-between gap-4 animate-blur-in"
         style={{ "--blur-delay": "0.15s" } as React.CSSProperties}
       >
-        <h1 className="font-serif-sc relative inline-block text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h1 className="font-serif-sc relative inline-block text-3xl tracking-tight sm:text-4xl">
           博客
           <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-[#00bc7d]" aria-hidden />
         </h1>

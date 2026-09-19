@@ -3,14 +3,11 @@
 @import "shadcn/tailwind.css";
 
 @font-face {
-  font-family: "ChillJinshuSong_CompactRegular";
-  src:
-    url("/fonts/ChillJinshuSong_CompactRegular-subset.woff2") format("woff2"),
-    url("/fonts/ChillJinshuSong_CompactRegular-subset.woff") format("woff");
+  font-family: "CorpSrcWinSong";
+  src: url("/fonts/CorpSrcWinSong-slim.woff2") format("woff2");
   font-display: swap;
   font-weight: 400;
   font-style: normal;
-  font-stretch: condensed;
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -18,11 +15,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "MiSans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono);
   --font-heading: var(--font-sans);
-  --font-serif-sc: "ChillJinshuSong_CompactRegular", serif;
-  --font-serif-sc-stretch: condensed;
+  --font-serif-sc: "CorpSrcWinSong", serif;
   --font-serif-song: "Noto Serif SC", "Songti SC", "SimSun", serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -146,9 +142,6 @@
   }
   html {
     @apply font-sans;
-  }
-  .font-serif-sc {
-    font-stretch: condensed;
   }
 }
 

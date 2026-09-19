@@ -70,7 +70,7 @@ export function Contributions() {
     <section id="contributions" className="scroll-mt-6 py-10">
       <Reveal delay="2.9s" direction="down">
         <div className="flex items-baseline justify-between gap-4">
-          <h2 className="font-serif-sc relative inline-block text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="font-serif-sc relative inline-block text-3xl tracking-tight sm:text-4xl">
             {t.contributions.title}
             <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-[#00bc7d]" aria-hidden />
           </h2>

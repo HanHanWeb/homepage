@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 import { LanguageProvider } from "@/components/language-provider";
@@ -7,14 +7,8 @@ import { RouteTransition } from "@/components/route-transition";
 import { SuppressScriptWarning } from "@/components/suppress-script-warning";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const geistSans = Geist({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   display: "swap",
 });
@@ -33,13 +27,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="zh-CN"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
+      className={`${jetbrainsMono.variable} h-full scroll-smooth antialiased`}
     >
       <head>
+        {/* MiSans 全站默认字体，CDN 直连 */}
+        <link
+          rel="stylesheet"
+          href="https://cdn-font.hyperos.mi.com/font/css?family=MiSans:100,200,300,400,500,600:Chinese_Simplify,Latin&display=swap"
+        />
         {/* 预加载标题字体，避免 font swap 在入场动画中途改变字形 */}
         <link
           rel="preload"
-          href="/fonts/ChillJinshuSong_CompactRegular-subset.woff2"
+          href="/fonts/CorpSrcWinSong-slim.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"

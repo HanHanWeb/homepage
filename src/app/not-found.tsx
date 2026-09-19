@@ -14,7 +14,7 @@ export default function NotFound() {
       {/* Oops! 大字：Hero 标题同款逐字符浮现（见 globals.css 的 .hero-char） */}
       <h1
         aria-label={OOPS}
-        className="font-serif-sc text-7xl font-semibold tracking-tight sm:text-8xl"
+        className="font-serif-sc text-7xl tracking-tight sm:text-8xl"
       >
         <span className="sr-only">{OOPS}</span>
         {OOPS.split("").map((ch, i) => (

@@ -1,6 +1,8 @@
 "use client";
 
-import { Calendar } from "lucide-react";
+import { Fancybox } from "@fancyapps/ui";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
+import { Calendar, Clock } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -45,6 +47,14 @@ export function PostView({ post }: { post: Post }) {
     if (Number.isInteger(saved) && saved >= 0 && saved < FONT_STEPS.length) {
       setFontStep(saved);
     }
+  }, []);
+
+  // 正文图片灯箱
+  useEffect(() => {
+    Fancybox.bind("[data-fancybox]");
+    return () => {
+      Fancybox.destroy();
+    };
   }, []);
 
   const changeFont = (step: number) => {
@@ -119,6 +129,7 @@ export function PostView({ post }: { post: Post }) {
                 <span aria-hidden className="opacity-60">
                   ·
                 </span>
+                <Clock className="size-3.5" strokeWidth={1.5} />
                 约 {estimateReadingMinutes(post.wordCount)} 分钟
               </>
             )}
@@ -149,7 +160,9 @@ export function PostView({ post }: { post: Post }) {
                       src={b.src}
                       alt={b.alt}
                       loading="lazy"
-                      className="w-full rounded-xl border"
+                      data-fancybox="post"
+                      data-caption={b.alt}
+                      className="w-full cursor-zoom-in rounded-xl border"
                     />
                   </span>
                 );

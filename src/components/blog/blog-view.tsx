@@ -1,6 +1,13 @@
 "use client";
 
-import { Calendar, Check, Copy, FileText, Rss } from "lucide-react";
+import {
+  Calendar,
+  Check,
+  Clock,
+  Copy,
+  FileText,
+  Rss,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -81,6 +88,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
                       <span aria-hidden className="opacity-60">
                         ·
                       </span>
+                      <Clock className="size-3.5" strokeWidth={1.5} />
                       约 {estimateReadingMinutes(post.wordCount)} 分钟
                     </>
                   )}

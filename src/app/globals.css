@@ -378,13 +378,39 @@ html[data-vt-effect="fade"]::view-transition-new(root) {
   }
 }
 
-/* 顶部导航与面包屑脱离 root 快照，路由过渡时保持静止 */
+/* 顶部导航与面包屑脱离 root 快照：组本身也需静止（UA 默认组动画会缩放/淡化整个组） */
+::view-transition-group(site-nav),
+::view-transition-group(vt-breadcrumbs) {
+  animation: none;
+}
+
+/* 离开页面的导航/面包屑快照立即淡出：没有新快照覆盖时（如博客→主页）
+   不再冻结悬挂整个过渡时长 */
 ::view-transition-old(site-nav),
+::view-transition-old(vt-breadcrumbs) {
+  animation: vt-sticky-exit 0.15s ease-out both;
+  mix-blend-mode: normal;
+}
+
+/* 进入页面的导航/面包屑快照静止呈现 */
 ::view-transition-new(site-nav),
-::view-transition-old(vt-breadcrumbs),
 ::view-transition-new(vt-breadcrumbs) {
   animation: none;
   mix-blend-mode: normal;
+}
+
+@keyframes vt-sticky-exit {
+  to {
+    opacity: 0;
+  }
+}
+
+/* 路由过渡期间暂停面包屑入场动画：入场动画与过渡快照竞态时，
+   新快照会拍到 opacity 0 的面包屑，导致旧快照全程裸露、过渡结束闪跳。
+   data-vt-active 由 RouteTransition 在发起过渡时置位且不清除
+   （清除会让 blur-in 重新播放造成二次闪烁）；刷新/新开页面无此标记，入场照常。 */
+html[data-vt-active] nav[aria-label="面包屑"] {
+  animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

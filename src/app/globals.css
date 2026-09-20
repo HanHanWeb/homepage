@@ -401,6 +401,14 @@ html[data-vt-no-chrome]::view-transition-old(vt-breadcrumbs) {
   opacity: 0;
 }
 
+/* 同一标记同步隐藏实时 DOM 中的导航/面包屑：startViewTransition 的旧快照
+   捕获可能滞后数百毫秒（dev 模式编译/渲染繁忙时更久），期间屏幕显示的
+   仍是实时 DOM，只隐藏快照会让导航在点击后残留可见 */
+html[data-vt-no-chrome] [data-vt-site-nav],
+html[data-vt-no-chrome] [data-vt-breadcrumbs] {
+  visibility: hidden;
+}
+
 /* 进入页面的导航/面包屑快照静止呈现 */
 ::view-transition-new(site-nav),
 ::view-transition-new(vt-breadcrumbs) {

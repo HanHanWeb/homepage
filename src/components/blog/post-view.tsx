@@ -317,6 +317,7 @@ export function PostView({ post }: { post: Post }) {
         aria-label="面包屑"
         className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground animate-blur-in"
         style={{ "--blur-delay": "0.05s", viewTransitionName: "vt-breadcrumbs" } as React.CSSProperties}
+        data-vt-breadcrumbs
       >
         <Link
           href="/"

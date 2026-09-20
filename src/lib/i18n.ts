@@ -62,7 +62,7 @@ export const dictionaries = {
     meta: {
       title: "Han — Student · Developer · Designer",
       description:
-        "一名来自中国的学生、开发者与设计师的个人主页。学生 · 开发者 · 设计师，记录学习与创作。",
+        "一名学生、开发者与设计师。喜欢用设计把事情做得简洁、好用又好看，目前主要探索 Web 开发与 AI 应用。",
     },
   },
   en: {

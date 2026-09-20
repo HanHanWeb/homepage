@@ -14,7 +14,7 @@ export function BlogBadges() {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://www.travellings.cn/assets/logo.svg"
+          src="/travellings-logo.svg"
           alt="开往 · Travellings"
           className="h-4 w-auto"
           loading="lazy"

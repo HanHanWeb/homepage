@@ -4,7 +4,7 @@ import { Clock } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import type { Post } from "@/lib/blog";
 
-/** 首页博客板块：最近 5 篇文章预览（标题、简介、发布时间） */
+/** 首页博客板块：最近 5 篇文章预览（标题、发布时间） */
 export function BlogPreview({ posts }: { posts: Post[] }) {
   const latest = posts.slice(0, 5);
   if (latest.length === 0) return null;
@@ -36,16 +36,13 @@ export function BlogPreview({ posts }: { posts: Post[] }) {
               href={`/blog/${post.slug}`}
               className="relative block rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50"
             >
-              <span className="absolute top-4 right-4 flex items-center gap-1 text-xs text-muted-foreground">
+              <h3 className="font-serif-song text-lg tracking-tight">
+                {post.title}
+              </h3>
+              <span className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock className="size-3" strokeWidth={1.5} />
                 {post.createdAt.slice(0, 10)}
               </span>
-              <h3 className="font-serif-song pr-20 text-lg tracking-tight">
-                {post.title}
-              </h3>
-              <p className="mt-1.5 line-clamp-2 text-sm leading-6 text-muted-foreground">
-                {post.description}
-              </p>
             </Link>
           </Reveal>
         ))}

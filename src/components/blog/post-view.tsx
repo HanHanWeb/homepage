@@ -10,6 +10,7 @@ import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { ReadingBgPicker } from "@/components/reading-bg";
 import { BlogBadges } from "@/components/blog-badges";
 import { BlogNav } from "@/components/blog/blog-nav";
+import { Confetti, type ConfettiRef } from "@/components/ui/confetti";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 const FONT_STEPS = ["14px", "15px", "17px"];
@@ -65,6 +66,7 @@ export function PostView({ post }: { post: Post }) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState<number | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const confettiRef = useRef<ConfettiRef | null>(null);
   // 点击目录后的平滑滚动期间锁定高亮，避免路过中间章节时闪烁
   const clickLockRef = useRef(false);
   const lockTimerRef = useRef<number | undefined>(undefined);
@@ -97,6 +99,31 @@ export function PostView({ post }: { post: Post }) {
     };
   }, [post.slug]);
 
+  const fireConfetti = () => {
+    if (!confettiRef.current) return;
+    // 从屏幕正中喷发，视觉上像为点赞庆祝
+    confettiRef.current.fire({
+      particleCount: 120,
+      angle: 90,
+      spread: 75,
+      startVelocity: 42,
+      gravity: 1,
+      decay: 0.92,
+      ticks: 240,
+      scalar: 0.95,
+      origin: { x: 0.5, y: 0.5 },
+      colors: [
+        "#00bc7d",
+        "#22c55e",
+        "#a3e635",
+        "#0ea5e9",
+        "#f59e0b",
+        "#f43f5e",
+        "#a855f7",
+      ],
+    });
+  };
+
   const toggleUseful = () => {
     const nextLiked = !liked;
     const method = nextLiked ? "POST" : "DELETE";
@@ -107,6 +134,8 @@ export function PostView({ post }: { post: Post }) {
       : Math.max(0, (likeCount ?? 1) - 1);
     setLiked(nextLiked);
     setLikeCount(optimistic);
+    // 只在新点赞时撒花，取消点赞不播动画
+    if (nextLiked) fireConfetti();
     try {
       const store = JSON.parse(localStorage.getItem("post-likes") ?? "{}");
       if (nextLiked) store[post.slug] = true;
@@ -250,6 +279,11 @@ export function PostView({ post }: { post: Post }) {
 
   return (
     <>
+      <Confetti
+        ref={confettiRef}
+        aria-hidden
+        className="z-[100]"
+      />
       <BlogNav
         title={post.title}
         menu={

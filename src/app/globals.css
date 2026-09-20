@@ -378,50 +378,12 @@ html[data-vt-effect="fade"]::view-transition-new(root) {
   }
 }
 
-/* 顶部导航与面包屑脱离 root 快照：组本身也需静止（UA 默认组动画会缩放/淡化整个组） */
-::view-transition-group(site-nav),
-::view-transition-group(vt-breadcrumbs) {
-  animation: none;
-}
-
-/* 离开页面的导航/面包屑快照立即淡出：没有新快照覆盖时（如博客→主页）
-   不再冻结悬挂整个过渡时长 */
-::view-transition-old(site-nav),
-::view-transition-old(vt-breadcrumbs) {
-  animation: vt-sticky-exit 0.15s ease-out both;
-  mix-blend-mode: normal;
-}
-
-/* 切到没有导航条/面包屑的页面（如主页、404）时旧快照直接不渲染：
-   渐隐只会让旧导航悬在新页面上“卡一下”才消失（标记由 RouteTransition
-   在发起过渡前按目标页是否有博客导航置位/清除；实时 DOM 中的导航/面包屑
-   由 RouteTransition 用内联 visibility:hidden 同步隐藏，不走这里）。
-   注意必须 display:none 而非 opacity:0——快照伪元素继承原元素的
-   backdrop-filter，opacity:0 时内容虽不可见，磨砂模糊仍会糊在身后
-   的新页面上，残留一条毛玻璃带直到过渡结束 */
-html[data-vt-no-chrome]::view-transition-old(site-nav),
-html[data-vt-no-chrome]::view-transition-old(vt-breadcrumbs) {
-  display: none;
-  backdrop-filter: none;
-}
-
-/* 进入页面的导航/面包屑快照静止呈现 */
-::view-transition-new(site-nav),
-::view-transition-new(vt-breadcrumbs) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-@keyframes vt-sticky-exit {
-  to {
-    opacity: 0;
-  }
-}
-
-/* 路由过渡期间暂停面包屑入场动画：入场动画与过渡快照竞态时，
-   新快照会拍到 opacity 0 的面包屑，导致旧快照全程裸露、过渡结束闪跳。
-   data-vt-active 由 RouteTransition 在发起过渡时置位且不清除
-   （清除会让 blur-in 重新播放造成二次闪烁）；刷新/新开页面无此标记，入场照常。 */
+/* 路由过渡期间暂停面包屑入场动画：新页 root 快照提交时 blur-in 还在播放，
+   会拍到透明内容，过渡结束后文字闪现。data-vt-active 由 RouteTransition
+   在发起过渡时置位且不清除（清除会让 blur-in 重新播放造成二次闪烁）；
+   刷新/新开页面无此标记，入场照常。
+   页面间共享的导航条/面包屑不注册 view-transition-name，作为普通页面
+   内容随 root 快照整体过渡，避免独立快照的残留/毛玻璃/竞态一类问题。 */
 html[data-vt-active] nav[aria-label="面包屑"] {
   animation: none;
 }

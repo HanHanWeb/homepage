@@ -66,6 +66,13 @@ export function RouteTransition() {
       // 之前置位，新页面挂载时规则已生效，过渡快照才能拍到完整不透明的面包屑。
       // 置位后不再清除——清除会让 blur-in 重新播放造成二次闪烁；刷新页面自然复位。
       document.documentElement.dataset.vtActive = "true";
+      // 目标页没有博客导航/面包屑（如主页、404）时，旧快照立即隐藏而非渐隐：
+      // 没有新快照接替，残留的旧导航会悬在新页面上“卡一下”才消失
+      if (href.startsWith("/blog")) {
+        delete document.documentElement.dataset.vtNoChrome;
+      } else {
+        document.documentElement.dataset.vtNoChrome = "true";
+      }
       const transition = doc.startViewTransition(
         () =>
           new Promise<void>((resolve) => {

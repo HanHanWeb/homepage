@@ -392,6 +392,15 @@ html[data-vt-effect="fade"]::view-transition-new(root) {
   mix-blend-mode: normal;
 }
 
+/* 切到没有导航条/面包屑的页面（如主页、404）时旧快照直接隐藏：
+   渐隐只会让旧导航悬在新页面上“卡一下”才消失（标记由 RouteTransition
+   在发起过渡前按目标页是否有博客导航置位/清除） */
+html[data-vt-no-chrome]::view-transition-old(site-nav),
+html[data-vt-no-chrome]::view-transition-old(vt-breadcrumbs) {
+  animation: none;
+  opacity: 0;
+}
+
 /* 进入页面的导航/面包屑快照静止呈现 */
 ::view-transition-new(site-nav),
 ::view-transition-new(vt-breadcrumbs) {

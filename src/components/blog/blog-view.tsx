@@ -102,6 +102,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
       <nav
         aria-label="面包屑"
         className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground"
+        style={{ viewTransitionName: "vt-breadcrumbs" }}
       >
         <Link
           href="/"

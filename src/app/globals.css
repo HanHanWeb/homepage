@@ -378,6 +378,15 @@ html[data-vt-effect="fade"]::view-transition-new(root) {
   }
 }
 
+/* 顶部导航与面包屑脱离 root 快照，路由过渡时保持静止 */
+::view-transition-old(site-nav),
+::view-transition-new(site-nav),
+::view-transition-old(vt-breadcrumbs),
+::view-transition-new(vt-breadcrumbs) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),
   ::view-transition-old(*),

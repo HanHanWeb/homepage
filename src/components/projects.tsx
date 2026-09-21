@@ -105,7 +105,12 @@ export function Projects() {
               className="group flex h-full flex-col rounded-xl border bg-card p-5 transition-colors hover:bg-muted/50"
             >
               <div className="flex items-center justify-between gap-2">
-                <h3 className="font-mono text-sm font-semibold tracking-tight">{project.name}</h3>
+                <div className="flex min-w-0 items-center gap-2">
+                  <h3 className="font-mono text-sm font-semibold tracking-tight">{project.name}</h3>
+                  <span className="rounded-full border px-2.5 py-0.5 text-xs text-[#00bc7d]">
+                    {locale === "en" ? project.tagEn : project.tagZh}
+                  </span>
+                </div>
                 <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
               <p className="mt-2 flex-1 text-sm leading-6 text-muted-foreground">

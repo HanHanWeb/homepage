@@ -3,6 +3,8 @@
 export type Project = {
   name: string;
   url: string;
+  tagZh: string;
+  tagEn: string;
   descZh: string;
   descEn: string;
   stack: string[];
@@ -12,6 +14,8 @@ export const PROJECTS: Project[] = [
   {
     name: "homepage",
     url: "https://github.com/HanHanWeb/homepage",
+    tagZh: "dev",
+    tagEn: "dev",
     descZh: "一个基于 Next.js 构建的个人主页，记录学习与创作。",
     descEn: "A personal homepage built with Next.js, documenting learning and creation.",
     stack: ["TypeScript", "CSS", "JavaScript"],
@@ -19,6 +23,8 @@ export const PROJECTS: Project[] = [
   {
     name: "spark",
     url: "https://github.com/HanHanWeb/spark",
+    tagZh: "dev",
+    tagEn: "dev",
     descZh: "搜索框即入口的轻量便签速记工具",
     descEn: "A lightweight quick-note app where the search box is the entry point.",
     stack: ["TypeScript", "CSS", "JavaScript"],
@@ -26,6 +32,8 @@ export const PROJECTS: Project[] = [
   {
     name: "roadmap",
     url: "https://github.com/HanHanWeb/roadmap",
+    tagZh: "archive",
+    tagEn: "archive",
     descZh: "一个轻量的公开项目路线图与功能投票平台。",
     descEn: "A lightweight platform for public project roadmaps and feature voting.",
     stack: ["TypeScript", "CSS", "JavaScript"],
@@ -33,6 +41,8 @@ export const PROJECTS: Project[] = [
   {
     name: "foxity",
     url: "https://github.com/HanHanWeb/foxity",
+    tagZh: "赛事项目",
+    tagEn: "Competition",
     descZh: "面向竞赛/项目团队的 AI 对话式能力测评平台 / NextStep 2026 武汉站小组项目",
     descEn: "An AI conversational assessment platform for competition and project teams · NextStep 2026 Wuhan.",
     stack: ["TypeScript", "CSS", "JavaScript"],
@@ -64,8 +74,8 @@ export type FeaturedProject = {
 export const FEATURED_PROJECT: FeaturedProject = {
   name: "界面生态",
   nameEn: "Intereco",
-  roleZh: "Founder · 已离职",
-  roleEn: "Founder · Former",
+  roleZh: "Founder / 已离职",
+  roleEn: "Founder / Former",
   descZh: "界面生态是国内最大的以 PPT OS 创意为核心的社区生态，汇聚创作者、作品和交流平台，曾推动 PPT 创意设计的发展。",
   descEn: "Intereco is China's largest community ecosystem centered on PPT OS creativity, bringing together creators, works and conversations, and has helped drive creative PPT design forward.",
   quote: {

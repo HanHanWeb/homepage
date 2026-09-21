@@ -16,7 +16,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: "MiSans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono);
+  --font-mono: var(--font-jetbrains-mono), "MiSans", ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-serif-sc: "CorpSrcWinSong", serif;
   --font-serif-song: "Noto Serif SC", "Songti SC", "SimSun", serif;

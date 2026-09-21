@@ -98,7 +98,7 @@
 }
 
 .dark {
-  --background: oklch(0.182 0 0); /* #121212 */
+  --background: oklch(0.182 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -208,7 +208,7 @@ html::-webkit-scrollbar {
   }
 }
 
-/* 标题逐字符浮现：合成器驱动的纯 CSS 实现（替代 motion JS 逐帧驱动，避免起点掉帧） */
+/* 标题逐字符浮现：合成器驱动的纯 CSS 实现，避免起点掉帧 */
 @keyframes char-float-in-tf {
   from {
     filter: blur(10px);
@@ -262,7 +262,7 @@ html::-webkit-scrollbar {
   will-change: opacity, filter, transform;
 }
 
-/* 贡献图：覆写 react-activity-calendar 默认的横向滚动，改为居右裁剪、无滚动条 */
+/* 贡献图：覆写 react-activity-calendar 默认横向滚动，居右裁剪、无滚动条 */
 .react-activity-calendar__scroll-container {
   overflow: hidden !important;
   display: flex !important;

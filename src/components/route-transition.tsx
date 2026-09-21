@@ -61,7 +61,7 @@ export function RouteTransition() {
       }
       // 门控面包屑入场动画（见 globals.css data-vt-active）：必须在 startViewTransition
       // 之前置位，新页面挂载时规则已生效，过渡快照才能拍到完整不透明的面包屑。
-      // 置位后不再清除——清除会让 blur-in 重新播放造成二次闪烁；刷新页面自然复位。
+      // 置位后不清除：清除会让 blur-in 重新播放造成二次闪烁；刷新页面自然复位。
       document.documentElement.dataset.vtActive = "true";
       const transition = doc.startViewTransition(
         () =>

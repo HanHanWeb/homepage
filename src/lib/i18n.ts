@@ -39,6 +39,10 @@ export const dictionaries = {
       title: "项目",
       affiliated: "附属项目",
     },
+    blog: {
+      title: "博客",
+      viewAll: "查看全部文章 →",
+    },
     contributions: {
       title: "贡献",
       tooltipEmpty: "无贡献 · {date}",
@@ -102,6 +106,10 @@ export const dictionaries = {
     projects: {
       title: "Projects",
       affiliated: "Affiliated",
+    },
+    blog: {
+      title: "Blog",
+      viewAll: "View all posts →",
     },
     contributions: {
       title: "Contributions",

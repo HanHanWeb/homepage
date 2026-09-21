@@ -1,11 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { Clock } from "lucide-react";
 
+import { useLanguage } from "@/components/language-provider";
 import { Reveal } from "@/components/reveal";
 import type { Post } from "@/lib/blog";
 
 /** 首页博客板块：最近 5 篇文章预览（标题、发布时间） */
 export function BlogPreview({ posts }: { posts: Post[] }) {
+  const { t } = useLanguage();
   const latest = posts.slice(0, 5);
   if (latest.length === 0) return null;
 
@@ -14,7 +18,7 @@ export function BlogPreview({ posts }: { posts: Post[] }) {
       <Reveal delay="2.25s" direction="down">
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="font-serif-sc relative inline-block text-3xl tracking-tight sm:text-4xl">
-            博客
+            {t.blog.title}
             <span
               className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-[#00bc7d]"
               aria-hidden
@@ -51,7 +55,7 @@ export function BlogPreview({ posts }: { posts: Post[] }) {
             href="/blog"
             className="mx-auto mt-1 block w-fit rounded-full border bg-card px-5 py-2 text-sm text-muted-foreground transition-colors hover:border-[#00bc7d]/60 hover:text-[#00bc7d]"
           >
-            查看全部文章 →
+            {t.blog.viewAll}
           </Link>
         </Reveal>
       </div>

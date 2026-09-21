@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLanguage } from "@/components/language-provider";
 
-// Radix Tooltip 不响应触摸（onPointerMove 直接忽略 touch），此处改为受控 open，
-// 触摸设备上通过点击格子切换 tooltip 显隐
+// Radix Tooltip 不响应触摸（onPointerMove 直接忽略 touch），用受控 open 实现：
+// 触摸设备上点击格子切换 tooltip 显隐
 type BlockProps = {
   onClick?: (event: ReactMouseEvent) => void;
 };

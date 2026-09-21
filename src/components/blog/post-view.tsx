@@ -198,8 +198,7 @@ export function PostView({ post }: { post: Post }) {
     lockTimerRef.current = window.setTimeout(() => {
       clickLockRef.current = false;
     }, 1000);
-    // 不用 scrollIntoView({behavior:'smooth'})：实测它时灵时不灵，
-    // 改为 scrollTo + 手动偏移（导航 56px + 呼吸空间 24px = 80px）
+    // scrollTo + 手动偏移定位章节（导航 56px + 呼吸空间 24px = 80px）
     const el = document.getElementById(`toc-b-${i}`);
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY - 80;

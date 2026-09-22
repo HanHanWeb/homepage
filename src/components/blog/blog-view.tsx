@@ -177,7 +177,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
                 id={`post-${post.slug}`}
                 className="scroll-mt-20 rounded-xl border bg-card p-5 transition-colors hover:bg-muted/50"
               >
-                <h2 className="font-serif-sc text-xl leading-8 tracking-tight sm:text-2xl">
+                <h2 className="font-serif-song text-xl leading-8 tracking-tight sm:text-2xl">
                   <Link
                     href={`/blog/${post.slug}`}
                     className="transition-colors hover:text-[#00bc7d]"

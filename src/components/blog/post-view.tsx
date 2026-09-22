@@ -341,11 +341,11 @@ export function PostView({ post }: { post: Post }) {
       </nav>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_15rem]">
-        <article
-          className="animate-blur-in"
+        <header
+          className="animate-blur-in mt-4 lg:col-span-2"
           style={{ "--blur-delay": "0.15s" } as React.CSSProperties}
         >
-          <h1 className="font-serif-sc mt-4 text-3xl tracking-tight sm:text-4xl">
+          <h1 className="font-serif-song text-3xl leading-snug tracking-tight sm:text-4xl">
             {post.title}
           </h1>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -361,9 +361,15 @@ export function PostView({ post }: { post: Post }) {
               </>
             )}
           </div>
+        </header>
+
+        <article
+          className="animate-blur-in"
+          style={{ "--blur-delay": "0.15s" } as React.CSSProperties}
+        >
           <div
             ref={contentRef}
-            className="mt-8 space-y-4 leading-8 text-foreground/90 [overflow-anchor:none]"
+            className="space-y-4 leading-8 text-foreground/90 [overflow-anchor:none]"
             style={{ fontSize: FONT_STEPS[fontStep] }}
           >
             {blocks.map((b, i) => {

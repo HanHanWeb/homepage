@@ -2,50 +2,82 @@
 
 export type Project = {
   name: string;
-  url: string;
+  nameEn: string;
+  url?: string;
   tagZh: string;
   tagEn: string;
   descZh: string;
   descEn: string;
-  stack: string[];
 };
 
 export const PROJECTS: Project[] = [
   {
-    name: "homepage",
+    name: "Homepage",
+    nameEn: "Homepage",
     url: "https://github.com/HanHanWeb/homepage",
     tagZh: "dev",
     tagEn: "dev",
     descZh: "一个基于 Next.js 构建的个人主页，记录学习与创作。",
     descEn: "A personal homepage built with Next.js, documenting learning and creation.",
-    stack: ["TypeScript", "CSS", "JavaScript"],
   },
   {
-    name: "spark",
+    name: "Spark",
+    nameEn: "Spark",
     url: "https://github.com/HanHanWeb/spark",
     tagZh: "dev",
     tagEn: "dev",
     descZh: "搜索框即入口的轻量便签速记工具",
     descEn: "A lightweight quick-note app where the search box is the entry point.",
-    stack: ["TypeScript", "CSS", "JavaScript"],
   },
   {
-    name: "roadmap",
+    name: "Roadmap",
+    nameEn: "Roadmap",
     url: "https://github.com/HanHanWeb/roadmap",
     tagZh: "archive",
     tagEn: "archive",
     descZh: "一个轻量的公开项目路线图与功能投票平台。",
     descEn: "A lightweight platform for public project roadmaps and feature voting.",
-    stack: ["TypeScript", "CSS", "JavaScript"],
   },
   {
-    name: "foxity",
+    name: "Foxity",
+    nameEn: "Foxity",
     url: "https://github.com/HanHanWeb/foxity",
-    tagZh: "赛事项目",
-    tagEn: "Competition",
+    tagZh: "dev",
+    tagEn: "dev",
     descZh: "面向竞赛/项目团队的 AI 对话式能力测评平台 / NextStep 2026 武汉站小组项目",
     descEn: "An AI conversational assessment platform for competition and project teams · NextStep 2026 Wuhan.",
-    stack: ["TypeScript", "CSS", "JavaScript"],
+  },
+  {
+    name: "句刻",
+    nameEn: "Asentence",
+    tagZh: "dev",
+    tagEn: "dev",
+    descZh: "即刻发现文字之美，高度自定义的一言 API 项目。",
+    descEn: "Discover the beauty of words in an instant — a highly customizable quote API project.",
+  },
+  {
+    name: "作品中心",
+    nameEn: "Gallery",
+    tagZh: "archive",
+    tagEn: "archive",
+    descZh: "界面生态附属项目，面向 PPT OS 爱好者的一站式作品中心。",
+    descEn: "An Intereco sub-project — a one-stop gallery for PPT OS enthusiasts.",
+  },
+  {
+    name: "IPOA 赛事系统",
+    nameEn: "IPOA Competition System",
+    tagZh: "archive",
+    tagEn: "archive",
+    descZh: "界面生态附属项目，PPT OS 创意赛事 IPOA 的官方赛事平台。",
+    descEn: "An Intereco sub-project — the official platform for IPOA, the creative PPT OS competition.",
+  },
+  {
+    name: "财务公开平台",
+    nameEn: "Finance Disclosure",
+    tagZh: "archive",
+    tagEn: "archive",
+    descZh: "界面生态附属项目，公开界面生态财务信息的透明化平台。",
+    descEn: "An Intereco sub-project — a transparency platform publishing Intereco's financial disclosures.",
   },
 ];
 
@@ -61,6 +93,7 @@ export type FeaturedProject = {
     textZh: string;
     textEn: string;
     author: string;
+    authorEn: string;
     titleZh: string;
     titleEn: string;
     avatar: string;
@@ -82,8 +115,9 @@ export const FEATURED_PROJECT: FeaturedProject = {
     textZh: "界面生态是 PPT 圈少见的兴趣垂类社区，希望热爱 PPT 的大家在这里玩的开心，愿 PPT 兴趣圈人来人往，永不落幕~",
     textEn: "Intereco is a rare passion-driven community in the PPT circle. May everyone who loves PPT have a great time here — may people come and go, and the show never end~",
     author: "安逸",
+    authorEn: "Anyi",
     titleZh: "「安逸PPT」账号主理人 · 金山最具价值专家（KVP） · 微软国际办公认证 MOS-PPT 专家 · 51PPT模板网大设计师",
-    titleEn: "Founder of 安逸PPT · Kingsoft Most Valuable Professional (KVP) · Microsoft Office Specialist (MOS-PPT) · Distinguished Designer at 51PPT",
+    titleEn: "Founder of AnyiPPT · Kingsoft Most Valuable Professional (KVP) · Microsoft Office Specialist (MOS-PPT) · Distinguished Designer at 51PPT",
     avatar: "https://q1.qlogo.cn/g?b=qq&nk=1559655822&s=640",
   },
   subProjects: [

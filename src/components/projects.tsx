@@ -78,7 +78,7 @@ export function Projects() {
                 />
                 <p className="min-w-0 text-xs text-muted-foreground">
                   <span className="block text-sm font-medium leading-5 text-foreground">
-                    {featured.quote.author}
+                    {locale === "en" ? featured.quote.authorEn : featured.quote.author}
                   </span>
                   <span className="mt-0.5 block h-5 overflow-hidden leading-5">
                     <span
@@ -96,39 +96,44 @@ export function Projects() {
       </Reveal>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        {PROJECTS.map((project, i) => (
-          <Reveal key={project.name} delay={`${2.5 + i * 0.08}s`} direction="down">
-            <a
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex h-full flex-col rounded-xl border bg-card p-5 transition-colors hover:bg-muted/50"
-            >
+        {PROJECTS.map((project, i) => {
+          const body = (
+            <>
               <div className="flex items-center justify-between gap-2">
                 <div className="flex min-w-0 items-center gap-2">
-                  <h3 className="font-mono text-sm font-semibold tracking-tight">{project.name}</h3>
+                  <h3 className="font-mono text-sm font-semibold tracking-tight">
+                    {locale === "en" ? project.nameEn : project.name}
+                  </h3>
                   <span className="rounded-full border px-2.5 py-0.5 text-xs text-[#00bc7d]">
                     {locale === "en" ? project.tagEn : project.tagZh}
                   </span>
                 </div>
-                <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                {project.url && (
+                  <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                )}
               </div>
               <p className="mt-2 flex-1 text-sm leading-6 text-muted-foreground">
                 {locale === "en" ? project.descEn : project.descZh}
               </p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {project.stack.map((tech) => (
-                  <span
-                    key={tech}
-                    className="rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </a>
-          </Reveal>
-        ))}
+            </>
+          );
+          return (
+            <Reveal key={project.name} delay={`${2.5 + i * 0.08}s`} direction="down">
+              {project.url ? (
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex h-full flex-col rounded-xl border bg-card p-5 transition-colors hover:bg-muted/50"
+                >
+                  {body}
+                </a>
+              ) : (
+                <div className="flex h-full flex-col rounded-xl border bg-card p-5">{body}</div>
+              )}
+            </Reveal>
+          );
+        })}
       </div>
     </section>
   );

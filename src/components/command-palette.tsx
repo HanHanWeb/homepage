@@ -6,6 +6,7 @@ import {
   FolderGit2,
   Check,
   Languages,
+  Link2,
   Mail,
   Moon,
   Sparkles,
@@ -83,6 +84,7 @@ export function CommandPalette() {
     { id: "projects", icon: FolderGit2, label: t.projects.title },
     { id: "contributions", icon: Trophy, label: t.contributions.title },
     { id: "contact", icon: Mail, label: t.contact.title },
+    { id: "friends", icon: Link2, label: t.friends.title },
     { id: "blog", icon: BookOpen, label: t.blog.title, href: "/blog" },
   ];
 

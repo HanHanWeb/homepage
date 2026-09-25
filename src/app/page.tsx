@@ -6,6 +6,7 @@ import { Contact } from "@/components/contact";
 import { Contributions } from "@/components/contributions";
 import { FlickeringGridTop } from "@/components/flickering-grid-top";
 import { Focus } from "@/components/focus";
+import { Friends } from "@/components/friends";
 import { Hero } from "@/components/hero";
 import { Projects } from "@/components/projects";
 import { LanguageToggle } from "@/components/language-toggle";
@@ -43,6 +44,7 @@ export default async function Home() {
         <Projects />
         <Contributions />
         <Contact />
+        <Friends />
       </main>
       <BottomGlow />
       <CommandPalette />

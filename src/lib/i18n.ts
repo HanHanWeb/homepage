@@ -37,6 +37,7 @@ export const dictionaries = {
             {
               hint: "UI/UX",
               images: [
+                { src: "/gallery-spark.webp", alt: "Spark 待办应用界面" },
                 { src: "/gallery-home.webp", alt: "Gallery 作品库页面" },
                 { src: "/gallery-post.webp", alt: "Gallery 作品详情页" },
                 { src: "/gallery-user.webp", alt: "Gallery 个人主页" },
@@ -79,6 +80,10 @@ export const dictionaries = {
     },
     contact: {
       title: "联系",
+    },
+    friends: {
+      title: "友情链接",
+      empty: "暂无友情链接",
     },
     backToTop: "回到顶部",
     cmdk: {
@@ -134,6 +139,7 @@ export const dictionaries = {
             {
               hint: "UI/UX",
               images: [
+                { src: "/gallery-spark.webp", alt: "Spark todo app interface" },
                 { src: "/gallery-home.webp", alt: "Gallery library page" },
                 { src: "/gallery-post.webp", alt: "Gallery work detail page" },
                 { src: "/gallery-user.webp", alt: "Gallery profile page" },
@@ -176,6 +182,10 @@ export const dictionaries = {
     },
     contact: {
       title: "Contact",
+    },
+    friends: {
+      title: "Friends",
+      empty: "No friend links yet",
     },
     backToTop: "Back to top",
     cmdk: {

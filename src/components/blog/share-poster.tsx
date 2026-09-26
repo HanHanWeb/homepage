@@ -247,26 +247,13 @@ function posterBody(post: Post): string {
   return articlePlainText(post).slice(0, 600);
 }
 
-/** 选区节选文本规整：块间换行转为分段标记，压缩段内空白并限长 */
-function normQuote(raw: string): string {
-  return raw
-    .replace(/\r/g, "")
-    .split(/\n+/)
-    .map((s) => s.replace(/\s+/g, " ").trim())
-    .filter(Boolean)
-    .join("\n")
-    .slice(0, 400);
-}
-
-/** 节选 + 前后文：在全文流中定位选区，前文向左截取并对齐词边界（不超过 beforeMax，
- * 保证选区起点落在可视行数内），返回拼接文本与选区高亮区间（UTF-16 下标） */
-function quoteWithContext(
+/** 选区窗口：在流内以已知高亮区间取前后文（前文对齐词边界、不超过 beforeMax） */
+function windowQuote(
   flow: string,
-  sel: string,
+  hiStart: number,
+  hiEnd: number,
   beforeMax: number,
 ): { text: string; hiStart: number; hiEnd: number } {
-  const hiStart = flow.indexOf(sel);
-  const hiEnd = hiStart + sel.length;
   let bStart = Math.max(0, hiStart - beforeMax);
   if (bStart > 0) {
     const sp = flow.lastIndexOf(" ", hiStart - 1);
@@ -274,10 +261,112 @@ function quoteWithContext(
   }
   const aEnd = Math.min(flow.length, hiEnd + 800);
   return {
-    text: `${flow.slice(bStart, hiStart)}${sel}${flow.slice(hiEnd, aEnd)}`,
+    text: flow.slice(bStart, aEnd),
     hiStart: hiStart - bStart,
     hiEnd: hiEnd - bStart,
   };
+}
+
+/** 正文选区定位：把容器的可见文本拼成空白折叠、行内标记剥除的「流」
+ * （与海报正文同构），并提供 DOM 选区端点 → 流内下标的换算；
+ * 纯图片块无文本，不计入 */
+function buildSelectionFlow(root: HTMLElement) {
+  const spans: { node: Text; start: number; end: number }[] = [];
+  let raw = "";
+  for (const block of Array.from(root.children)) {
+    if (!(block instanceof HTMLElement) || !block.textContent?.trim()) continue;
+    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const node = n as Text;
+      if (!node.data) continue;
+      spans.push({
+        node,
+        start: raw.length,
+        end: raw.length + node.data.length,
+      });
+      raw += node.data;
+    }
+    raw += "\n";
+  }
+
+  // 逐字符折叠空白、剥除行内 Markdown 标记，记录 flow 每个字符对应的 raw 下标
+  const emitted: number[] = [];
+  let flow = "";
+  let lastSpace = true;
+  for (let i = 0; i < raw.length; i++) {
+    const ch = raw[i];
+    if (/\s/.test(ch)) {
+      if (!lastSpace) {
+        flow += " ";
+        emitted.push(i);
+        lastSpace = true;
+      }
+      continue;
+    }
+    if ("#>*`~".includes(ch)) continue;
+    flow += ch;
+    emitted.push(i);
+    lastSpace = false;
+  }
+  if (flow.endsWith(" ")) {
+    flow = flow.slice(0, -1);
+    emitted.pop();
+  }
+
+  /** 流内下标：第一个 raw ≥ r 的字符（选区起点），可能等于 flow.length */
+  const ceil = (r: number) => {
+    let lo = 0;
+    let hi = emitted.length;
+    while (lo < hi) {
+      const m = (lo + hi) >> 1;
+      if (emitted[m] < r) lo = m + 1;
+      else hi = m;
+    }
+    return lo;
+  };
+  /** 流内下标：最后一个 raw ≤ r 的字符的前一位（选区终点），可能为 -1 */
+  const floor = (r: number) => {
+    let lo = 0;
+    let hi = emitted.length;
+    while (lo < hi) {
+      const m = (lo + hi) >> 1;
+      if (emitted[m] <= r) lo = m + 1;
+      else hi = m;
+    }
+    return lo - 1;
+  };
+
+  /** 选区端点 (node, offset) → raw 下标；元素端点取其相邻子树的文本边界 */
+  const locate = (node: Node | null, offset: number): number | null => {
+    if (!node) return null;
+    if (node.nodeType === Node.TEXT_NODE) {
+      const sp = spans.find((s) => s.node === node);
+      return sp ? sp.start + Math.min(offset, sp.end - sp.start) : null;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return null;
+    const el = node as Element;
+    const kids = el.childNodes;
+    const prev = offset > 0 ? kids[offset - 1] : null;
+    const next = offset < kids.length ? kids[offset] : null;
+    if (prev) {
+      let best: number | null = null;
+      for (const s of spans) {
+        if (prev.contains(s.node)) best = Math.max(best ?? 0, s.end);
+      }
+      if (best !== null) return best;
+    }
+    if (next) {
+      let best: number | null = null;
+      for (const s of spans) {
+        if (next.contains(s.node))
+          best = best === null ? s.start : Math.min(best, s.start);
+      }
+      if (best !== null) return best;
+    }
+    return null;
+  };
+
+  return { flow, locate, ceil, floor };
 }
 
 /** 折行并记录每行在源文本中的起始下标（源文本须先把连续空白折叠为单空格），
@@ -337,12 +426,12 @@ function wrapWithOffsets(
   return lines;
 }
 
-/** 绘制分享海报并导出 PNG data URL；传入 quote 时以节选为正文；
+/** 绘制分享海报并导出 PNG data URL；传入 quote（DOM 选区定位结果）时以节选为正文；
  * 字体/头像/二维码任一加载失败均降级绘制，不阻塞出图 */
 async function renderPoster(
   post: Post,
   dark: boolean,
-  quote?: string,
+  quote?: { flow: string; hiStart: number; hiEnd: number },
 ): Promise<string> {
   const c = PALETTES[dark ? "dark" : "light"];
   const mono = monoFamily();
@@ -416,16 +505,15 @@ async function renderPoster(
     Math.floor((bodyBottomLimit - bodyTop) / bodyLH),
   );
 
-  // 短节选（≤120 字）在全文流中定位后补足前后文：选区实色、前后文淡化；
-  // 定位失败或选区过长时退化为纯节选/全文开头，超出行数时尾部渐隐示意未完
+  // 短节选（≤120 字）补足前后文：选区实色、前后文淡化；选区过长或未提供定位时
+  // 退化为纯节选/全文开头，超出行数时尾部渐隐示意未完
   let quoteCtx: { text: string; hiStart: number; hiEnd: number } | null = null;
   if (quote) {
-    const sel = quote.replace(/\s+/g, " ").trim();
-    const flow = articlePlainText(post).replace(/\s+/g, " ").trim();
+    const selLen = quote.hiEnd - quote.hiStart;
     // 34px 下每行约 24 字：前文窗口压缩到「可排字数 - 选区长度」内，选区起点必可视
-    const beforeMax = Math.max(0, Math.min(120, maxBodyLines * 24 - sel.length - 2));
-    if (sel.length >= 2 && sel.length <= 120 && flow.includes(sel)) {
-      quoteCtx = quoteWithContext(flow, sel, beforeMax);
+    const beforeMax = Math.max(0, Math.min(120, maxBodyLines * 24 - selLen - 2));
+    if (selLen >= 2 && selLen <= 120) {
+      quoteCtx = windowQuote(quote.flow, quote.hiStart, quote.hiEnd, beforeMax);
     }
   }
   const quoteLines = quoteCtx
@@ -435,7 +523,7 @@ async function renderPoster(
     ? quoteLines.map((l) => l.text)
     : wrapText(
         ctx,
-        quote?.trim() ? quote : posterBody(post),
+        quote ? quote.flow : posterBody(post),
         inner,
         maxBodyLines,
         "clip",
@@ -711,14 +799,18 @@ export function SelectionPoster({
     y: number;
     below: boolean;
   } | null>(null);
-  const [quote, setQuote] = useState("");
+  const [quote, setQuote] = useState<{
+    flow: string;
+    hiStart: number;
+    hiEnd: number;
+  } | null>(null);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    let raf = 0;
+    // 选区有效时气泡跟随其位置；无效（收起/移出正文）则隐藏
     const update = () => {
       const sel = window.getSelection();
       const root = container.current;
@@ -730,15 +822,28 @@ export function SelectionPoster({
         setAnchor(null);
         return;
       }
-      const text = normQuote(sel.toString());
       const rect = sel.getRangeAt(0).getBoundingClientRect();
-      if (text.length < 2 || (!rect.width && !rect.height)) {
+      if (!rect.width && !rect.height) {
+        setAnchor(null);
+        return;
+      }
+      // 把 DOM 选区端点换算为流内下标，选哪儿高亮哪儿，不靠字符串查找
+      const { flow, locate, ceil, floor } = buildSelectionFlow(root);
+      const r1 = locate(sel.anchorNode, sel.anchorOffset);
+      const r2 = locate(sel.focusNode, sel.focusOffset);
+      if (r1 === null || r2 === null) {
+        setAnchor(null);
+        return;
+      }
+      const hiStart = ceil(Math.min(r1, r2));
+      const hiEnd = floor(Math.max(r1, r2));
+      if (hiEnd - hiStart < 2) {
         setAnchor(null);
         return;
       }
       // 默认悬浮在选区上方；顶部空间不足（导航条区域）时改到下方
       const below = rect.top < 96;
-      setQuote(text);
+      setQuote({ flow, hiStart, hiEnd });
       setAnchor({
         x: Math.min(
           Math.max(rect.left + rect.width / 2, 100),
@@ -748,23 +853,38 @@ export function SelectionPoster({
         below,
       });
     };
-    // mouseup 后浏览器可能补发 selectionchange：统一走 rAF 求值，
-    // 选区有效则跟随重新定位（气泡不闪没），收起才隐藏
-    const schedule = () => {
+    // 长按选词/拖手柄期间 selectionchange 连续触发，只判有效性不重定位，避免闪跳；
+    // 位置仅在 mouseup/touchend（手势结束）时更新一次
+    const evaluate = () => {
+      const sel = window.getSelection();
+      const root = container.current;
+      const valid =
+        !!sel &&
+        !sel.isCollapsed &&
+        sel.rangeCount > 0 &&
+        !!root &&
+        root.contains(sel.anchorNode) &&
+        root.contains(sel.focusNode);
+      if (!valid) setAnchor(null);
+    };
+    let raf = 0;
+    const schedule = (fn: () => void) => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(update);
+      raf = requestAnimationFrame(fn);
     };
     const hide = () => setAnchor(null);
-    document.addEventListener("mouseup", schedule);
-    document.addEventListener("touchend", schedule, { passive: true });
-    document.addEventListener("selectionchange", schedule);
+    const onUpdate = () => schedule(update);
+    const onSelectionChange = () => schedule(evaluate);
+    document.addEventListener("mouseup", onUpdate);
+    document.addEventListener("touchend", onUpdate, { passive: true });
+    document.addEventListener("selectionchange", onSelectionChange);
     window.addEventListener("scroll", hide, { passive: true });
     window.addEventListener("resize", hide);
     return () => {
       cancelAnimationFrame(raf);
-      document.removeEventListener("mouseup", schedule);
-      document.removeEventListener("touchend", schedule);
-      document.removeEventListener("selectionchange", schedule);
+      document.removeEventListener("mouseup", onUpdate);
+      document.removeEventListener("touchend", onUpdate);
+      document.removeEventListener("selectionchange", onSelectionChange);
       window.removeEventListener("scroll", hide);
       window.removeEventListener("resize", hide);
     };

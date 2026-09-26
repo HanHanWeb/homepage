@@ -1,7 +1,7 @@
 "use client";
 
 import { ImageDown, Loader2 } from "lucide-react";
-import { useEffect, useState, type RefObject } from "react";
+import { useState } from "react";
 import { useTheme } from "next-themes";
 
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
@@ -29,7 +29,6 @@ const PALETTES = {
     border: "#e5e5e5",
     glowOuter: 0.1,
     glowInner: 0.16,
-    quoteCtx: 0.16,
   },
   dark: {
     bg: "#121212",
@@ -38,7 +37,6 @@ const PALETTES = {
     border: "rgba(255, 255, 255, 0.1)",
     glowOuter: 0.2,
     glowInner: 0.3,
-    quoteCtx: 0.22,
   },
 } as const;
 
@@ -222,7 +220,7 @@ function loadImage(src: string, timeout = 2500): Promise<HTMLImageElement | null
   });
 }
 
-/** 文章纯文本：按空行分段流入（整行图片跳过，行内标记剥除），供海报正文与节选定位 */
+/** 文章纯文本：按空行分段流入（整行图片跳过，行内标记剥除），供海报正文 */
 function articlePlainText(post: Post): string {
   const blocks = (post.content ?? "").split(/\n{2,}/);
   const parts: string[] = [];
@@ -247,191 +245,10 @@ function posterBody(post: Post): string {
   return articlePlainText(post).slice(0, 600);
 }
 
-/** 选区窗口：在流内以已知高亮区间取前后文（前文对齐词边界、不超过 beforeMax） */
-function windowQuote(
-  flow: string,
-  hiStart: number,
-  hiEnd: number,
-  beforeMax: number,
-): { text: string; hiStart: number; hiEnd: number } {
-  let bStart = Math.max(0, hiStart - beforeMax);
-  if (bStart > 0) {
-    const sp = flow.lastIndexOf(" ", hiStart - 1);
-    if (sp > bStart) bStart = sp + 1;
-  }
-  const aEnd = Math.min(flow.length, hiEnd + 800);
-  return {
-    text: flow.slice(bStart, aEnd),
-    hiStart: hiStart - bStart,
-    hiEnd: hiEnd - bStart,
-  };
-}
-
-/** 正文选区定位：把容器的可见文本拼成空白折叠、行内标记剥除的「流」
- * （与海报正文同构），并提供 DOM 选区端点 → 流内下标的换算；
- * 纯图片块无文本，不计入 */
-function buildSelectionFlow(root: HTMLElement) {
-  const spans: { node: Text; start: number; end: number }[] = [];
-  let raw = "";
-  for (const block of Array.from(root.children)) {
-    if (!(block instanceof HTMLElement) || !block.textContent?.trim()) continue;
-    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
-    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-      const node = n as Text;
-      if (!node.data) continue;
-      spans.push({
-        node,
-        start: raw.length,
-        end: raw.length + node.data.length,
-      });
-      raw += node.data;
-    }
-    raw += "\n";
-  }
-
-  // 逐字符折叠空白、剥除行内 Markdown 标记，记录 flow 每个字符对应的 raw 下标
-  const emitted: number[] = [];
-  let flow = "";
-  let lastSpace = true;
-  for (let i = 0; i < raw.length; i++) {
-    const ch = raw[i];
-    if (/\s/.test(ch)) {
-      if (!lastSpace) {
-        flow += " ";
-        emitted.push(i);
-        lastSpace = true;
-      }
-      continue;
-    }
-    if ("#>*`~".includes(ch)) continue;
-    flow += ch;
-    emitted.push(i);
-    lastSpace = false;
-  }
-  if (flow.endsWith(" ")) {
-    flow = flow.slice(0, -1);
-    emitted.pop();
-  }
-
-  /** 流内下标：第一个 raw ≥ r 的字符（选区起点），可能等于 flow.length */
-  const ceil = (r: number) => {
-    let lo = 0;
-    let hi = emitted.length;
-    while (lo < hi) {
-      const m = (lo + hi) >> 1;
-      if (emitted[m] < r) lo = m + 1;
-      else hi = m;
-    }
-    return lo;
-  };
-  /** 流内下标：最后一个 raw ≤ r 的字符的前一位（选区终点），可能为 -1 */
-  const floor = (r: number) => {
-    let lo = 0;
-    let hi = emitted.length;
-    while (lo < hi) {
-      const m = (lo + hi) >> 1;
-      if (emitted[m] <= r) lo = m + 1;
-      else hi = m;
-    }
-    return lo - 1;
-  };
-
-  /** 选区端点 (node, offset) → raw 下标；元素端点取其相邻子树的文本边界 */
-  const locate = (node: Node | null, offset: number): number | null => {
-    if (!node) return null;
-    if (node.nodeType === Node.TEXT_NODE) {
-      const sp = spans.find((s) => s.node === node);
-      return sp ? sp.start + Math.min(offset, sp.end - sp.start) : null;
-    }
-    if (node.nodeType !== Node.ELEMENT_NODE) return null;
-    const el = node as Element;
-    const kids = el.childNodes;
-    const prev = offset > 0 ? kids[offset - 1] : null;
-    const next = offset < kids.length ? kids[offset] : null;
-    if (prev) {
-      let best: number | null = null;
-      for (const s of spans) {
-        if (prev.contains(s.node)) best = Math.max(best ?? 0, s.end);
-      }
-      if (best !== null) return best;
-    }
-    if (next) {
-      let best: number | null = null;
-      for (const s of spans) {
-        if (next.contains(s.node))
-          best = best === null ? s.start : Math.min(best, s.start);
-      }
-      if (best !== null) return best;
-    }
-    return null;
-  };
-
-  return { flow, locate, ceil, floor };
-}
-
-/** 折行并记录每行在源文本中的起始下标（源文本须先把连续空白折叠为单空格），
- * 供节选海报逐字区分选区与前后文；超出 maxLines 的部分直接丢弃 */
-function wrapWithOffsets(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-  maxLines: number,
-  tracking: number,
-): { text: string; start: number }[] {
-  const width = (s: string) =>
-    ctx.measureText(s).width + tracking * Math.max(0, [...s].length - 1);
-  const lines: { text: string; start: number }[] = [];
-  let line = "";
-  let lineStart = 0;
-  let pendingSpace = false;
-
-  const append = (piece: string, pieceStart: number) => {
-    const gap = pendingSpace && line ? " " : "";
-    if (width(line + gap + piece) <= maxWidth) {
-      if (!line) lineStart = pieceStart;
-      line += gap + piece;
-      pendingSpace = false;
-      return;
-    }
-    if (line) lines.push({ text: line, start: lineStart });
-    line = piece;
-    lineStart = pieceStart;
-    pendingSpace = false;
-  };
-
-  for (const m of text.matchAll(TOKEN_RE)) {
-    const token = m[0];
-    if (/^\s+$/.test(token)) {
-      if (line) pendingSpace = true;
-      continue;
-    }
-    let rest = token;
-    let restStart = m.index ?? 0;
-    while (width(rest) > maxWidth && rest.length > 1) {
-      let n = rest.length;
-      while (n > 1 && width(rest.slice(0, n)) > maxWidth) n--;
-      append(rest.slice(0, n), restStart);
-      if (line) {
-        lines.push({ text: line, start: lineStart });
-        line = "";
-      }
-      rest = rest.slice(n);
-      restStart += n;
-    }
-    append(rest, restStart);
-  }
-  if (line) lines.push({ text: line, start: lineStart });
-
-  if (lines.length > maxLines) lines.length = maxLines;
-  return lines;
-}
-
-/** 绘制分享海报并导出 PNG data URL；传入 quote（DOM 选区定位结果）时以节选为正文；
- * 字体/头像/二维码任一加载失败均降级绘制，不阻塞出图 */
+/** 绘制分享海报并导出 PNG data URL；字体/头像/二维码任一加载失败均降级绘制，不阻塞出图 */
 async function renderPoster(
   post: Post,
   dark: boolean,
-  quote?: { flow: string; hiStart: number; hiEnd: number },
 ): Promise<string> {
   const c = PALETTES[dark ? "dark" : "light"];
   const mono = monoFamily();
@@ -505,30 +322,14 @@ async function renderPoster(
     Math.floor((bodyBottomLimit - bodyTop) / bodyLH),
   );
 
-  // 短节选（≤120 字）补足前后文：选区实色、前后文淡化；选区过长或未提供定位时
-  // 退化为纯节选/全文开头，超出行数时尾部渐隐示意未完
-  let quoteCtx: { text: string; hiStart: number; hiEnd: number } | null = null;
-  if (quote) {
-    const selLen = quote.hiEnd - quote.hiStart;
-    // 34px 下每行约 24 字：前文窗口压缩到「可排字数 - 选区长度」内，选区起点必可视
-    const beforeMax = Math.max(0, Math.min(120, maxBodyLines * 24 - selLen - 2));
-    if (selLen >= 2 && selLen <= 120) {
-      quoteCtx = windowQuote(quote.flow, quote.hiStart, quote.hiEnd, beforeMax);
-    }
-  }
-  const quoteLines = quoteCtx
-    ? wrapWithOffsets(ctx, quoteCtx.text, inner, maxBodyLines, BODY_TRACKING)
-    : null;
-  const bodyLines: string[] = quoteLines
-    ? quoteLines.map((l) => l.text)
-    : wrapText(
-        ctx,
-        quote ? quote.flow : posterBody(post),
-        inner,
-        maxBodyLines,
-        "clip",
-        BODY_TRACKING,
-      );
+  const bodyLines = wrapText(
+    ctx,
+    posterBody(post),
+    inner,
+    maxBodyLines,
+    "clip",
+    BODY_TRACKING,
+  );
 
   // 品牌行：头像 + BLOG（同博客导航），右侧分类 tag（同侧栏 #TOC 角标的样式）
   const brandCy = 128;
@@ -597,67 +398,16 @@ async function renderPoster(
       octx.textBaseline = "middle";
       octx.font = `400 34px ${sans}`;
       octx.fillStyle = c.fg;
-      // 选区所在的首行；找不到（理论上不会发生）时退化为普通渐隐分支
-      const hiLineStart =
-        quoteLines && quoteCtx
-          ? quoteLines.findIndex(
-              (l) =>
-                l.start + l.text.length > quoteCtx.hiStart &&
-                l.start < quoteCtx.hiEnd,
-            )
-          : -1;
-      if (quoteLines && quoteCtx && hiLineStart >= 0) {
-        const qc = quoteCtx;
-        // 前后文按「离选区行的行距」做上下渐隐+模糊包络
-        const hiLineEnd = quoteLines.reduce(
-          (acc, l, i) =>
-            l.start + l.text.length > qc.hiStart && l.start < qc.hiEnd ? i : acc,
-          hiLineStart,
-        );
-        // 节选 + 前后文：逐字绘制，选区实色，前后文随远离选区渐隐并叠加模糊
-        quoteLines.forEach(({ text: line, start }, li) => {
-          const y = bodyTop + bodyLH / 2 + li * bodyLH;
-          const dist =
-            li < hiLineStart
-              ? hiLineStart - li
-              : li > hiLineEnd
-                ? li - hiLineEnd
-                : 0;
-          const k = Math.min(1, dist / 2.5);
-          const eased = k * k * (3 - 2 * k);
-          const ctxAlpha = c.quoteCtx * (1 - eased);
-          const ctxBlur = eased * 5;
-          let cx = PAD;
-          let u = start;
-          for (const ch of line) {
-            const w = octx.measureText(ch).width;
-            if (ch !== " ") {
-              if (u >= qc.hiStart && u < qc.hiEnd) {
-                octx.globalAlpha = 0.9;
-                octx.filter = "none";
-              } else {
-                octx.globalAlpha = ctxAlpha;
-                octx.filter = `blur(${ctxBlur.toFixed(2)}px)`;
-              }
-              octx.fillText(ch, cx, y);
-            }
-            cx += w + BODY_TRACKING;
-            u += ch.length;
-          }
-        });
-      } else {
-        // 全文/纯节选：超出可排空间（被截断）时尾部沿 smoothstep 渐隐并叠加模糊
-        const truncated = bodyLines.length >= maxBodyLines;
-        const n = bodyLines.length;
-        bodyLines.forEach((line, i) => {
-          const t = n <= 1 ? 0 : i / (n - 1);
-          const k = truncated && t > 0.5 ? (t - 0.5) / 0.5 : 0;
-          const eased = k * k * (3 - 2 * k);
-          octx.globalAlpha = 0.9 * (1 - eased);
-          octx.filter = `blur(${(eased * 5).toFixed(2)}px)`;
-          drawTracked(octx, line, PAD, bodyTop + bodyLH / 2 + i * bodyLH, BODY_TRACKING, "left");
-        });
-      }
+      // 正文尾部沿 smoothstep 渐隐并叠加模糊，示意文章未完
+      const n = bodyLines.length;
+      bodyLines.forEach((line, i) => {
+        const t = n <= 1 ? 0 : i / (n - 1);
+        const k = t > 0.5 ? (t - 0.5) / 0.5 : 0;
+        const eased = k * k * (3 - 2 * k);
+        octx.globalAlpha = 0.9 * (1 - eased);
+        octx.filter = `blur(${(eased * 5).toFixed(2)}px)`;
+        drawTracked(octx, line, PAD, bodyTop + bodyLH / 2 + i * bodyLH, BODY_TRACKING, "left");
+      });
       octx.filter = "none";
       octx.globalAlpha = 1;
       ctx.drawImage(off, 0, 0);
@@ -780,162 +530,6 @@ export function SharePosterButton({ post }: { post: Post }) {
         onOpenChange={setOpen}
         dataUrl={dataUrl}
         fileName={`${post.slug}-share.png`}
-      />
-    </>
-  );
-}
-
-/** 选区节选分享：正文内划选（桌面划选 / 移动端长按）后，选区上方浮现生成入口，
- * 以所选文字为海报正文 */
-export function SelectionPoster({
-  post,
-  container,
-}: {
-  post: Post;
-  container: RefObject<HTMLElement | null>;
-}) {
-  const [anchor, setAnchor] = useState<{
-    x: number;
-    y: number;
-    below: boolean;
-  } | null>(null);
-  const [quote, setQuote] = useState<{
-    flow: string;
-    hiStart: number;
-    hiEnd: number;
-  } | null>(null);
-  const [open, setOpen] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [dataUrl, setDataUrl] = useState<string | null>(null);
-  const { resolvedTheme } = useTheme();
-
-  useEffect(() => {
-    // 选区有效时气泡跟随其位置；无效（收起/移出正文）则隐藏
-    const update = () => {
-      const sel = window.getSelection();
-      const root = container.current;
-      if (!sel || sel.isCollapsed || sel.rangeCount === 0 || !root) {
-        setAnchor(null);
-        return;
-      }
-      if (!root.contains(sel.anchorNode) || !root.contains(sel.focusNode)) {
-        setAnchor(null);
-        return;
-      }
-      const rect = sel.getRangeAt(0).getBoundingClientRect();
-      if (!rect.width && !rect.height) {
-        setAnchor(null);
-        return;
-      }
-      // 把 DOM 选区端点换算为流内下标，选哪儿高亮哪儿，不靠字符串查找
-      const { flow, locate, ceil, floor } = buildSelectionFlow(root);
-      const r1 = locate(sel.anchorNode, sel.anchorOffset);
-      const r2 = locate(sel.focusNode, sel.focusOffset);
-      if (r1 === null || r2 === null) {
-        setAnchor(null);
-        return;
-      }
-      const hiStart = ceil(Math.min(r1, r2));
-      const hiEnd = floor(Math.max(r1, r2));
-      if (hiEnd - hiStart < 2) {
-        setAnchor(null);
-        return;
-      }
-      // 默认悬浮在选区上方；顶部空间不足（导航条区域）时改到下方
-      const below = rect.top < 96;
-      setQuote({ flow, hiStart, hiEnd });
-      setAnchor({
-        x: Math.min(
-          Math.max(rect.left + rect.width / 2, 100),
-          window.innerWidth - 100,
-        ),
-        y: below ? rect.bottom + 10 : rect.top - 10,
-        below,
-      });
-    };
-    // 长按选词/拖手柄期间 selectionchange 连续触发，只判有效性不重定位，避免闪跳；
-    // 位置仅在 mouseup/touchend（手势结束）时更新一次
-    const evaluate = () => {
-      const sel = window.getSelection();
-      const root = container.current;
-      const valid =
-        !!sel &&
-        !sel.isCollapsed &&
-        sel.rangeCount > 0 &&
-        !!root &&
-        root.contains(sel.anchorNode) &&
-        root.contains(sel.focusNode);
-      if (!valid) setAnchor(null);
-    };
-    let raf = 0;
-    const schedule = (fn: () => void) => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(fn);
-    };
-    const hide = () => setAnchor(null);
-    const onUpdate = () => schedule(update);
-    const onSelectionChange = () => schedule(evaluate);
-    document.addEventListener("mouseup", onUpdate);
-    document.addEventListener("touchend", onUpdate, { passive: true });
-    document.addEventListener("selectionchange", onSelectionChange);
-    window.addEventListener("scroll", hide, { passive: true });
-    window.addEventListener("resize", hide);
-    return () => {
-      cancelAnimationFrame(raf);
-      document.removeEventListener("mouseup", onUpdate);
-      document.removeEventListener("touchend", onUpdate);
-      document.removeEventListener("selectionchange", onSelectionChange);
-      window.removeEventListener("scroll", hide);
-      window.removeEventListener("resize", hide);
-    };
-  }, [container]);
-
-  const generate = async () => {
-    if (busy || !quote) return;
-    setBusy(true);
-    setAnchor(null);
-    // 清除选区高亮，避免弹窗下方残留蓝色选区
-    window.getSelection()?.removeAllRanges();
-    try {
-      setDataUrl(await renderPoster(post, resolvedTheme === "dark", quote));
-      setOpen(true);
-    } catch (err) {
-      console.error("生成分享图失败", err);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <>
-      {anchor && !open && (
-        <button
-          type="button"
-          data-selection-share
-          onPointerDown={(e) => e.preventDefault()}
-          onClick={generate}
-          style={{
-            left: anchor.x,
-            top: anchor.y,
-            transform: anchor.below
-              ? "translate(-50%, 0)"
-              : "translate(-50%, -100%)",
-          }}
-          className="animate-blur-in fixed z-50 flex items-center gap-1.5 rounded-full border bg-card px-3.5 py-2 text-xs text-muted-foreground shadow-lg transition-colors hover:border-[#00bc7d]/50 hover:text-[#00bc7d]"
-        >
-          {busy ? (
-            <Loader2 className="size-3.5 animate-spin" strokeWidth={1.5} />
-          ) : (
-            <ImageDown className="size-3.5" strokeWidth={1.5} />
-          )}
-          生成分享图
-        </button>
-      )}
-      <PosterDialog
-        open={open}
-        onOpenChange={setOpen}
-        dataUrl={dataUrl}
-        fileName={`${post.slug}-quote.png`}
       />
     </>
   );

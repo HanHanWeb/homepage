@@ -10,7 +10,7 @@ import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { ReadingBgPicker } from "@/components/reading-bg";
 import { BlogBadges } from "@/components/blog-badges";
 import { BlogNav } from "@/components/blog/blog-nav";
-import { SharePosterButton, SelectionPoster } from "@/components/blog/share-poster";
+import { SharePosterButton } from "@/components/blog/share-poster";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 const FONT_STEPS = ["14px", "15px", "17px"];
@@ -226,7 +226,6 @@ export function PostView({ post }: { post: Post }) {
       </Sheet>
 
       <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 pt-20 pb-16">
-      <SelectionPoster post={post} container={contentRef} />
       <nav
         aria-label="面包屑"
         className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground animate-blur-in"

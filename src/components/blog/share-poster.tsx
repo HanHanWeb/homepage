@@ -718,6 +718,7 @@ export function SelectionPoster({
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
+    let raf = 0;
     const update = () => {
       const sel = window.getSelection();
       const root = container.current;
@@ -747,16 +748,23 @@ export function SelectionPoster({
         below,
       });
     };
+    // mouseup 后浏览器可能补发 selectionchange：统一走 rAF 求值，
+    // 选区有效则跟随重新定位（气泡不闪没），收起才隐藏
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    };
     const hide = () => setAnchor(null);
-    document.addEventListener("mouseup", update);
-    document.addEventListener("touchend", update, { passive: true });
-    document.addEventListener("selectionchange", hide);
+    document.addEventListener("mouseup", schedule);
+    document.addEventListener("touchend", schedule, { passive: true });
+    document.addEventListener("selectionchange", schedule);
     window.addEventListener("scroll", hide, { passive: true });
     window.addEventListener("resize", hide);
     return () => {
-      document.removeEventListener("mouseup", update);
-      document.removeEventListener("touchend", update);
-      document.removeEventListener("selectionchange", hide);
+      cancelAnimationFrame(raf);
+      document.removeEventListener("mouseup", schedule);
+      document.removeEventListener("touchend", schedule);
+      document.removeEventListener("selectionchange", schedule);
       window.removeEventListener("scroll", hide);
       window.removeEventListener("resize", hide);
     };

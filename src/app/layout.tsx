@@ -47,7 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           rel="stylesheet"
           href="https://cdn-font.hyperos.mi.com/font/css?family=MiSans:100,200,300,400,500,600:Chinese_Simplify,Latin&display=swap"
         />
-        {/* 思源宋体 400/600：全站统一在此加载，跨页复用浏览器缓存 */}
+        {/* 思源宋体 400/600/700：全站统一在此加载，跨页复用浏览器缓存 */}
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.3.0/chinese-simplified-400.css"
@@ -55,6 +55,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.3.0/chinese-simplified-600.css"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.3.0/chinese-simplified-700.css"
         />
         {/* 预加载标题字体，避免 font swap 在入场动画中途改变字形 */}
         <link

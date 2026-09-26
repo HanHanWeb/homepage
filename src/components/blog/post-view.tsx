@@ -2,7 +2,7 @@
 
 import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
-import { Calendar, Clock, Menu, Triangle } from "lucide-react";
+import { Calendar, Clock, Menu } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -10,7 +10,7 @@ import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { ReadingBgPicker } from "@/components/reading-bg";
 import { BlogBadges } from "@/components/blog-badges";
 import { BlogNav } from "@/components/blog/blog-nav";
-import { Confetti, type ConfettiRef } from "@/components/ui/confetti";
+import { SharePosterButton } from "@/components/blog/share-poster";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 const FONT_STEPS = ["14px", "15px", "17px"];
@@ -63,10 +63,7 @@ export function PostView({ post }: { post: Post }) {
   const [fontStep, setFontStep] = useState(1);
   const [active, setActive] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState<number | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const confettiRef = useRef<ConfettiRef | null>(null);
   // 点击目录后的平滑滚动期间锁定高亮，避免路过中间章节时闪烁
   const clickLockRef = useRef(false);
   const lockTimerRef = useRef<number | undefined>(undefined);
@@ -76,85 +73,7 @@ export function PostView({ post }: { post: Post }) {
     if (Number.isInteger(saved) && saved >= 0 && saved < FONT_STEPS.length) {
       setFontStep(saved);
     }
-    try {
-      // localStorage 只记「我是否标记过」，真实计数以服务端为准
-      const store = JSON.parse(localStorage.getItem("post-likes") ?? "{}");
-      setLiked(Boolean(store[post.slug]));
-    } catch {
-      // 存储不可用时忽略
-    }
-    let cancelled = false;
-    fetch(`/api/posts/${post.slug}/like`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((data) => {
-        if (!cancelled && typeof data?.count === "number") {
-          setLikeCount(data.count);
-        }
-      })
-      .catch(() => {
-        // 数据库不可用时不显示数字
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [post.slug]);
-
-  const fireConfetti = () => {
-    if (!confettiRef.current) return;
-    // 从屏幕正中喷发，视觉上像为点赞庆祝
-    confettiRef.current.fire({
-      particleCount: 120,
-      angle: 90,
-      spread: 75,
-      startVelocity: 42,
-      gravity: 1,
-      decay: 0.92,
-      ticks: 240,
-      scalar: 0.95,
-      origin: { x: 0.5, y: 0.5 },
-      colors: [
-        "#00bc7d",
-        "#22c55e",
-        "#a3e635",
-        "#0ea5e9",
-        "#f59e0b",
-        "#f43f5e",
-        "#a855f7",
-      ],
-    });
-  };
-
-  const toggleUseful = () => {
-    const nextLiked = !liked;
-    const method = nextLiked ? "POST" : "DELETE";
-    const prevCount = likeCount;
-    // 乐观更新：本地先加/减 1，以服务端返回值为准
-    const optimistic = nextLiked
-      ? (likeCount ?? 0) + 1
-      : Math.max(0, (likeCount ?? 1) - 1);
-    setLiked(nextLiked);
-    setLikeCount(optimistic);
-    // 只在新点赞时撒花，取消点赞不播动画
-    if (nextLiked) fireConfetti();
-    try {
-      const store = JSON.parse(localStorage.getItem("post-likes") ?? "{}");
-      if (nextLiked) store[post.slug] = true;
-      else delete store[post.slug];
-      localStorage.setItem("post-likes", JSON.stringify(store));
-    } catch {
-      // 存储不可用时忽略
-    }
-    fetch(`/api/posts/${post.slug}/like`, { method })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((data) => {
-        if (typeof data?.count === "number") setLikeCount(data.count);
-      })
-      .catch(() => {
-        // 接口失败时回滚 UI，保持与服务端一致
-        setLiked(!nextLiked);
-        setLikeCount(prevCount);
-      });
-  };
+  }, []);
 
   // 正文图片灯箱
   useEffect(() => {
@@ -278,11 +197,6 @@ export function PostView({ post }: { post: Post }) {
 
   return (
     <>
-      <Confetti
-        ref={confettiRef}
-        aria-hidden
-        className="z-[100]"
-      />
       <BlogNav
         title={post.title}
         menu={
@@ -345,7 +259,7 @@ export function PostView({ post }: { post: Post }) {
           className="animate-blur-in mt-4 lg:col-span-2"
           style={{ "--blur-delay": "0.15s" } as React.CSSProperties}
         >
-          <h1 className="font-serif-song text-3xl leading-snug tracking-tight sm:text-4xl">
+          <h1 className="font-serif-song font-bold text-3xl leading-snug tracking-tight sm:text-4xl">
             {post.title}
           </h1>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -379,7 +293,7 @@ export function PostView({ post }: { post: Post }) {
                     key={i}
                     id={showToc ? `toc-b-${i}` : undefined}
                     data-toc={showToc ? "" : undefined}
-                    className="font-serif-song mt-9 scroll-mt-20 text-[1.6em] leading-[1.4] tracking-tight"
+                    className="font-serif-song font-bold mt-9 scroll-mt-20 text-[1.6em] leading-[1.4] tracking-tight"
                   >
                     {b.text}
                   </h2>
@@ -429,22 +343,7 @@ export function PostView({ post }: { post: Post }) {
           </div>
 
           <div className="mt-10 flex justify-center">
-            <button
-              type="button"
-              onClick={toggleUseful}
-              aria-pressed={liked}
-              className={`inline-flex items-center gap-2 rounded-full border px-5 py-2 text-sm transition-colors ${
-                liked
-                  ? "border-[#00bc7d]/60 bg-[#00bc7d]/10 text-[#00bc7d]"
-                  : "border-border bg-card text-muted-foreground hover:border-[#00bc7d]/50 hover:text-[#00bc7d]"
-              }`}
-            >
-              <Triangle
-                className={`size-4 ${liked ? "fill-[#00bc7d] text-[#00bc7d]" : ""}`}
-                strokeWidth={1.5}
-              />
-              有用{likeCount !== null ? ` ${likeCount}` : ""}
-            </button>
+            <SharePosterButton post={post} />
           </div>
         </article>
 

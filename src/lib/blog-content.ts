@@ -1,4 +1,3 @@
-import { createClient, type Client } from "@libsql/client";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
@@ -10,7 +9,6 @@ import type { Post } from "@/lib/blog";
  * 图片等资源放在同一目录并用相对路径引用（由 /blog/<slug>/<file> 路由提供）。
  * index.md 头部为 `---` 包裹的简单键值 frontmatter：
  *   title / description / category / tags（如 [a, b]）/ date
- * 数据库仅用于「有用」计数（post_likes 表）。
  */
 
 type PostMeta = Pick<
@@ -76,6 +74,8 @@ async function readPost(slug: string): Promise<Post | null> {
   } catch {
     return null;
   }
+  // 统一为 LF：CRLF 的 \r\n\r\n 不含连续两个 \n，会让正文按空行分块的解析失效
+  raw = raw.replace(/\r\n/g, "\n");
   const { meta, body } = parseFrontMatter(raw);
   if (!meta.title) return null;
   return {
@@ -137,63 +137,4 @@ export function postOgImage(post: Post): string | undefined {
   const src = m[1];
   if (/^(https?:)?\/\//.test(src) || src.startsWith("/")) return src;
   return `/blog/${post.slug}/${src}`;
-}
-
-let client: Client | null = null;
-
-function getClient(): Client | null {
-  const url = process.env.TURSO_DATABASE_URL;
-  if (!url) return null;
-  client ??= createClient({
-    url,
-    authToken: process.env.TURSO_AUTH_TOKEN,
-  });
-  return client;
-}
-
-/** 文章「有用」计数表：首次访问时懒建表 */
-let likesTableEnsured = false;
-async function ensureLikesTable(db: Client) {
-  if (likesTableEnsured) return;
-  await db.execute(
-    "CREATE TABLE IF NOT EXISTS post_likes (slug TEXT PRIMARY KEY, count INTEGER NOT NULL DEFAULT 0)",
-  );
-  likesTableEnsured = true;
-}
-
-/** 读取某篇文章的「有用」总数；数据库不可用时返回 null */
-export async function getPostLikes(slug: string): Promise<number | null> {
-  const db = getClient();
-  if (!db) return null;
-  try {
-    await ensureLikesTable(db);
-    const result = await db.execute({
-      sql: "SELECT count FROM post_likes WHERE slug = ?",
-      args: [slug],
-    });
-    return Number(result.rows[0]?.count ?? 0);
-  } catch {
-    return null;
-  }
-}
-
-/** 增/减「有用」计数（delta 为 1 或 -1），返回更新后的总数 */
-export async function changePostLikes(
-  slug: string,
-  delta: 1 | -1,
-): Promise<number | null> {
-  const db = getClient();
-  if (!db) return null;
-  try {
-    await ensureLikesTable(db);
-    const result = await db.execute({
-      sql: `INSERT INTO post_likes (slug, count) VALUES (?, 1)
-            ON CONFLICT(slug) DO UPDATE SET count = MAX(0, count + ?)
-            RETURNING count`,
-      args: [slug, delta],
-    });
-    return Number(result.rows[0]?.count ?? 0);
-  } catch {
-    return null;
-  }
 }

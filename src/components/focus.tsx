@@ -2,7 +2,6 @@
 
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import { Fancybox } from "@fancyapps/ui";
-import { Clapperboard } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
@@ -11,8 +10,8 @@ import Text3DFlip from "@/registry/magicui/text-3d-flip";
 
 const BILIBILI_BVID = "BV1KWhJ67EYm";
 
-/** B 站播放器：滚动进入视口后才加载并静音自动播放，右下角悬浮提示角标 */
-function BilibiliVideo({ bvid, title, hint }: { bvid: string; title: string; hint: string }) {
+/** B 站播放器：滚动进入视口后才加载并静音自动播放 */
+function BilibiliVideo({ bvid, title }: { bvid: string; title: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
 
@@ -45,10 +44,6 @@ function BilibiliVideo({ bvid, title, hint }: { bvid: string; title: string; hin
       ) : (
         <div className="aspect-video w-full bg-muted/40" aria-hidden />
       )}
-      <span className="pointer-events-none absolute right-3 bottom-3 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-xs text-white/90 backdrop-blur-sm">
-        <Clapperboard className="size-3.5" strokeWidth={1.5} aria-hidden />
-        {hint}
-      </span>
     </div>
   );
 }
@@ -176,9 +171,7 @@ export function Focus() {
                   ))}
                 </div>
               </div>
-              {"videoHint" in item && (
-                <BilibiliVideo bvid={BILIBILI_BVID} title={item.title} hint={item.videoHint} />
-              )}
+              {"video" in item && <BilibiliVideo bvid={BILIBILI_BVID} title={item.title} />}
               {"collections" in item && (
                 <div className="relative mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {item.collections.map((col, colIdx) => (

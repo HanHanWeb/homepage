@@ -62,7 +62,7 @@ export const dictionaries = {
           ],
           note: "仅展示部分作品，部分作品经多次迭代，设计或功能可能有变化，请以生产环境或现实为准。",
         },
-        { title: "影像创作", options: ["摄影", "航拍", "视频剪辑"], videoHint: "航拍视频片段" },
+        { title: "影像创作", options: ["摄影", "航拍", "视频剪辑"], video: true, note: "仅展示部分航拍片段，素材仅经初步剪辑、未做后期处理，请以实际成片为准。" },
       ],
     },
     projects: {
@@ -164,7 +164,7 @@ export const dictionaries = {
           ],
           note: "A selection of works only. Some have gone through multiple iterations — designs or features may differ; please refer to the production environment or the real thing.",
         },
-        { title: "Visual Creation", options: ["Photography", "Aerial", "Video Editing"], videoHint: "Aerial footage" },
+        { title: "Visual Creation", options: ["Photography", "Aerial", "Video Editing"], video: true, note: "A selection of aerial footage only — roughly cut, with no post-production; please refer to the final film." },
       ],
     },
     projects: {

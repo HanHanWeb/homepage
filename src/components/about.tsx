@@ -68,7 +68,7 @@ const codexIcon: BrandIconDef = {
 const TOOLS: Array<{ name: string; icon?: SimpleIcon | BrandIconDef }> = [
   { name: "OpenCode", icon: siOpencode },
   { name: "Codex", icon: codexIcon },
-  { name: "Z.ai", icon: siZdotai },
+  { name: "ZCode", icon: siZdotai },
   { name: "DeepSeek", icon: siDeepseek },
   { name: "Trae", icon: siTrae },
   { name: "VS Code", icon: siVisualstudiocode },

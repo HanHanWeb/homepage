@@ -8,6 +8,7 @@ import { FlickeringGridTop } from "@/components/flickering-grid-top";
 import { Focus } from "@/components/focus";
 import { Friends } from "@/components/friends";
 import { Hero } from "@/components/hero";
+import { HomeToc } from "@/components/home-toc";
 import { Projects } from "@/components/projects";
 import { LanguageToggle } from "@/components/language-toggle";
 import { BottomGlow } from "@/components/ui/bottom-glow";
@@ -30,6 +31,7 @@ export default async function Home() {
       <FlickeringGridTop />
       <ScrollProgress />
       <BackToTop />
+      <HomeToc />
       {/* 语言切换仅首页显示（404 等页面不渲染） */}
       <div className="pointer-events-none fixed top-5 right-20 z-50">
         <div className="pointer-events-auto">

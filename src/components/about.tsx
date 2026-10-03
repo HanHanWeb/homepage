@@ -2,6 +2,7 @@
 
 import { Sparkles } from "lucide-react";
 import {
+  siCodebuddy,
   siCss,
   siDeepseek,
   siDocker,
@@ -69,9 +70,10 @@ const TOOLS: Array<{ name: string; icon?: SimpleIcon | BrandIconDef }> = [
   { name: "OpenCode", icon: siOpencode },
   { name: "Codex", icon: codexIcon },
   { name: "ZCode", icon: siZdotai },
-  { name: "DeepSeek", icon: siDeepseek },
+  { name: "DeepSeek Harness", icon: siDeepseek },
   { name: "Trae", icon: siTrae },
   { name: "VS Code", icon: siVisualstudiocode },
+  { name: "CodeBuddy", icon: siCodebuddy },
 ];
 
 export function About() {

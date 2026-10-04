@@ -84,6 +84,8 @@ export const dictionaries = {
     friends: {
       title: "友情链接",
       empty: "暂无友情链接",
+      apply: "申请友链",
+      applyHint: "点此邮件申请交换链接",
     },
     backToTop: "回到顶部",
     cmdk: {
@@ -186,6 +188,8 @@ export const dictionaries = {
     friends: {
       title: "Friends",
       empty: "No friend links yet",
+      apply: "Apply for a link",
+      applyHint: "Email me to exchange links",
     },
     backToTop: "Back to top",
     cmdk: {

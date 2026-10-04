@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowUpRight, Link2 } from "lucide-react";
+import { ArrowUpRight, Link2, Mail } from "lucide-react";
 
 import { useLanguage } from "@/components/language-provider";
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { FRIENDS } from "@/lib/friends";
+import { SOCIALS } from "@/lib/socials";
 
 export function Friends() {
   const { t } = useLanguage();
@@ -62,10 +63,46 @@ export function Friends() {
                 </div>
               );
             })}
+            <a
+              href={SOCIALS.find((s) => s.href.startsWith("mailto:"))?.href}
+              className="group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card">
+                <Mail className="size-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-medium leading-5">
+                  {t.friends.apply}
+                </span>
+                <span className="block truncate text-xs leading-5 text-muted-foreground">
+                  {t.friends.applyHint}
+                </span>
+              </span>
+              <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+            </a>
           </div>
         ) : (
-          <div className="mt-4 rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-            {t.friends.empty}
+          <div className="mt-4 space-y-3">
+            <div className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+              {t.friends.empty}
+            </div>
+            <a
+              href={SOCIALS.find((s) => s.href.startsWith("mailto:"))?.href}
+              className="group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card">
+                <Mail className="size-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-medium leading-5">
+                  {t.friends.apply}
+                </span>
+                <span className="block truncate text-xs leading-5 text-muted-foreground">
+                  {t.friends.applyHint}
+                </span>
+              </span>
+              <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+            </a>
           </div>
         )}
       </Reveal>

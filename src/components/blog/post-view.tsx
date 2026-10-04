@@ -7,7 +7,6 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
-import { BlogBadges } from "@/components/blog-badges";
 import { BlogNav } from "@/components/blog/blog-nav";
 import { SharePosterButton } from "@/components/blog/share-poster";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -170,7 +169,6 @@ export function PostView({ post }: { post: Post }) {
           <SheetTitle className="sr-only">文章侧边栏</SheetTitle>
           <div className="space-y-4">
             {tocCard(true)}
-            <BlogBadges />
           </div>
         </SheetContent>
       </Sheet>
@@ -209,7 +207,10 @@ export function PostView({ post }: { post: Post }) {
           className="animate-blur-in mt-4 lg:col-span-2"
           style={{ "--blur-delay": "0.15s" } as React.CSSProperties}
         >
-          <h1 className="font-serif-song font-bold text-3xl leading-snug tracking-tight sm:text-4xl">
+          <h1
+            data-post-title
+            className="font-serif-song font-semibold text-3xl leading-snug tracking-tight sm:text-4xl"
+          >
             {post.title}
           </h1>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -266,6 +267,11 @@ export function PostView({ post }: { post: Post }) {
                       data-caption={b.alt}
                       className="w-full cursor-zoom-in rounded-xl border"
                     />
+                    {b.alt && (
+                      <span className="mt-3 block text-center font-mono text-sm text-muted-foreground">
+                        {b.alt}
+                      </span>
+                    )}
                   </span>
                 );
               }
@@ -298,7 +304,6 @@ export function PostView({ post }: { post: Post }) {
 
         <aside className="hidden space-y-4 lg:sticky lg:top-20 lg:block">
           {tocCard()}
-          <BlogBadges />
         </aside>
       </div>
     </main>

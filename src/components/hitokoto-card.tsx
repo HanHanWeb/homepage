@@ -73,15 +73,9 @@ export function HitokotoCard() {
 
   return (
     <section className="rounded-xl border bg-card px-4 py-3">
-      <div className="flex items-center gap-3 pb-1.5">
-        <p className="min-w-0 flex-1 text-sm font-medium">一言</p>
-        <span className="font-mono text-[10px] tracking-widest text-muted-foreground/60">
-          #HITOKOTO
-        </span>
-      </div>
       {quote ? (
         <>
-          <p className="font-serif-song text-[13.5px] leading-relaxed text-foreground/90">
+          <p className="font-serif-song font-semibold text-[13.5px] leading-relaxed text-foreground/90">
             「{quote.text}」
           </p>
           <p className="mt-1.5 text-right text-xs text-muted-foreground">

@@ -30,7 +30,7 @@ export function BlogPreview({ posts }: { posts: Post[] }) {
               <h3 className="font-serif-song font-semibold text-lg tracking-tight">
                 {post.title}
               </h3>
-              <span className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
+              <span className="mt-1.5 flex items-center gap-1 font-mono text-xs text-muted-foreground">
                 <Clock className="size-3" strokeWidth={1.5} />
                 {post.createdAt.slice(0, 10)}
               </span>

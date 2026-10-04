@@ -24,7 +24,7 @@ export function BlogNav({
   useEffect(() => {
     if (!title) return;
     const update = () => {
-      const h1 = document.querySelector("article h1");
+      const h1 = document.querySelector("h1[data-post-title]");
       if (!h1) return;
       // 文章标题底部滚入导航条（56px）以下时切换显示
       setPassed(h1.getBoundingClientRect().bottom <= 56);

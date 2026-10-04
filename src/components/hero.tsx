@@ -2,7 +2,6 @@
 
 import { GithubIcon } from "@/components/icons";
 import { InstallBadge } from "@/components/install-badge";
-import { Typewriter } from "@/components/typewriter";
 import { Button } from "@/components/ui/button";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { TiltCard } from "@/components/ui/tilt-card";
@@ -105,12 +104,7 @@ export function Hero() {
                     transition={{ duration: 0.3, delay: line.at / 1000, ease: "easeOut" }}
                   >
                     <span className="text-green-500">❯</span>
-                    <Typewriter
-                      phrases={[line.text]}
-                      loop={false}
-                      typeMs={50}
-                      startDelay={line.at + 150}
-                    />
+                    <span>{line.text}</span>
                   </AnimatedSpan>
                 ) : (
                   <AnimatedSpan

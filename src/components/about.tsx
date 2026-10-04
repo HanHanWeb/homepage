@@ -74,7 +74,7 @@ const TOOLS: Array<{ name: string; icon?: SimpleIcon | BrandIconDef }> = [
   { name: "DeepSeek Harness", icon: siDeepseek },
   { name: "Trae", icon: siTrae },
   { name: "VS Code", icon: siVisualstudiocode },
-  { name: "CodeBuddy", icon: siCodebuddy },
+  { name: "WorkBuddy", icon: siCodebuddy },
 ];
 
 export function About() {

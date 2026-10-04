@@ -16,12 +16,21 @@ export function Projects() {
     .map((title) => title.trim());
 
   const [titleIndex, setTitleIndex] = useState(0);
+  const [rollInstant, setRollInstant] = useState(false);
   useEffect(() => {
     const timer = setInterval(() => {
-      setTitleIndex((index) => (index + 1) % titles.length);
+      setTitleIndex((index) => index + 1);
     }, 3000);
     return () => clearInterval(timer);
-  }, [titles.length]);
+  }, []);
+
+  // 语言切换后标题集改变，无动画复位到第一行
+  useEffect(() => {
+    setRollInstant(true);
+    setTitleIndex(0);
+    const raf = requestAnimationFrame(() => setRollInstant(false));
+    return () => cancelAnimationFrame(raf);
+  }, [locale]);
   return (
     <section id="projects" className="scroll-mt-6 py-10">
       <Reveal delay="2.35s" direction="down">
@@ -32,7 +41,7 @@ export function Projects() {
         <article className="mt-4 rounded-xl border bg-card p-5">
           <div className="sm:flex sm:gap-8">
             <header className="flex flex-col sm:flex-1">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 <h3 className="font-mono text-base font-semibold tracking-tight">
                   {locale === "en" ? featured.nameEn : featured.name}
                 </h3>
@@ -55,9 +64,9 @@ export function Projects() {
                 ))}
               </div>
             </header>
-            <figure className="relative mt-5 overflow-hidden rounded-lg bg-linear-to-br from-[#00bc7d]/10 to-[#00bc7d]/[0.04] p-4 sm:mt-0 sm:w-[calc(50%-6px)] sm:shrink-0">
+            <figure className="relative mt-5 overflow-hidden rounded-lg border border-[#00bc7d]/25 bg-linear-to-br from-[#00bc7d]/10 to-[#00bc7d]/[0.02] p-4 sm:mt-0 sm:w-[calc(50%-6px)] sm:shrink-0">
               <Quote
-                className="absolute -top-1 right-2 size-10 text-[#00bc7d]/20"
+                className="absolute -top-2 right-2 size-10 text-[#00bc7d]/20"
                 strokeWidth={1.5}
                 aria-hidden
               />
@@ -77,10 +86,22 @@ export function Projects() {
                   </span>
                   <span className="mt-0.5 block h-5 overflow-hidden leading-5">
                     <span
-                      key={titleIndex}
-                      className="block truncate animate-in fade-in slide-in-from-bottom-2 duration-500"
+                      onTransitionEnd={(e) => {
+                        if (e.target !== e.currentTarget || e.propertyName !== "transform") return;
+                        if (titleIndex >= titles.length) {
+                          setRollInstant(true);
+                          setTitleIndex(titleIndex % titles.length);
+                          requestAnimationFrame(() => setRollInstant(false));
+                        }
+                      }}
+                      className={`block ${rollInstant ? "" : "transition-transform duration-500 ease-out"}`}
+                      style={{ transform: `translateY(calc(-${titleIndex} * 1.25rem))` }}
                     >
-                      {titles[titleIndex]}
+                      {[...titles, titles[0]].map((title, i) => (
+                        <span key={i} className="block h-5 truncate leading-5">
+                          {title}
+                        </span>
+                      ))}
                     </span>
                   </span>
                 </p>

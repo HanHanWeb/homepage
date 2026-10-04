@@ -114,8 +114,10 @@ export async function listPosts(): Promise<Post[]> {
 
 /** 供 /blog/[slug] 详情页使用：读文件返回文章 */
 export async function getPost(slug: string): Promise<Post | null> {
-  const cached = cache?.posts.find((p) => p.slug === slug);
-  if (cached) return cached;
+  if (cache && Date.now() - cache.at < CACHE_MS) {
+    const cached = cache.posts.find((p) => p.slug === slug);
+    if (cached) return cached;
+  }
   return readPost(slug);
 }
 

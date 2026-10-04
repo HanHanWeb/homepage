@@ -7,14 +7,10 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
-import { ReadingBgPicker } from "@/components/reading-bg";
 import { BlogBadges } from "@/components/blog-badges";
 import { BlogNav } from "@/components/blog/blog-nav";
 import { SharePosterButton } from "@/components/blog/share-poster";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-
-const FONT_STEPS = ["14px", "15px", "17px"];
-const FONT_LABELS = ["A-", "A", "A+"];
 
 type Block =
   | { kind: "heading"; text: string }
@@ -60,20 +56,12 @@ export function PostView({ post }: { post: Post }) {
     .map((b, i) => ({ b, i }))
     .filter(({ b }) => b.kind === "heading");
   const showToc = headings.length >= 2;
-  const [fontStep, setFontStep] = useState(1);
   const [active, setActive] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
   // 点击目录后的平滑滚动期间锁定高亮，避免路过中间章节时闪烁
   const clickLockRef = useRef(false);
   const lockTimerRef = useRef<number | undefined>(undefined);
-
-  useEffect(() => {
-    const saved = Number(localStorage.getItem("post-font-size"));
-    if (Number.isInteger(saved) && saved >= 0 && saved < FONT_STEPS.length) {
-      setFontStep(saved);
-    }
-  }, []);
 
   // 正文图片灯箱
   useEffect(() => {
@@ -82,11 +70,6 @@ export function PostView({ post }: { post: Post }) {
       Fancybox.destroy();
     };
   }, []);
-
-  const changeFont = (step: number) => {
-    setFontStep(step);
-    localStorage.setItem("post-font-size", String(step));
-  };
 
   // 滚动时高亮视口顶附近的章节标题；不依赖 rAF（后台/节流时会被暂停导致失效）
   useEffect(() => {
@@ -123,37 +106,6 @@ export function PostView({ post }: { post: Post }) {
     const top = el.getBoundingClientRect().top + window.scrollY - 80;
     window.scrollTo({ top, behavior: "smooth" });
   };
-
-  const fontSizeCard = (
-    <section className="rounded-xl border bg-card px-4 py-3">
-      <div className="flex items-center gap-3">
-        <p className="min-w-0 flex-1 text-sm font-medium">阅读字号</p>
-        <div
-          className="flex overflow-hidden rounded-[9px] border"
-          role="group"
-          aria-label="调节正文字号"
-        >
-          {FONT_STEPS.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => changeFont(i)}
-              aria-pressed={fontStep === i}
-              className={`flex h-6 w-9 items-center justify-center text-center text-xs transition-colors ${
-                i > 0 ? "border-l" : ""
-              } ${
-                fontStep === i
-                  ? "bg-[#00bc7d]/10 font-medium text-[#00bc7d]"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {FONT_LABELS[i]}
-            </button>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
 
   const tocCard = (closeAfter = false) =>
     showToc ? (
@@ -218,8 +170,6 @@ export function PostView({ post }: { post: Post }) {
           <SheetTitle className="sr-only">文章侧边栏</SheetTitle>
           <div className="space-y-4">
             {tocCard(true)}
-            <ReadingBgPicker onSelect={() => setMenuOpen(false)} />
-            {fontSizeCard}
             <BlogBadges />
           </div>
         </SheetContent>
@@ -283,8 +233,7 @@ export function PostView({ post }: { post: Post }) {
         >
           <div
             ref={contentRef}
-            className="space-y-4 leading-8 text-foreground/90 [overflow-anchor:none]"
-            style={{ fontSize: FONT_STEPS[fontStep] }}
+            className="space-y-4 text-[15px] leading-8 text-foreground/90 [overflow-anchor:none]"
           >
             {blocks.map((b, i) => {
               if (b.kind === "heading") {
@@ -349,8 +298,6 @@ export function PostView({ post }: { post: Post }) {
 
         <aside className="hidden space-y-4 lg:sticky lg:top-20 lg:block">
           {tocCard()}
-          <ReadingBgPicker />
-          {fontSizeCard}
           <BlogBadges />
         </aside>
       </div>

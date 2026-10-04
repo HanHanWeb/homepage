@@ -27,7 +27,7 @@ export function BlogPreview({ posts }: { posts: Post[] }) {
               href={`/blog/${post.slug}`}
               className="relative block rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50"
             >
-              <h3 className="font-serif-song text-lg tracking-tight">
+              <h3 className="font-serif-song font-semibold text-lg tracking-tight">
                 {post.title}
               </h3>
               <span className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">

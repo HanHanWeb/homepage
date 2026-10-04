@@ -11,7 +11,7 @@ import {
   Search,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { estimateReadingMinutes, type Post } from "@/lib/blog";
 import { HitokotoCard } from "@/components/hitokoto-card";
@@ -26,6 +26,12 @@ export function BlogView({ posts }: { posts: Post[] }) {
   const [category, setCategory] = useState("全部");
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  // 滑动选中指示器：跟踪选中项在分组内的位置
+  const groupRef = useRef<HTMLDivElement | null>(null);
+  const [indicator, setIndicator] = useState<{
+    left: number;
+    width: number;
+  } | null>(null);
 
   const categories = [
     "全部",
@@ -50,6 +56,21 @@ export function BlogView({ posts }: { posts: Post[] }) {
       // 剪贴板不可用（如非安全上下文）时静默失败
     }
   };
+
+  useEffect(() => {
+    const group = groupRef.current;
+    if (!group) return;
+    const update = () => {
+      const active = group.querySelector<HTMLElement>('[data-state="on"]');
+      if (!active) return;
+      setIndicator({ left: active.offsetLeft, width: active.offsetWidth });
+    };
+    update();
+    // 字体加载、窗口变化引起的尺寸变化都重算
+    const ro = new ResizeObserver(update);
+    ro.observe(group);
+    return () => ro.disconnect();
+  }, [category, categories.length]);
 
   return (
     <>
@@ -125,20 +146,28 @@ export function BlogView({ posts }: { posts: Post[] }) {
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <ToggleGroup
+          ref={groupRef}
           type="single"
           value={category}
           onValueChange={(v) => {
             if (v) setCategory(v);
           }}
           aria-label="文章分类"
-          className="h-9 rounded-full border bg-card p-1"
+          className="relative h-9 rounded-full border bg-card p-1"
         >
+          {indicator && (
+            <span
+              aria-hidden
+              className="absolute inset-y-1 rounded-full bg-[#00bc7d]/10 transition-[left,width] duration-300 ease-out"
+              style={{ left: indicator.left, width: indicator.width }}
+            />
+          )}
           {categories.map((c) => (
             <ToggleGroupItem
               key={c}
               value={c}
               aria-label={`分类：${c}`}
-              className="h-7 rounded-full border-0 px-4 text-sm data-[state=on]:bg-[#00bc7d]/10 data-[state=on]:font-medium data-[state=on]:text-[#00bc7d] data-[state=on]:shadow-none"
+              className="relative h-7 rounded-full border-0 px-4 text-sm data-[state=on]:bg-transparent data-[state=on]:font-medium data-[state=on]:text-[#00bc7d] data-[state=on]:shadow-none"
             >
               {c}
             </ToggleGroupItem>
@@ -177,7 +206,7 @@ export function BlogView({ posts }: { posts: Post[] }) {
                 id={`post-${post.slug}`}
                 className="scroll-mt-20 rounded-xl border bg-card p-5 transition-colors hover:bg-muted/50"
               >
-                <h2 className="font-serif-song font-bold text-xl leading-8 tracking-tight sm:text-2xl">
+                <h2 className="font-serif-song font-semibold text-xl leading-8 tracking-tight sm:text-2xl">
                   <Link
                     href={`/blog/${post.slug}`}
                     className="transition-colors hover:text-[#00bc7d]"

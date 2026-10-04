@@ -38,7 +38,7 @@ export default async function Home() {
           <LanguageToggle />
         </div>
       </div>
-      <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-20 pb-16">
+      <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pb-16">
         <Hero />
         <About />
         <Focus />

@@ -248,20 +248,6 @@ html::-webkit-scrollbar {
   animation-delay: var(--blur-delay, 0s);
 }
 
-/* Reveal 组件挂载即播放（整页入场编排，--blur-delay 控制各板块先后顺序） */
-.blur-in-pending {
-  opacity: 0;
-  filter: blur(8px);
-  transform: translateY(var(--blur-offset, 8px));
-}
-
-.blur-in-pending.is-blur-in {
-  animation: blur-in 0.5s ease-out both;
-  animation-delay: var(--blur-delay, 0s);
-  /* 预建合成层：与 .animate-blur-in 同机制，避免动画首帧建层掉帧 */
-  will-change: opacity, filter, transform;
-}
-
 /* 贡献图：覆写 react-activity-calendar 默认横向滚动，居右裁剪、无滚动条 */
 .react-activity-calendar__scroll-container {
   overflow: hidden !important;

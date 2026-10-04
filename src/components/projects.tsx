@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { Reveal } from "@/components/reveal";
+import { SectionHeading } from "@/components/section-heading";
 import { FEATURED_PROJECT, PROJECTS } from "@/lib/projects";
 
 export function Projects() {
@@ -24,13 +25,7 @@ export function Projects() {
   return (
     <section id="projects" className="scroll-mt-6 py-10">
       <Reveal delay="2.35s" direction="down">
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="font-serif-sc relative inline-block text-3xl tracking-tight sm:text-4xl">
-            {t.projects.title}
-            <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-[#00bc7d]" aria-hidden />
-          </h2>
-          <span className="text-sm font-normal tracking-widest text-muted-foreground/40">#PROJECTS</span>
-        </div>
+        <SectionHeading title={t.projects.title} tag="#PROJECTS" />
       </Reveal>
 
       <Reveal delay="2.45s" direction="down">
@@ -118,7 +113,7 @@ export function Projects() {
             </>
           );
           return (
-            <Reveal key={project.name} delay={`${2.5 + i * 0.08}s`} direction="down">
+            <Reveal key={project.name} delay={`${0.15 + i * 0.08}s`} direction="down">
               {project.url ? (
                 <a
                   href={project.url}

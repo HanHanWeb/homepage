@@ -4,29 +4,15 @@ import React from "react";
 
 import { cn } from "@/lib/utils";
 
-/** Mount-time blur reveal with a configurable vertical direction. */
+/** 板块内容静态容器；delay/direction 参数保留以兼容既有调用，不再产生动画 */
 export function Reveal({
   children,
   className,
-  delay,
-  direction = "up",
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: string;
   direction?: "up" | "down";
 }) {
-  return (
-    <div
-      className={cn("blur-in-pending is-blur-in", className)}
-      style={
-        {
-          "--blur-delay": delay ?? "0s",
-          "--blur-offset": direction === "down" ? "-8px" : "8px",
-        } as React.CSSProperties
-      }
-    >
-      {children}
-    </div>
-  );
+  return <div className={cn(className)}>{children}</div>;
 }

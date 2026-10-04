@@ -23,7 +23,7 @@ export function Hero() {
   ];
 
   return (
-    <section id="intro" className="flex flex-col pb-10 mt-20">
+    <section id="intro" className="flex min-h-dvh flex-col justify-center">
       <div className="flex flex-col items-center gap-10 sm:grid sm:grid-cols-2 sm:items-center">
         <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
           <InstallBadge className="w-fit animate-blur-in" />

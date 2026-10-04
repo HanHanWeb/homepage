@@ -18,34 +18,50 @@ export function Friends() {
       <Reveal delay="3.65s" direction="down">
         {FRIENDS.length > 0 ? (
           <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-            {FRIENDS.map((friend) => (
-              <a
-                key={friend.name}
-                href={friend.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
-              >
-                {friend.avatar ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={friend.avatar}
-                    alt={friend.name}
-                    loading="lazy"
-                    className="size-10 shrink-0 rounded-full border bg-card object-cover"
-                  />
-                ) : (
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card">
-                    <Link2 className="size-4" />
+            {FRIENDS.map((friend) => {
+              const card = (
+                <>
+                  {friend.avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={friend.avatar}
+                      alt={friend.name}
+                      loading="lazy"
+                      className="size-10 shrink-0 rounded-full border bg-card object-cover"
+                    />
+                  ) : (
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card">
+                      <Link2 className="size-4" />
+                    </span>
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium leading-5">{friend.name}</span>
+                    <span className="block truncate text-xs leading-5 text-muted-foreground">{friend.description}</span>
                   </span>
-                )}
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium leading-5">{friend.name}</span>
-                  <span className="block truncate text-xs leading-5 text-muted-foreground">{friend.description}</span>
-                </span>
-                <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-              </a>
-            ))}
+                  {friend.href && (
+                    <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                  )}
+                </>
+              );
+              return friend.href ? (
+                <a
+                  key={friend.name}
+                  href={friend.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
+                >
+                  {card}
+                </a>
+              ) : (
+                <div
+                  key={friend.name}
+                  className="flex items-center gap-3 rounded-xl border p-4"
+                >
+                  {card}
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="mt-4 rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">

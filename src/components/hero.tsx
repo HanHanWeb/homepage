@@ -1,12 +1,10 @@
 "use client";
 
-import { GithubIcon } from "@/components/icons";
 import { InstallBadge } from "@/components/install-badge";
-import { Button } from "@/components/ui/button";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { TiltCard } from "@/components/ui/tilt-card";
 import { useLanguage } from "@/components/language-provider";
-import { AnimatedSpan, Terminal } from "@/registry/magicui/terminal";
+import { Terminal } from "@/registry/magicui/terminal";
 
 export function Hero() {
   const { t } = useLanguage();
@@ -67,21 +65,6 @@ export function Hero() {
             >
               <span className="text-sm font-medium text-white">{t.hero.ctaAbout}</span>
             </ShimmerButton>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="h-10 rounded-full px-5"
-            >
-              <a
-                href="https://github.com/HanHanWeb"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GithubIcon className="size-4" />
-                {t.hero.ctaGithub}
-              </a>
-            </Button>
           </div>
         </div>
 
@@ -96,26 +79,14 @@ export function Hero() {
             >
               {LINES.map((line, i) =>
                 line.kind === "cmd" ? (
-                  <AnimatedSpan
-                    key={i}
-                    className="flex gap-2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3, delay: line.at / 1000, ease: "easeOut" }}
-                  >
+                  <div key={i} className="flex gap-2">
                     <span className="text-green-500">❯</span>
                     <span>{line.text}</span>
-                  </AnimatedSpan>
+                  </div>
                 ) : (
-                  <AnimatedSpan
-                    key={i}
-                    className="text-muted-foreground"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.35, delay: line.at / 1000, ease: "easeOut" }}
-                  >
+                  <div key={i} className="text-muted-foreground">
                     {line.text}
-                  </AnimatedSpan>
+                  </div>
                 ),
               )}
             </Terminal>

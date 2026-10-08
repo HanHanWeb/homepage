@@ -12,8 +12,8 @@ export type Project = {
 
 export const PROJECTS: Project[] = [
   {
-    name: "Homepage",
-    nameEn: "Homepage",
+    name: "homepage",
+    nameEn: "homepage",
     url: "https://github.com/HanHanWeb/homepage",
     tagZh: "开发",
     tagEn: "dev",
@@ -21,17 +21,26 @@ export const PROJECTS: Project[] = [
     descEn: "A personal homepage built with Next.js, documenting learning and creation.",
   },
   {
-    name: "Spark",
-    nameEn: "Spark",
-    url: "https://github.com/HanHanWeb/spark",
+    name: "typesmith",
+    nameEn: "typesmith",
+    url: "https://typesmith.hhan.me/",
+    tagZh: "开发",
+    tagEn: "dev",
+    descZh: "为初学者打造的交互式 LaTeX 学习平台。",
+    descEn: "An interactive LaTeX learning platform built for beginners.",
+  },
+  {
+    name: "spark",
+    nameEn: "spark",
+    url: "https://spark.hhan.me/",
     tagZh: "开发",
     tagEn: "dev",
     descZh: "搜索框即入口的轻量便签速记工具",
     descEn: "A lightweight quick-note app where the search box is the entry point.",
   },
   {
-    name: "Roadmap",
-    nameEn: "Roadmap",
+    name: "roadmap",
+    nameEn: "roadmap",
     url: "https://github.com/HanHanWeb/roadmap",
     tagZh: "归档",
     tagEn: "archive",
@@ -39,8 +48,8 @@ export const PROJECTS: Project[] = [
     descEn: "A lightweight platform for public project roadmaps and feature voting.",
   },
   {
-    name: "Foxity",
-    nameEn: "Foxity",
+    name: "foxity",
+    nameEn: "foxity",
     url: "https://github.com/HanHanWeb/foxity",
     tagZh: "开发",
     tagEn: "dev",

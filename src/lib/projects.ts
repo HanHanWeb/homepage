@@ -1,5 +1,12 @@
 /** 项目数据:从 GitHub (HanHanWeb) 拉取的公开仓库快照,无国内实时接口故静态维护 */
 
+/** 项目预览图：文件在 public 下，alt 按语言取用 */
+export type ProjectImage = {
+  src: string;
+  altZh: string;
+  altEn: string;
+};
+
 export type Project = {
   name: string;
   nameEn: string;
@@ -8,6 +15,8 @@ export type Project = {
   tagEn: string;
   descZh: string;
   descEn: string;
+  /** 卡片顶部预览图；多张时卡片内自动滚动播放，点击打开灯箱 */
+  images?: readonly ProjectImage[];
 };
 
 export const PROJECTS: Project[] = [
@@ -19,6 +28,7 @@ export const PROJECTS: Project[] = [
     tagEn: "dev",
     descZh: "一个基于 Next.js 构建的个人主页，记录学习与创作。",
     descEn: "A personal homepage built with Next.js, documenting learning and creation.",
+    images: [{ src: "/project-homepage.webp", altZh: "homepage 主页界面", altEn: "homepage interface" }],
   },
   {
     name: "typesmith",
@@ -28,6 +38,18 @@ export const PROJECTS: Project[] = [
     tagEn: "dev",
     descZh: "为初学者打造的交互式 LaTeX 学习平台。",
     descEn: "An interactive LaTeX learning platform built for beginners.",
+    images: [
+      {
+        src: "/project-typesmith-1.webp",
+        altZh: "Typesmith 首页：学习进度与学习模块",
+        altEn: "Typesmith home: progress and learning modules",
+      },
+      {
+        src: "/project-typesmith-2.webp",
+        altZh: "Typesmith 课程页：文档类与实时编译运行",
+        altEn: "Typesmith lesson page: document classes with live compile",
+      },
+    ],
   },
   {
     name: "spark",
@@ -55,6 +77,7 @@ export const PROJECTS: Project[] = [
     tagEn: "dev",
     descZh: "面向竞赛/项目团队的 AI 对话式能力测评平台 / NextStep 2026 武汉站小组项目",
     descEn: "An AI conversational assessment platform for competition and project teams · NextStep 2026 Wuhan.",
+    images: [{ src: "/project-foxity.webp", altZh: "Foxity 落地页", altEn: "Foxity landing page" }],
   },
   {
     name: "句刻",

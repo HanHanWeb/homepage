@@ -1,12 +1,11 @@
 "use client";
 
-import "@fancyapps/ui/dist/fancybox/fancybox.css";
-import { Fancybox } from "@fancyapps/ui";
-import { useEffect, useState } from "react";
-
 import { useLanguage } from "@/components/language-provider";
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
+import { ShotCarousel } from "@/components/shot-carousel";
+import { useFancybox } from "@/lib/use-fancybox";
+import { cn } from "@/lib/utils";
 import Text3DFlip from "@/registry/magicui/text-3d-flip";
 
 const BILIBILI_BVID = "BV1KWhJ67EYm";
@@ -26,76 +25,9 @@ function BilibiliVideo({ bvid, title }: { bvid: string; title: string }) {
   );
 }
 
-/** 作品集轮播 banner：自动左右滑动，悬停暂停，右下角指示器，悬停浮现集合名；点击打开灯箱 */
-function ShotCarousel({
-  images,
-  hint,
-  group,
-  className,
-  cropTop,
-}: {
-  images: readonly { src: string; alt: string }[];
-  hint: string;
-  group: string;
-  className?: string;
-  cropTop?: boolean;
-}) {
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-
-  useEffect(() => {
-    if (paused || images.length < 2) return;
-    const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % images.length);
-    }, 3500);
-    return () => clearInterval(timer);
-  }, [paused, images.length]);
-
-  return (
-    <div
-      className={`group relative overflow-hidden rounded-[10px] bg-muted ${className ?? ""}`}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
-      <div
-        className="flex transition-transform duration-500 ease-out"
-        style={{ transform: `translateX(-${index * 100}%)` }}
-      >
-        {images.map((img) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={img.src}
-            src={img.src}
-            alt={img.alt}
-            loading="lazy"
-            draggable={false}
-            className={`aspect-video w-full shrink-0 cursor-zoom-in object-cover ${cropTop ? "object-top" : ""}`}
-            data-fancybox={group}
-            data-caption={img.alt}
-          />
-        ))}
-      </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/55 to-transparent px-3 pt-8 pb-2.5 text-xs text-white">
-        {hint}
-      </div>
-      {images.length > 1 && (
-        <span className="pointer-events-none absolute right-2.5 bottom-2.5 rounded-full bg-black/55 px-2 py-0.5 text-[11px] text-white/90">
-          {index + 1} / {images.length}
-        </span>
-      )}
-    </div>
-  );
-}
-
 export function Focus() {
   const { t } = useLanguage();
-
-  useEffect(() => {
-    Fancybox.bind("[data-fancybox]");
-    return () => {
-      Fancybox.destroy();
-    };
-  }, []);
+  useFancybox();
 
   const serviceCard = (item: (typeof t.services.items)[number]) => (
     <div
@@ -120,7 +52,7 @@ export function Focus() {
           {item.title}
         </Text3DFlip>
         <div className="flex flex-wrap gap-2">
-          {item.options.map((opt, j) => (
+          {item.options.map((opt) => (
             <span
               key={`opt-${opt}`}
               className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1 text-xs font-medium"
@@ -140,7 +72,7 @@ export function Focus() {
               images={col.images}
               hint={col.hint}
               group={`focus-${colIdx}`}
-              className={"wide" in col && col.wide ? "sm:col-span-2" : undefined}
+              className={cn("rounded-[10px]", "wide" in col && col.wide && "sm:col-span-2")}
               cropTop={"crop" in col && col.crop === "top"}
             />
           ))}

@@ -6,10 +6,13 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/language-provider";
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
+import { ShotCarousel } from "@/components/shot-carousel";
 import { FEATURED_PROJECT, PROJECTS } from "@/lib/projects";
+import { useFancybox } from "@/lib/use-fancybox";
 
 export function Projects() {
   const { t, locale } = useLanguage();
+  useFancybox();
   const featured = FEATURED_PROJECT;
   const titles = (locale === "en" ? featured.quote.titleEn : featured.quote.titleZh)
     .split("·")
@@ -17,6 +20,14 @@ export function Projects() {
 
   const [titleIndex, setTitleIndex] = useState(0);
   const [rollInstant, setRollInstant] = useState(false);
+  // 语言切换后标题集改变：渲染期直接复位到第一行并临时关闭过渡（React 官方的“prop 变化时调整 state”写法）
+  const [rollLocale, setRollLocale] = useState(locale);
+  if (rollLocale !== locale) {
+    setRollLocale(locale);
+    setTitleIndex(0);
+    setRollInstant(true);
+  }
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTitleIndex((index) => index + 1);
@@ -24,13 +35,12 @@ export function Projects() {
     return () => clearInterval(timer);
   }, []);
 
-  // 语言切换后标题集改变，无动画复位到第一行
+  // 复位生效后，下一帧恢复过渡动画
   useEffect(() => {
-    setRollInstant(true);
-    setTitleIndex(0);
+    if (!rollInstant) return;
     const raf = requestAnimationFrame(() => setRollInstant(false));
     return () => cancelAnimationFrame(raf);
-  }, [locale]);
+  }, [rollInstant]);
   return (
     <section id="projects" className="scroll-mt-6 py-10">
       <Reveal delay="2.35s" direction="down">
@@ -111,8 +121,10 @@ export function Projects() {
         </article>
       </Reveal>
 
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      {/* 瀑布流：卡片高度不一（有无预览图），用多列布局自然错落 */}
+      <div className="mt-3 columns-1 gap-3 sm:columns-2">
         {PROJECTS.map((project, i) => {
+          const shots = project.images ?? [];
           const body = (
             <>
               <div className="flex items-center justify-between gap-2">
@@ -133,19 +145,40 @@ export function Projects() {
               </p>
             </>
           );
+          const content = (
+            <>
+              {shots.length > 0 && (
+                <ShotCarousel
+                  images={shots.map((img) => ({
+                    src: img.src,
+                    alt: locale === "en" ? img.altEn : img.altZh,
+                  }))}
+                  group={`project-${project.name}`}
+                  aspectClassName="aspect-[19/10]"
+                  className="border-b"
+                />
+              )}
+              <div className="flex flex-col p-5">{body}</div>
+            </>
+          );
           return (
-            <Reveal key={project.name} delay={`${0.15 + i * 0.08}s`} direction="down">
+            <Reveal
+              key={project.name}
+              delay={`${0.15 + i * 0.08}s`}
+              direction="down"
+              className="mb-3 break-inside-avoid"
+            >
               {project.url ? (
                 <a
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex h-full flex-col rounded-xl border bg-card p-5 transition-colors hover:bg-muted/50"
+                  className="group flex flex-col overflow-hidden rounded-xl border bg-card transition-colors hover:bg-muted/50"
                 >
-                  {body}
+                  {content}
                 </a>
               ) : (
-                <div className="flex h-full flex-col rounded-xl border bg-card p-5">{body}</div>
+                <div className="flex flex-col overflow-hidden rounded-xl border bg-card">{content}</div>
               )}
             </Reveal>
           );

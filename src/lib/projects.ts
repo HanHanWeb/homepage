@@ -59,6 +59,9 @@ export const PROJECTS: Project[] = [
     tagEn: "dev",
     descZh: "搜索框即入口的轻量便签速记工具",
     descEn: "A lightweight quick-note app where the search box is the entry point.",
+    images: [
+      { src: "/project-spark.webp", altZh: "Spark 界面：搜索框与便签列表", altEn: "Spark interface: search box and note list" },
+    ],
   },
   {
     name: "roadmap",
@@ -68,6 +71,13 @@ export const PROJECTS: Project[] = [
     tagEn: "archive",
     descZh: "一个轻量的公开项目路线图与功能投票平台。",
     descEn: "A lightweight platform for public project roadmaps and feature voting.",
+    images: [
+      {
+        src: "/project-roadmap.webp",
+        altZh: "roadmap 界面：功能投票与路线图看板",
+        altEn: "roadmap interface: feature voting and roadmap board",
+      },
+    ],
   },
   {
     name: "foxity",

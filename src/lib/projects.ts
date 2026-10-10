@@ -112,6 +112,13 @@ export const PROJECTS: Project[] = [
     tagEn: "archive",
     descZh: "界面生态附属项目，PPT OS 创意赛事 IPOA 的官方赛事平台。",
     descEn: "An Intereco sub-project — the official platform for IPOA, the creative PPT OS competition.",
+    images: [
+      {
+        src: "/project-ipoa.webp",
+        altZh: "IPOA 赛事系统首页：PPTOS 创意设计大赛",
+        altEn: "IPOA competition site: PPTOS creative design contest",
+      },
+    ],
   },
   {
     name: "财务公开平台",

@@ -33,7 +33,7 @@ export const PROJECTS: Project[] = [
   {
     name: "typesmith",
     nameEn: "typesmith",
-    url: "https://typesmith.hhan.me/",
+    url: "https://typesmith.pages.dev/",
     tagZh: "开发",
     tagEn: "dev",
     descZh: "为初学者打造的交互式 LaTeX 学习平台。",

@@ -90,6 +90,21 @@ export const PROJECTS: Project[] = [
     images: [{ src: "/project-foxity.webp", altZh: "Foxity 落地页", altEn: "Foxity landing page" }],
   },
   {
+    name: "fill-letter",
+    nameEn: "fill-letter",
+    tagZh: "开发",
+    tagEn: "dev",
+    descZh: "让每一张照片，有新的秩序。",
+    descEn: "Give every photo a new order.",
+    images: [
+      {
+        src: "/project-fill-letter.webp",
+        altZh: "fill-letter 界面：字母填充预览与创作面板",
+        altEn: "fill-letter interface: letter-fill preview and creation panel",
+      },
+    ],
+  },
+  {
     name: "句刻",
     nameEn: "Asentence",
     tagZh: "归档",

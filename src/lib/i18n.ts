@@ -54,7 +54,6 @@ export const dictionaries = {
               images: [
                 { src: "/paper-1.webp", alt: "澎湃报 第 7 版 · 一刻" },
                 { src: "/paper-2.webp", alt: "澎湃报 第 8 版 · 运动会" },
-                { src: "/paper-3.webp", alt: "澎湃报 第 2 版 · 时事新闻" },
                 { src: "/paper-4.webp", alt: "澎湃报 第 8 版 · 摄影" },
                 { src: "/paper-5.webp", alt: "澎湃报 暑期合订版目录" },
               ],
@@ -158,7 +157,6 @@ export const dictionaries = {
               images: [
                 { src: "/paper-1.webp", alt: "The Surging Newspaper, page 7" },
                 { src: "/paper-2.webp", alt: "The Surging Newspaper, page 8: Sports Day" },
-                { src: "/paper-3.webp", alt: "The Surging Newspaper, page 2: News" },
                 { src: "/paper-4.webp", alt: "The Surging Newspaper, page 8: Photography" },
                 { src: "/paper-5.webp", alt: "The Surging Newspaper, summer edition contents" },
               ],

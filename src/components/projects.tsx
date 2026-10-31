@@ -48,7 +48,7 @@ export function Projects() {
       </Reveal>
 
       <Reveal delay="2.45s" direction="down">
-        <article className="mt-4 rounded-xl border bg-card p-5">
+        <article className="cursor-spotlight mt-4 rounded-xl border bg-card p-5">
           <div className="sm:flex sm:gap-8">
             <header className="flex flex-col sm:flex-1">
               <div className="flex min-w-0 items-center gap-2">
@@ -173,12 +173,12 @@ export function Projects() {
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-col overflow-hidden rounded-xl border bg-card transition-colors hover:bg-muted/50"
+                  className="cursor-spotlight group flex flex-col overflow-hidden rounded-xl border bg-card transition-colors hover:bg-muted/50"
                 >
                   {content}
                 </a>
               ) : (
-                <div className="flex flex-col overflow-hidden rounded-xl border bg-card">{content}</div>
+                <div className="cursor-spotlight flex flex-col overflow-hidden rounded-xl border bg-card">{content}</div>
               )}
             </Reveal>
           );

@@ -3,9 +3,8 @@
 import { useLanguage } from "@/components/language-provider";
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
-import { ShotCarousel } from "@/components/shot-carousel";
+import { ThreeDMarquee } from "@/components/three-d-marquee";
 import { useFancybox } from "@/lib/use-fancybox";
-import { cn } from "@/lib/utils";
 import Text3DFlip from "@/registry/magicui/text-3d-flip";
 
 const BILIBILI_BVID = "BV1KWhJ67EYm";
@@ -26,12 +25,12 @@ function BilibiliVideo({ bvid, title }: { bvid: string; title: string }) {
 }
 
 export function Focus() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   useFancybox();
 
   const serviceCard = (item: (typeof t.services.items)[number]) => (
     <div
-      className="relative overflow-hidden rounded-xl border p-5 sm:p-6"
+      className="cursor-spotlight relative overflow-hidden rounded-xl border p-5 sm:p-6"
       style={{
         backgroundImage:
           "repeating-linear-gradient(45deg, var(--border) 0 1px, transparent 1px 10px)",
@@ -65,18 +64,16 @@ export function Focus() {
       </div>
       {"video" in item && <BilibiliVideo bvid={BILIBILI_BVID} title={item.title} />}
       {"collections" in item && (
-        <div className="relative mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {item.collections.map((col, colIdx) => (
-            <ShotCarousel
-              key={col.hint}
-              images={col.images}
-              hint={col.hint}
-              group={`focus-${colIdx}`}
-              className={cn("rounded-[10px]", "wide" in col && col.wide && "sm:col-span-2")}
-              cropTop={"crop" in col && col.crop === "top"}
-            />
-          ))}
-        </div>
+        <ThreeDMarquee
+          images={item.collections.flatMap((collection) => collection.images.map((image) => ({
+            ...image,
+            category: collection.hint,
+            cropTop: "crop" in collection && collection.crop === "top",
+          })))}
+          label={locale === "en" ? "Design portfolio" : "设计作品展示"}
+          pauseLabel={locale === "en" ? "Pause gallery" : "暂停图片滚动"}
+          playLabel={locale === "en" ? "Play gallery" : "继续图片滚动"}
+        />
       )}
       {"note" in item && (
         <p className="relative mt-3 text-xs leading-5 text-muted-foreground">

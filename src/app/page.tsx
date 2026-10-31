@@ -3,6 +3,7 @@ import { BackToTop } from "@/components/back-to-top";
 import { BlogPreview } from "@/components/blog-preview";
 import { CommandPalette } from "@/components/command-palette";
 import { Contact } from "@/components/contact";
+import { CursorSpotlight } from "@/components/cursor-spotlight";
 import { Contributions } from "@/components/contributions";
 import { FlickeringGridTop } from "@/components/flickering-grid-top";
 import { Focus } from "@/components/focus";
@@ -38,7 +39,7 @@ export default async function Home() {
           <LanguageToggle />
         </div>
       </div>
-      <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pb-16">
+      <CursorSpotlight className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pb-16">
         <Hero />
         <About />
         <Focus />
@@ -47,7 +48,7 @@ export default async function Home() {
         <Contributions />
         <Contact />
         <Friends />
-      </main>
+      </CursorSpotlight>
       <BottomGlow />
       <CommandPalette />
     </>

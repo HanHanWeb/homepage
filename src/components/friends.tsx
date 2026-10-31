@@ -50,14 +50,14 @@ export function Friends() {
                   href={friend.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
+                  className="cursor-spotlight group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
                 >
                   {card}
                 </a>
               ) : (
                 <div
                   key={friend.name}
-                  className="flex items-center gap-3 rounded-xl border p-4"
+                  className="cursor-spotlight flex items-center gap-3 rounded-xl border p-4"
                 >
                   {card}
                 </div>
@@ -65,7 +65,7 @@ export function Friends() {
             })}
             <a
               href={SOCIALS.find((s) => s.href.startsWith("mailto:"))?.href}
-              className="group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
+              className="cursor-spotlight group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
             >
               <span className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card">
                 <Mail className="size-4" />
@@ -88,7 +88,7 @@ export function Friends() {
             </div>
             <a
               href={SOCIALS.find((s) => s.href.startsWith("mailto:"))?.href}
-              className="group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
+              className="cursor-spotlight group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
             >
               <span className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card">
                 <Mail className="size-4" />

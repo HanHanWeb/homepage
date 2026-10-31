@@ -320,6 +320,104 @@ html::-webkit-scrollbar {
   }
 }
 
+/* A tilted gallery plane with alternating, seamless vertical tracks. */
+.marquee-viewport {
+  position: relative;
+  height: clamp(320px, 65vw, 440px);
+  overflow: hidden;
+  perspective: 1000px;
+  isolation: isolate;
+}
+
+.marquee-viewport::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--card), transparent 18%, transparent 82%, var(--card));
+}
+
+.marquee-plane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  width: max(135%, 680px);
+  height: 900px;
+  transform: translate(-50%, -50%) rotateX(50deg) rotateY(0deg) rotateZ(-35deg);
+}
+
+.marquee-column { min-width: 0; }
+.marquee-column:nth-child(2) { margin-top: -100px; }
+.marquee-track { animation: gallery-marquee var(--marquee-duration) linear infinite; }
+.marquee-column:nth-child(2) .marquee-track { animation-direction: reverse; }
+.marquee-copy { display: grid; gap: 16px; padding-bottom: 16px; }
+.marquee-image { aspect-ratio: 4 / 3; cursor: zoom-in; }
+
+/* Hover and restored image focus must not stop continuous playback. */
+.marquee-gallery[data-paused="true"] .marquee-track { animation-play-state: paused; }
+
+@keyframes gallery-marquee {
+  from { transform: translateY(calc(-100% / 3)); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-viewport { height: auto; overflow: visible; perspective: none; }
+  .marquee-viewport::after, .marquee-control, .marquee-copy[aria-hidden="true"] { display: none; }
+  .marquee-plane { position: static; width: auto; height: auto; transform: none; gap: 10px; padding: 10px; }
+  .marquee-column:nth-child(2) { margin-top: 0; }
+  .marquee-track { animation: none; }
+  .marquee-copy { gap: 10px; padding: 0; }
+}
+
+/* Local cursor light: dark desktop only, with no hit-testing or layout changes. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .dark .cursor-spotlight {
+    --spotlight-surface: oklch(from var(--ring) l c h / 9%);
+    --spotlight-edge: oklch(from var(--ring) l c h / 55%);
+    position: relative;
+    isolation: isolate;
+  }
+
+  .dark .cursor-spotlight::before,
+  .dark .cursor-spotlight::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 280ms ease-out;
+  }
+
+  .dark .cursor-spotlight::before {
+    background: radial-gradient(
+      320px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+      var(--spotlight-surface), transparent 75%
+    );
+  }
+
+  .dark .cursor-spotlight::after {
+    /* Keep the edge light inside the existing border radius. */
+    padding: 1px;
+    background: radial-gradient(
+      200px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+      var(--spotlight-edge), transparent 75%
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+  }
+
+  .dark .cursor-spotlight[data-spotlight-active]::before,
+  .dark .cursor-spotlight[data-spotlight-active]::after {
+    opacity: 1;
+  }
+}
+
 /* ===== 路由切换过渡（View Transitions API）===== */
 /* 过渡中露出的边缘用主题背景兜底，避免闪出黑/白边 */
 ::view-transition-group(root) {

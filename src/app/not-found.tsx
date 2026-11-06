@@ -10,7 +10,7 @@ const OOPS = "Oops!";
 
 export default function NotFound() {
   return (
-    <main className="relative z-10 mx-auto flex min-h-full w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-20 text-center">
+    <main className="site-container relative z-10 flex min-h-full flex-1 flex-col items-center justify-center py-20 text-center">
       {/* Oops! 大字：Hero 标题同款逐字符浮现（见 globals.css 的 .hero-char） */}
       <h1
         aria-label={OOPS}

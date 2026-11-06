@@ -149,7 +149,6 @@ export function PostView({ post }: { post: Post }) {
   return (
     <>
       <BlogNav
-        title={post.title}
         menu={
           <button
             type="button"

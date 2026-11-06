@@ -20,15 +20,15 @@ export function Hero() {
   ];
 
   return (
-    <section id="intro" className="flex min-h-dvh flex-col justify-center">
-      <div className="flex flex-col items-center gap-10 sm:grid sm:grid-cols-2 sm:items-center">
-        <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
+    <section id="intro" className="flex min-h-dvh flex-col justify-center py-20 sm:py-24">
+      <div className="flex min-w-0 flex-col items-center gap-10 md:grid md:grid-cols-2 md:items-center lg:gap-16">
+        <div className="flex min-w-0 flex-col items-center text-center md:items-start md:text-left">
           <InstallBadge className="w-fit animate-blur-in" />
 
           {/* 逐字符浮现：纯 CSS 合成器驱动，见 globals.css 的 .hero-char */}
           <h1
             aria-label={t.hero.title}
-            className="font-serif-sc mt-4 text-4xl tracking-tight sm:text-5xl"
+            className="font-serif-sc mt-7 text-4xl tracking-tight sm:mt-8 sm:text-5xl"
           >
             <span className="sr-only">{t.hero.title}</span>
             {t.hero.title.split("").map((ch, i) => (
@@ -55,7 +55,7 @@ export function Hero() {
           </p>
 
           <div
-            className="mt-6 flex flex-wrap items-center justify-center gap-3 animate-blur-in sm:justify-start"
+            className="mt-6 flex flex-wrap items-center justify-center gap-3 animate-blur-in md:justify-start"
             style={{ "--blur-delay": "0.85s" } as React.CSSProperties}
           >
             <ShimmerButton
@@ -69,7 +69,7 @@ export function Hero() {
         </div>
 
         <div
-          className="w-full animate-blur-in"
+          className="w-full min-w-0 animate-blur-in"
           style={{ "--blur-delay": "1.1s" } as React.CSSProperties}
         >
           <TiltCard>

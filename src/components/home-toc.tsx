@@ -10,11 +10,8 @@ export function HomeToc() {
   const items = [
     { id: "about", label: t.about.title },
     { id: "focus", label: t.services.title },
-    { id: "blog", label: t.blog.title },
-    { id: "projects", label: t.projects.title },
     { id: "contributions", label: t.contributions.title },
     { id: "contact", label: t.contact.title },
-    { id: "friends", label: t.friends.title },
   ];
   const [active, setActive] = useState(items[0].id);
 

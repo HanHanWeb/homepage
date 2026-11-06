@@ -74,11 +74,11 @@ export function Contributions() {
       </Reveal>
 
       <Reveal delay="3.05s" direction="down">
-        <div className="relative mt-4 overflow-hidden rounded-xl border bg-card p-4">
+        <div className="relative mt-4 w-full overflow-hidden rounded-xl border bg-card p-4">
           {/* 日历层：就绪前透明（min-h 防塌陷），数据到达后淡入 */}
           <div
             className={cn(
-              "min-h-[112px] transition-opacity duration-500",
+              "flex min-h-[112px] min-w-0 justify-center transition-opacity duration-500",
               ready ? "opacity-100" : "opacity-0",
             )}
             aria-hidden={!ready}

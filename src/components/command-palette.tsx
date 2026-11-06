@@ -1,10 +1,7 @@
 "use client";
 
 import {
-  BookOpen,
-  Copy,
   FolderGit2,
-  Check,
   Languages,
   Link2,
   Mail,
@@ -16,6 +13,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 
 import {
   Command,
@@ -28,15 +26,12 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useLanguage } from "@/components/language-provider";
-import { navigateWithTransition } from "@/components/route-transition";
-
-const EMAIL = "im@hhan.me";
 
 export function CommandPalette() {
+  const router = useRouter();
   const { t, toggle: toggleLocale } = useLanguage();
   const { resolvedTheme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -45,32 +40,28 @@ export function CommandPalette() {
         setOpen((value) => !value);
       }
     };
+    const show = () => setOpen(true);
+    document.addEventListener("open-command-palette", show);
     document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
+    return () => {
+      document.removeEventListener("open-command-palette", show);
+      document.removeEventListener("keydown", down);
+    };
   }, []);
 
   const jumpTo = (id: string) => {
     setOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  // 等面板退出动画播完再截图，避免过渡快照里残留半关闭的面板
-  const openBlog = () => {
-    setOpen(false);
-    setTimeout(() => navigateWithTransition("/blog"), 200);
-  };
-
-  const copyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(EMAIL);
-      setCopied(true);
-      setTimeout(() => {
-        setCopied(false);
-        setOpen(false);
-      }, 1200);
-    } catch {
-      setOpen(false);
+    const target = document.getElementById(id);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      router.push(`/#${id}`);
     }
+  };
+
+  const openPage = (href: string) => {
+    setOpen(false);
+    router.push(href);
   };
 
   const toggleTheme = () => {
@@ -81,11 +72,12 @@ export function CommandPalette() {
   const navItems = [
     { id: "about", icon: User, label: t.about.title },
     { id: "focus", icon: Target, label: t.services.title },
-    { id: "projects", icon: FolderGit2, label: t.projects.title },
+    { id: "projects", icon: FolderGit2, label: t.projects.title, href: "/projects" },
     { id: "contributions", icon: Trophy, label: t.contributions.title },
     { id: "contact", icon: Mail, label: t.contact.title },
-    { id: "friends", icon: Link2, label: t.friends.title },
-    { id: "blog", icon: BookOpen, label: t.blog.title, href: "/blog" },
+    { id: "friends", icon: Link2, label: t.friends.title, href: "/friends" },
+    // 博客暂时停用，恢复时同时启用对应路由和导航入口。
+    // { id: "blog", icon: BookOpen, label: t.blog.title, href: "/blog" },
   ];
 
   return (
@@ -104,7 +96,7 @@ export function CommandPalette() {
             <CommandItem
               key={item.id}
               value={item.label}
-              onSelect={() => ("href" in item && item.href ? openBlog() : jumpTo(item.id))}
+              onSelect={() => ("href" in item && item.href ? openPage(item.href) : jumpTo(item.id))}
             >
               <item.icon />
               {item.label}
@@ -113,10 +105,6 @@ export function CommandPalette() {
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading={t.cmdk.actions}>
-          <CommandItem value={t.cmdk.copyEmail} onSelect={copyEmail}>
-            {copied ? <Check className="text-[#00bc7d]" /> : <Copy />}
-            {copied ? t.cmdk.emailCopied : `${t.cmdk.copyEmail} · ${EMAIL}`}
-          </CommandItem>
           <CommandItem value={t.cmdk.toggleTheme} onSelect={toggleTheme}>
             <Moon />
             {t.cmdk.toggleTheme}

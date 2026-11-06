@@ -1,189 +1,143 @@
 "use client";
 
-import { ArrowUpRight, Quote } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, Quote } from "lucide-react";
+import { useRef, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
-import { Reveal } from "@/components/reveal";
+import { GithubIcon } from "@/components/icons";
+import { ImageSlide } from "@/components/image-slide";
 import { SectionHeading } from "@/components/section-heading";
-import { ShotCarousel } from "@/components/shot-carousel";
-import { FEATURED_PROJECT, PROJECTS } from "@/lib/projects";
-import { useFancybox } from "@/lib/use-fancybox";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { FEATURED_PROJECT, PROJECTS, type Project } from "@/lib/projects";
+
+function ProjectLinks({ project, en }: { project: Project; en: boolean }) {
+  const isGitHub = project.url?.startsWith("https://github.com/");
+  const githubUrl = project.githubUrl ?? (isGitHub ? project.url : undefined);
+  const websiteUrl = isGitHub ? undefined : project.url;
+  return (
+    <div className="flex shrink-0 items-center gap-2">
+      {githubUrl && (
+        <a href={githubUrl} target="_blank" rel="noopener noreferrer" aria-label={`${project.nameEn} · GitHub`} title="GitHub" className="inline-flex size-8 items-center justify-center rounded-full bg-muted transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+          <GithubIcon className="size-4" />
+        </a>
+      )}
+      {websiteUrl && (
+        <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-8 items-center gap-1.5 rounded-full bg-muted px-3 text-xs transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{en ? "Visit" : "访问"}<ArrowUpRight aria-hidden className="size-3.5" /></a>
+      )}
+      {!githubUrl && !websiteUrl && <span className="text-xs text-muted-foreground">{en ? "Archived" : "已归档"}</span>}
+    </div>
+  );
+}
 
 export function Projects() {
   const { t, locale } = useLanguage();
-  useFancybox();
+  const en = locale === "en";
+  const [filter, setFilter] = useState("active");
+  const [selected, setSelected] = useState<Project | null>(null);
+  const [shotIndex, setShotIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState(1);
+  const trigger = useRef<HTMLButtonElement | null>(null);
   const featured = FEATURED_PROJECT;
-  const titles = (locale === "en" ? featured.quote.titleEn : featured.quote.titleZh)
-    .split("·")
-    .map((title) => title.trim());
+  const activeCount = PROJECTS.filter((project) => project.tagZh !== "归档").length;
+  const archiveCount = PROJECTS.length - activeCount;
+  const visible = PROJECTS.filter((project) => (project.tagZh === "归档") === (filter === "archive"));
+  const selectedShot = selected?.images?.[shotIndex];
 
-  const [titleIndex, setTitleIndex] = useState(0);
-  const [rollInstant, setRollInstant] = useState(false);
-  // 语言切换后标题集改变：渲染期直接复位到第一行并临时关闭过渡（React 官方的“prop 变化时调整 state”写法）
-  const [rollLocale, setRollLocale] = useState(locale);
-  if (rollLocale !== locale) {
-    setRollLocale(locale);
-    setTitleIndex(0);
-    setRollInstant(true);
-  }
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTitleIndex((index) => index + 1);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // 复位生效后，下一帧恢复过渡动画
-  useEffect(() => {
-    if (!rollInstant) return;
-    const raf = requestAnimationFrame(() => setRollInstant(false));
-    return () => cancelAnimationFrame(raf);
-  }, [rollInstant]);
   return (
-    <section id="projects" className="scroll-mt-6 py-10">
-      <Reveal delay="2.35s" direction="down">
-        <SectionHeading title={t.projects.title} tag="#PROJECTS" />
-      </Reveal>
+    <section id="projects" className="min-w-0 pb-8">
+      <SectionHeading title={t.projects.title} tag="#PROJECTS" level={1} />
+      <div className="mt-7 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
+        <p className="max-w-xl text-2xl leading-relaxed tracking-tight sm:text-3xl">
+          {en ? "Ideas, brought to life." : "把想法，做成可以使用的东西。"}
+          <span className="block text-muted-foreground">{en ? "A collection of things I build and care about." : "一些独立开发，一些共同创造。"}</span>
+        </p>
+        <span className="shrink-0 font-mono text-xs text-muted-foreground">{String(PROJECTS.length + 1).padStart(2, "0")} {en ? "PROJECTS" : "个项目"}</span>
+      </div>
 
-      <Reveal delay="2.45s" direction="down">
-        <article className="cursor-spotlight mt-4 rounded-xl border bg-card p-5">
-          <div className="sm:flex sm:gap-8">
-            <header className="flex flex-col sm:flex-1">
-              <div className="flex min-w-0 items-center gap-2">
-                <h3 className="font-mono text-base font-semibold tracking-tight">
-                  {locale === "en" ? featured.nameEn : featured.name}
-                </h3>
-                <span className="rounded-full border px-2.5 py-0.5 text-xs text-[#00bc7d]">
-                  {locale === "en" ? featured.roleEn : featured.roleZh}
-                </span>
-              </div>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {locale === "en" ? featured.descEn : featured.descZh}
-              </p>
-              <div className="mt-4 flex flex-wrap items-center gap-1.5 sm:mt-auto">
-                <span className="mr-1 text-xs text-muted-foreground">{t.projects.affiliated}</span>
-                {featured.subProjects.map((sub) => (
-                  <span
-                    key={sub.name}
-                    className="rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground"
-                  >
-                    {locale === "en" ? sub.nameEn : sub.name}
-                  </span>
+      <article className="cursor-spotlight mt-10 overflow-hidden rounded-xl border border-border/60 bg-muted/40">
+        <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
+          <div className="flex min-w-0 flex-col items-start">
+            <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">{en ? featured.nameEn : featured.name}</h2>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {[en ? featured.roleEn : featured.roleZh, ...(en ? ["Planning", "Design", "Promotion", "Development"] : ["策划", "设计", "宣传", "开发"])].map((role) => (
+                <Badge key={role} variant="outline" className="h-6 px-3">{role}</Badge>
+              ))}
+            </div>
+            <p className="mt-5 text-sm leading-7 text-muted-foreground">{en ? featured.descEn : featured.descZh}</p>
+            <div className="mt-auto w-full pt-8">
+              <p className="mb-4 text-xs text-muted-foreground">{t.projects.affiliated}</p>
+              <ul className="grid grid-cols-1 gap-x-5 gap-y-3 border-t border-border/70 pt-5 min-[400px]:grid-cols-2">
+                {featured.subProjects.map((project) => (
+                  <li key={project.name} className="flex min-w-0 items-center gap-2.5 text-sm leading-5">
+                    <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
+                    {en ? project.nameEn : project.name}
+                  </li>
                 ))}
-              </div>
-            </header>
-            <figure className="relative mt-5 overflow-hidden rounded-lg border border-[#00bc7d]/25 bg-linear-to-br from-[#00bc7d]/10 to-[#00bc7d]/[0.02] p-4 sm:mt-0 sm:w-[calc(50%-6px)] sm:shrink-0">
-              <Quote
-                className="absolute -top-2 right-2 size-10 text-[#00bc7d]/20"
-                strokeWidth={1.5}
-                aria-hidden
-              />
-              <blockquote className="relative pr-10 text-sm leading-6">
-                {locale === "en" ? featured.quote.textEn : featured.quote.textZh}
-              </blockquote>
-              <figcaption className="relative mt-3.5 flex items-center gap-2.5">
-                <img
-                  src={featured.quote.avatar}
-                  alt={featured.quote.author}
-                  loading="lazy"
-                  className="size-8 shrink-0 rounded-full border object-cover"
-                />
-                <p className="min-w-0 text-xs text-muted-foreground">
-                  <span className="block text-sm font-medium leading-5 text-foreground">
-                    {locale === "en" ? featured.quote.authorEn : featured.quote.author}
-                  </span>
-                  <span className="mt-0.5 block h-5 overflow-hidden leading-5">
-                    <span
-                      onTransitionEnd={(e) => {
-                        if (e.target !== e.currentTarget || e.propertyName !== "transform") return;
-                        if (titleIndex >= titles.length) {
-                          setRollInstant(true);
-                          setTitleIndex(titleIndex % titles.length);
-                          requestAnimationFrame(() => setRollInstant(false));
-                        }
-                      }}
-                      className={`block ${rollInstant ? "" : "transition-transform duration-500 ease-out"}`}
-                      style={{ transform: `translateY(calc(-${titleIndex} * 1.25rem))` }}
-                    >
-                      {[...titles, titles[0]].map((title, i) => (
-                        <span key={i} className="block h-5 truncate leading-5">
-                          {title}
-                        </span>
-                      ))}
-                    </span>
-                  </span>
-                </p>
-              </figcaption>
-            </figure>
+              </ul>
+            </div>
           </div>
-        </article>
-      </Reveal>
+          <figure className="flex min-w-0 flex-col justify-between rounded-lg border border-border/60 bg-card p-5 sm:p-6">
+            <Quote aria-hidden className="size-6 text-muted-foreground/40" />
+            <blockquote className="mt-4 text-base leading-8 tracking-tight">{en ? featured.quote.textEn : featured.quote.textZh}</blockquote>
+            <figcaption className="mt-6 flex items-start gap-3 border-t border-border/60 pt-5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={featured.quote.avatar} alt="" loading="lazy" className="size-9 shrink-0 rounded-full border object-cover" />
+              <div className="min-w-0"><p className="text-sm font-medium">{en ? featured.quote.authorEn : featured.quote.author}</p><div className="mt-1 h-5 overflow-hidden text-xs leading-5 text-muted-foreground" title={en ? featured.quote.titleEn : featured.quote.titleZh}><span className="sr-only">{en ? featured.quote.titleEn : featured.quote.titleZh}</span><div aria-hidden className="project-title-cycle">{[...(en ? featured.quote.titleEn : featured.quote.titleZh).split("·"), (en ? featured.quote.titleEn : featured.quote.titleZh).split("·")[0]].map((title, index) => <span key={index} className="block h-5 truncate">{title.trim()}</span>)}</div></div></div>
+            </figcaption>
+          </figure>
+        </div>
+      </article>
 
-      {/* 瀑布流：卡片高度不一（有无预览图），用多列布局自然错落 */}
-      <div className="mt-3 columns-1 gap-3 sm:columns-2">
-        {PROJECTS.map((project, i) => {
-          const shots = project.images ?? [];
-          const body = (
-            <>
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-2">
-                  <h3 className="font-mono text-sm font-semibold tracking-tight">
-                    {locale === "en" ? project.nameEn : project.name}
-                  </h3>
-                  <span className="rounded-full border px-2.5 py-0.5 text-xs text-[#00bc7d]">
-                    {locale === "en" ? project.tagEn : project.tagZh}
-                  </span>
-                </div>
-                {project.url && (
-                  <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                )}
-              </div>
-              <p className="mt-2 flex-1 text-sm leading-6 text-muted-foreground">
-                {locale === "en" ? project.descEn : project.descZh}
-              </p>
-            </>
-          );
-          const content = (
-            <>
-              {shots.length > 0 && (
-                <ShotCarousel
-                  images={shots.map((img) => ({
-                    src: img.src,
-                    alt: locale === "en" ? img.altEn : img.altZh,
-                  }))}
-                  group={`project-${project.name}`}
-                  aspectClassName="aspect-[19/10]"
-                  className="border-b"
-                />
-              )}
-              <div className="flex flex-col p-5">{body}</div>
-            </>
-          );
+      <div className="mt-12 flex flex-wrap items-center justify-between gap-4">
+        <ToggleGroup type="single" variant="outline" value={filter} onValueChange={(value) => { if (value) setFilter(value); }} aria-label={en ? "Project collection" : "项目分类"}>
+          <ToggleGroupItem value="active" className="gap-2 px-4">{en ? "Development" : "开发"}<span className="text-xs text-muted-foreground">{activeCount}</span></ToggleGroupItem>
+          <ToggleGroupItem value="archive" className="gap-2 px-4">{en ? "Archive" : "归档"}<span className="text-xs text-muted-foreground">{archiveCount}</span></ToggleGroupItem>
+        </ToggleGroup>
+
+      </div>
+
+      <div className="mt-5 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {visible.map((project) => {
+          const cover = project.images?.[0];
           return (
-            <Reveal
-              key={project.name}
-              delay={`${0.15 + i * 0.08}s`}
-              direction="down"
-              className="mb-3 break-inside-avoid"
-            >
-              {project.url ? (
-                <a
-                  href={project.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="cursor-spotlight group flex flex-col overflow-hidden rounded-xl border bg-card transition-colors hover:bg-muted/50"
-                >
-                  {content}
-                </a>
-              ) : (
-                <div className="cursor-spotlight flex flex-col overflow-hidden rounded-xl border bg-card">{content}</div>
-              )}
-            </Reveal>
+            <article key={project.name} className="cursor-spotlight group flex min-w-0 flex-col rounded-xl border border-border/70 bg-card p-3 shadow-xs transition-shadow hover:shadow-md">
+              <button type="button" aria-label={en ? `View ${project.nameEn}` : `查看项目：${project.name}`} aria-haspopup="dialog" className="flex min-w-0 flex-1 cursor-pointer flex-col text-left focus-visible:rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring" onClick={(event) => { trigger.current = event.currentTarget; setShotIndex(0); setSelected(project); }}>
+                <div className="relative w-full overflow-hidden rounded-lg border border-border/40 bg-muted/40 aspect-[4/3]">
+                  {cover ? <div className="absolute inset-4 flex items-center justify-center sm:inset-5">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={cover.src} alt={en ? cover.altEn : cover.altZh} loading="lazy" className="block h-auto max-h-full w-auto max-w-full rounded-md shadow-md" />
+                  </div> : <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center"><Code2 aria-hidden className="size-7 text-muted-foreground/40" /><span className="font-mono text-xl tracking-tight text-foreground/75">{en ? project.nameEn : project.name}</span></div>}
+                </div>
+                <div className="mt-4 flex w-full items-start justify-between gap-3 px-1">
+                  <h2 className="min-w-0 text-base font-medium tracking-tight">{en ? project.nameEn : project.name}</h2>
+                  <Badge variant="outline" className="shrink-0">{project.tagZh === "归档" ? (en ? "Archive" : "归档") : (en ? project.tagEn : project.tagZh)}</Badge>
+                </div>
+                <p className="mt-2 px-1 text-sm leading-6 text-muted-foreground">{en ? project.descEn : project.descZh}</p>
+              </button>
+              <div className="mt-5 flex min-h-8 items-center justify-between gap-2 border-t border-border/50 px-1 pt-3">
+                <span className="text-xs text-muted-foreground">{project.images?.length ? `${project.images.length} ${en ? "screenshots" : "张预览"}` : (en ? "Project notes" : "项目记录")}</span>
+                <ProjectLinks project={project} en={en} />
+              </div>
+            </article>
           );
         })}
       </div>
+
+      <Dialog open={Boolean(selected)} onOpenChange={(open) => { if (!open) setSelected(null); }}>
+        <DialogContent className="flex max-h-[90dvh] min-w-0 flex-col overflow-hidden sm:max-w-4xl" onCloseAutoFocus={(event) => { event.preventDefault(); trigger.current?.focus(); }}>
+          <DialogHeader className="shrink-0 pr-8"><DialogTitle>{en ? selected?.nameEn : selected?.name}</DialogTitle><DialogDescription>{en ? selected?.descEn : selected?.descZh}</DialogDescription></DialogHeader>
+          {selectedShot && <div className="flex min-h-0 flex-1 items-center justify-center rounded-lg border bg-muted/40 p-4">
+            <ImageSlide src={selectedShot.src} alt={en ? selectedShot.altEn : selectedShot.altZh} direction={slideDirection} sources={selected?.images?.map((image) => image.src)} />
+          </div>}
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
+            {selected && <ProjectLinks project={selected} en={en} />}
+            {selected?.images && selected.images.length > 1 && <div className="flex items-center gap-2"><Button variant="outline" size="icon" aria-label={en ? "Previous image" : "上一张"} onClick={() => { setSlideDirection(-1); setShotIndex((index) => (index - 1 + selected.images!.length) % selected.images!.length); }}><ChevronLeft aria-hidden /></Button><span className="min-w-10 text-center text-xs text-muted-foreground">{shotIndex + 1} / {selected.images.length}</span><Button variant="outline" size="icon" aria-label={en ? "Next image" : "下一张"} onClick={() => { setSlideDirection(1); setShotIndex((index) => (index + 1) % selected.images!.length); }}><ChevronRight aria-hidden /></Button></div>}
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

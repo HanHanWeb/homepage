@@ -6,17 +6,20 @@ export function SectionHeading({
   title,
   tag,
   href,
+  level = 2,
 }: {
   title: string;
   tag: string;
   href?: string;
+  level?: 1 | 2;
 }) {
+  const Heading = level === 1 ? "h1" : "h2";
   return (
     <div className="flex items-baseline justify-between gap-4">
-      <h2 className="font-serif-sc relative inline-block text-3xl tracking-tight sm:text-4xl">
+      <Heading className="font-serif-sc relative inline-block text-3xl tracking-tight sm:text-4xl">
         {title}
         <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-[#00bc7d]" aria-hidden />
-      </h2>
+      </Heading>
       {href ? (
         <Link
           href={href}

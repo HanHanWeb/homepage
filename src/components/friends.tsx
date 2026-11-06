@@ -13,7 +13,7 @@ export function Friends() {
   return (
     <section id="friends" className="scroll-mt-6 py-10">
       <Reveal delay="3.5s" direction="down">
-        <SectionHeading title={t.friends.title} tag="#FRIENDS" />
+        <SectionHeading title={t.friends.title} tag="#FRIENDS" level={1} />
       </Reveal>
 
       <Reveal delay="3.65s" direction="down">

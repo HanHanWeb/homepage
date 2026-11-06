@@ -17,14 +17,14 @@ export function Contact() {
       </Reveal>
 
       <Reveal delay="3.35s" direction="down">
-        <div className="mt-4 divide-y overflow-hidden rounded-xl border">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {SOCIALS.map((social) => (
             <a
               key={social.name}
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/50"
+              className="group flex min-w-0 items-center gap-3 rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
             >
               <span className="flex size-8 shrink-0 items-center justify-center rounded-full border bg-card">
                 {social.icon ? (

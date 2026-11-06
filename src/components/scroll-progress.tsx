@@ -2,39 +2,15 @@
 
 import { motion, useScroll, useSpring } from "motion/react";
 
+/** Progress ring shares the back-to-top button's bounds. */
 export function ScrollProgress() {
   const { scrollYProgress } = useScroll();
-  const smooth = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 30,
-    mass: 0.5,
-  });
+  const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.5 });
 
   return (
-    <div
-      aria-hidden
-      className="fixed top-5 right-6 z-50 flex size-11 items-center justify-center rounded-full border bg-card/80 shadow-sm backdrop-blur"
-    >
-      <svg viewBox="0 0 36 36" className="absolute size-8 -rotate-90">
-        <circle
-          cx="18"
-          cy="18"
-          r="16"
-          fill="none"
-          strokeWidth="3"
-          className="stroke-border"
-        />
-        <motion.circle
-          cx="18"
-          cy="18"
-          r="16"
-          fill="none"
-          strokeWidth="3"
-          strokeLinecap="round"
-          className="stroke-foreground"
-          style={{ pathLength: smooth }}
-        />
-      </svg>
-    </div>
+    <svg aria-hidden viewBox="0 0 48 48" className="pointer-events-none absolute inset-0 size-full -rotate-90">
+      <circle cx="24" cy="24" r="21" fill="none" strokeWidth="1.5" className="stroke-border" />
+      <motion.circle cx="24" cy="24" r="21" fill="none" strokeWidth="1.5" strokeLinecap="round" className="stroke-foreground" style={{ pathLength: smooth }} />
+    </svg>
   );
 }

@@ -12,6 +12,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Shared page width: 1024px of content with fluid mobile gutters. */
+@utility site-container {
+  width: 100%;
+  min-width: 0;
+  max-width: calc(var(--site-content-width) + var(--site-gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--site-gutter);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -49,6 +58,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --radius-2xs: calc(var(--radius) * 0.2);
+  --radius-xs: calc(var(--radius) * 0.4);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -61,6 +72,9 @@
 }
 
 :root {
+  --site-content-width: 64rem;
+  --thinking-color: #a75c3c;
+  --site-gutter: clamp(1rem, 3vw, 1.5rem);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -84,6 +98,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  /* Containers use the normal radius scale; pill controls opt into rounded-full. */
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -98,6 +113,7 @@
 }
 
 .dark {
+  --thinking-color: #d99a78;
   --background: oklch(0.182 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -150,6 +166,10 @@
 }
 
 /* 隐藏页面滚动条：滚动功能保留，仅不显示 */
+.home-content > section[id] {
+  scroll-margin-top: 5rem;
+}
+
 html {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* 旧版 Edge/IE */
@@ -418,64 +438,58 @@ html::-webkit-scrollbar {
   }
 }
 
-/* ===== 路由切换过渡（View Transitions API）===== */
-/* 过渡中露出的边缘用主题背景兜底，避免闪出黑/白边 */
-::view-transition-group(root) {
-  background: var(--background);
+
+@keyframes thinking-spark {
+  0% { transform: rotate(0deg) scale(0.85); opacity: 0.65; }
+  50% { transform: rotate(90deg) scale(1); opacity: 1; }
+  100% { transform: rotate(180deg) scale(0.85); opacity: 0.65; }
 }
 
-/* 缩放：旧页轻微缩小淡出，新页从 103% 缩回原位 */
-html[data-vt-effect="zoom"]::view-transition-old(root) {
-  animation: vt-zoom-old 0.3s ease both;
-}
-html[data-vt-effect="zoom"]::view-transition-new(root) {
-  animation: vt-zoom-new 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-@keyframes vt-zoom-old {
-  to {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-}
-@keyframes vt-zoom-new {
-  from {
-    opacity: 0;
-    transform: scale(1.03);
-  }
-}
-
-/* 淡入淡出：新旧页面原位交叉淡入淡出 */
-html[data-vt-effect="fade"]::view-transition-old(root) {
-  animation: vt-fade-old 0.3s ease both;
-}
-html[data-vt-effect="fade"]::view-transition-new(root) {
-  animation: vt-fade-new 0.3s ease both;
-}
-@keyframes vt-fade-old {
-  to {
-    opacity: 0;
-  }
-}
-@keyframes vt-fade-new {
-  from {
-    opacity: 0;
-  }
-}
-
-/* 路由过渡期间暂停面包屑入场动画：新页 root 快照提交时 blur-in 还在播放，
-   会拍到透明内容，过渡结束后文字闪现。data-vt-active 由 RouteTransition
-   在发起过渡时置位且不清除（清除会让 blur-in 重新播放造成二次闪烁）；
-   刷新/新开页面无此标记，入场照常。
-   页面间共享的导航条/面包屑不注册 view-transition-name，作为普通页面
-   内容随 root 快照整体过渡，避免独立快照的残留/毛玻璃/竞态一类问题。 */
-html[data-vt-active] nav[aria-label="面包屑"] {
-  animation: none;
+.thinking-spark {
+  animation: thinking-spark 2s steps(8, end) infinite;
+  transform-origin: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
+  .thinking-spark { animation: none; }
+}
+
+@keyframes project-title-cycle {
+  0%, 20% { transform: translateY(0); }
+  25%, 45% { transform: translateY(-1.25rem); }
+  50%, 70% { transform: translateY(-2.5rem); }
+  75%, 95% { transform: translateY(-3.75rem); }
+  100% { transform: translateY(-5rem); }
+}
+.project-title-cycle { animation: project-title-cycle 16s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .project-title-cycle { animation: none; }
+}
+
+/* A frosted surface remains visible over the empty hero, before scrolling. */
+.nav-glass {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(135deg,
+    oklch(from var(--background) l c h / 72%),
+    oklch(from var(--muted) l c h / 82%));
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 oklch(from var(--foreground) l c h / 5%),
+    inset 0 -1px 0 oklch(from var(--foreground) l c h / 3%),
+    0 1px 3px oklch(from var(--foreground) l c h / 4%);
+}
+.nav-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23888' filter='url(%23n)' opacity='.4' d='M0 0h120v120H0z'/%3E%3C/svg%3E");
+  opacity: 0.1;
+}
+.nav-glass:hover {
+  background-color: oklch(from var(--muted) l c h / 45%);
 }

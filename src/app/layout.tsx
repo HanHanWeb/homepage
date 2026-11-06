@@ -4,7 +4,7 @@ import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 import { LanguageProvider } from "@/components/language-provider";
-import { RouteTransition } from "@/components/route-transition";
+import { CommandPalette } from "@/components/command-palette";
 import { SuppressScriptWarning } from "@/components/suppress-script-warning";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SITE_URL } from "@/lib/site";
@@ -29,9 +29,10 @@ export const metadata: Metadata = {
     images: ["/icon.png"],
   },
   twitter: { card: "summary" },
-  alternates: {
-    types: { "application/rss+xml": "/feed.xml" },
-  },
+  // 博客订阅暂时停用。
+  // alternates: {
+  //   types: { "application/rss+xml": "/feed.xml" },
+  // },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -78,8 +79,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           disableTransitionOnChange
         >
           <LanguageProvider>
-            <RouteTransition />
             {children}
+            <CommandPalette />
           </LanguageProvider>
         </ThemeProvider>
         {/* 51LA 网站统计（异步安装，不阻塞首屏渲染） */}

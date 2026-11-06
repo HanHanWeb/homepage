@@ -6,7 +6,7 @@ export function LicenseCard() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="本站内容采用 CC BY-NC-SA 4.0 协议"
-      className="inline-flex h-4 w-fit items-center rounded-[4px] bg-[#007ec6] px-1.5 text-[10px] font-medium leading-none text-white transition-opacity hover:opacity-80"
+      className="inline-flex h-4 w-fit items-center rounded-full bg-[#007ec6] px-1.5 text-[10px] font-medium leading-none text-white transition-opacity hover:opacity-80"
     >
       CC BY-NC-SA 4.0
     </a>

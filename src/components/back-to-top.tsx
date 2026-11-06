@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
+import { ScrollProgress } from "@/components/scroll-progress";
 
 export function BackToTop() {
   const { t } = useLanguage();
@@ -29,9 +30,10 @@ export function BackToTop() {
           exit={{ opacity: 0, y: 12, scale: 0.9 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed right-6 bottom-6 z-50 flex size-11 items-center justify-center rounded-full border bg-card/80 shadow-sm backdrop-blur transition-colors hover:bg-card hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+          className="fixed right-6 bottom-6 z-50 flex size-12 items-center justify-center rounded-full border bg-card/80 shadow-sm backdrop-blur transition-colors hover:bg-card hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
         >
-          <ArrowUp className="size-4" />
+          <ScrollProgress />
+          <ArrowUp aria-hidden className="size-4" />
         </motion.button>
       )}
     </AnimatePresence>

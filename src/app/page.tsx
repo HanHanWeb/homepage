@@ -1,56 +1,30 @@
 import { About } from "@/components/about";
 import { BackToTop } from "@/components/back-to-top";
-import { BlogPreview } from "@/components/blog-preview";
-import { CommandPalette } from "@/components/command-palette";
 import { Contact } from "@/components/contact";
 import { CursorSpotlight } from "@/components/cursor-spotlight";
 import { Contributions } from "@/components/contributions";
 import { FlickeringGridTop } from "@/components/flickering-grid-top";
 import { Focus } from "@/components/focus";
-import { Friends } from "@/components/friends";
 import { Hero } from "@/components/hero";
-import { HomeToc } from "@/components/home-toc";
-import { Projects } from "@/components/projects";
-import { LanguageToggle } from "@/components/language-toggle";
+import { HomeNav } from "@/components/home-nav";
 import { BottomGlow } from "@/components/ui/bottom-glow";
-import { ProgressiveBlur } from "@/components/ui/progressive-blur";
-import { ScrollProgress } from "@/components/scroll-progress";
-import { listPosts } from "@/lib/blog-content";
 
 export const revalidate = 300;
 
-export default async function Home() {
-  const posts = await listPosts();
+export default function Home() {
   return (
     <>
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-x-0 top-0 z-40"
-      >
-        <ProgressiveBlur position="top" height="10vh" />
-      </div>
+      <HomeNav />
       <FlickeringGridTop />
-      <ScrollProgress />
       <BackToTop />
-      <HomeToc />
-      {/* 语言切换仅首页显示（404 等页面不渲染） */}
-      <div className="pointer-events-none fixed top-5 right-20 z-50">
-        <div className="pointer-events-auto">
-          <LanguageToggle />
-        </div>
-      </div>
-      <CursorSpotlight className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pb-16">
+      <CursorSpotlight className="site-container home-content relative z-10 flex flex-1 flex-col pb-16">
         <Hero />
         <About />
         <Focus />
-        <BlogPreview posts={posts} />
-        <Projects />
         <Contributions />
         <Contact />
-        <Friends />
       </CursorSpotlight>
       <BottomGlow />
-      <CommandPalette />
     </>
   );
 }

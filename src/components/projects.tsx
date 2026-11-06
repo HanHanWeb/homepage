@@ -117,8 +117,8 @@ export function Projects() {
                 </div>
                 <p className="mt-2 px-1 text-sm leading-6 text-muted-foreground">{en ? project.descEn : project.descZh}</p>
               </button>
-              <div className="mt-5 flex min-h-8 items-center justify-between gap-2 border-t border-border/50 px-1 pt-3">
-                <span className="text-xs text-muted-foreground">{project.images?.length ? `${project.images.length} ${en ? "screenshots" : "张预览"}` : (en ? "Project notes" : "项目记录")}</span>
+              <div className="mt-5 flex min-h-8 items-center justify-end gap-2 border-t border-border/50 px-1 pt-3">
+
                 <ProjectLinks project={project} en={en} />
               </div>
             </article>

@@ -134,7 +134,7 @@ export function Focus() {
                 <div className="mt-3 flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <h4 className="text-sm font-medium leading-5">{image.title}</h4>
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{image.category}{image.screenshots.length > 1 && ` · ${image.screenshots.length} ${zh ? "张作品" : "images"}`}</p>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{image.category}</p>
                   </div>
                   <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted/70 text-muted-foreground transition-colors group-hover:bg-accent group-hover:text-foreground"><ArrowUpRight className="size-3.5" /></span>
                 </div>

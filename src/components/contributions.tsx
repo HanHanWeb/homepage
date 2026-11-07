@@ -1,16 +1,20 @@
 "use client";
 
-import { cloneElement, useRef, useState } from "react";
+import { cloneElement, useCallback, useEffect, useRef, useState } from "react";
 import type { MouseEvent as ReactMouseEvent, ReactElement, ReactNode } from "react";
 import { useInView } from "motion/react";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
+import type { Activity } from "react-github-calendar";
 
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLanguage } from "@/components/language-provider";
+
+const blockSize = 12;
+const blockMargin = 4;
 
 function CalendarLoading() {
   const { locale } = useLanguage();
@@ -59,6 +63,30 @@ export function Contributions() {
   const en = locale === "en";
   const calendar = useRef<HTMLDivElement>(null);
   const nearViewport = useInView(calendar, { once: true, margin: "480px" });
+  const [visibleWeeks, setVisibleWeeks] = useState(0);
+
+  useEffect(() => {
+    const container = calendar.current;
+    if (!nearViewport || !container) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry.contentRect.width;
+      setVisibleWeeks(Math.floor((width + blockMargin) / (blockSize + blockMargin)));
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [nearViewport]);
+
+  const fitRecentWeeks = useCallback((activities: Activity[]) => {
+    const latest = activities.at(-1);
+    if (!latest) return activities;
+
+    // Calendar columns start on Sunday. Keep the weeks that fit, ending at the latest date.
+    const cutoff = new Date(`${latest.date}T00:00:00Z`);
+    cutoff.setUTCDate(cutoff.getUTCDate() - cutoff.getUTCDay() - (visibleWeeks - 1) * 7);
+    const firstVisibleDate = cutoff.toISOString().slice(0, 10);
+    return activities.filter((activity) => activity.date >= firstVisibleDate);
+  }, [visibleWeeks]);
 
   return (
     <section id="contributions" className="scroll-mt-6 py-10">
@@ -78,13 +106,15 @@ export function Contributions() {
               <p className="mt-1 text-sm text-muted-foreground">{en ? "Peak tokens" : "峰值 Token"}</p>
             </div>
           </div>
-          <div ref={calendar} className="contribution-calendar flex min-h-[150px] min-w-0 justify-center">
-            {nearViewport ? (
+          <div ref={calendar} className="contribution-calendar flex min-h-[150px] min-w-0 justify-end">
+            {nearViewport && visibleWeeks > 0 ? (
               <GitHubCalendar
                 username="HanHanWeb"
                 year="last"
-                blockSize={12}
-                blockMargin={4}
+                blockSize={blockSize}
+                blockMargin={blockMargin}
+                weekStart={0}
+                transformData={fitRecentWeeks}
                 fontSize={12}
                 colorScheme={resolvedTheme === "dark" ? "dark" : "light"}
                 showTotalCount={false}

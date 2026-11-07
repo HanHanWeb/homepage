@@ -64,7 +64,7 @@ export function Projects() {
         <span className="shrink-0 font-mono text-xs text-muted-foreground">{String(PROJECTS.length + 1).padStart(2, "0")} {en ? "PROJECTS" : "个项目"}</span>
       </div>
 
-      <article className="cursor-spotlight mt-10 overflow-hidden rounded-xl border border-emerald-200/70 bg-linear-to-br from-emerald-100/70 via-card to-cyan-100/60 dark:border-emerald-800/60 dark:from-emerald-950/65 dark:to-cyan-950/55">
+      <article className="cursor-spotlight mt-10 overflow-hidden rounded-xl border border-border/60 bg-muted/40">
         <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
           <div className="flex min-w-0 flex-col items-start">
             <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">{en ? featured.nameEn : featured.name}</h2>
@@ -79,7 +79,7 @@ export function Projects() {
               <ul className="grid grid-cols-1 gap-x-5 gap-y-3 border-t border-border/70 pt-5 min-[400px]:grid-cols-2">
                 {featured.subProjects.map((project) => (
                   <li key={project.name} className="flex min-w-0 items-center gap-2.5 text-sm leading-5">
-                    <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-emerald-500/65" />
+                    <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
                     {en ? project.nameEn : project.name}
                   </li>
                 ))}
@@ -87,7 +87,7 @@ export function Projects() {
             </div>
           </div>
           <figure className="flex min-w-0 flex-col justify-between rounded-lg border border-border/60 bg-card p-5 sm:p-6">
-            <Quote aria-hidden className="size-6 text-emerald-600/60 dark:text-emerald-400/70" />
+            <Quote aria-hidden className="size-6 text-muted-foreground/40" />
             <blockquote className="mt-4 text-base leading-8 tracking-tight">{en ? featured.quote.textEn : featured.quote.textZh}</blockquote>
             <figcaption className="mt-6 flex items-start gap-3 border-t border-border/60 pt-5">
               {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -21,13 +21,13 @@ import {
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { cn } from "@/lib/utils";
 
-const navLink = "inline-flex min-h-9 items-center justify-center rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none";
+const navLink = "inline-flex min-h-9 items-center justify-center rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:bg-muted/60 hover:text-foreground hover:backdrop-blur-[12px] focus-visible:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:backdrop-blur-[12px] aria-[current=page]:bg-muted/70 aria-[current=page]:text-foreground aria-[current=page]:backdrop-blur-[12px] motion-reduce:transition-none";
 const navOffset = "0.5rem";
 const navHeight = "3.5rem";
 const navBlurHeight = `calc(${navOffset} + max(10vh, ${navHeight} + 1.5rem) + 0.5rem)`;
-const settingsRow = "flex min-h-14 items-center justify-between gap-3 px-2.5 py-2";
-const settingsSegments = "flex shrink-0 items-center gap-0.5 rounded-xl bg-muted p-1";
-const settingsOption = "h-8 cursor-pointer justify-center rounded-lg border border-transparent py-0 text-sm font-normal text-muted-foreground data-[state=checked]:border-border data-[state=checked]:bg-background data-[state=checked]:text-foreground data-[state=checked]:shadow-xs [&_[data-slot=dropdown-menu-radio-item-indicator]]:hidden";
+const settingsRow = "flex min-h-11 items-center justify-between gap-3 px-2.5 py-1";
+const settingsSegments = "flex shrink-0 items-center gap-0.5 rounded-full bg-muted p-0.5";
+const settingsOption = "h-8 cursor-pointer justify-center rounded-full border border-transparent py-0 text-sm font-normal text-muted-foreground data-[state=checked]:border-border data-[state=checked]:bg-background data-[state=checked]:text-foreground data-[state=checked]:shadow-xs sm:h-7 [&_[data-slot=dropdown-menu-radio-item-indicator]]:hidden";
 
 export function HomeNav({ menu }: { menu?: ReactNode }) {
   const { locale, t, setLocale } = useLanguage();
@@ -57,7 +57,7 @@ export function HomeNav({ menu }: { menu?: ReactNode }) {
             </Link>
             <div className="hidden items-center gap-1 sm:flex">
               {items.map((item) => (
-                <Link key={item.href} href={item.href} aria-current={isActive(item.href) ? "page" : undefined} className={cn(navLink, isActive(item.href) && "bg-muted/70 text-foreground")}>
+                <Link key={item.href} href={item.href} aria-current={isActive(item.href) ? "page" : undefined} className={navLink}>
                   {item.label}
                 </Link>
               ))}

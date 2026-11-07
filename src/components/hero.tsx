@@ -71,7 +71,7 @@ export function Hero() {
           <TiltCard>
             <Terminal
               sequence={false}
-              className="bg-card text-sm shadow-lg [&_code]:font-mono [&_pre]:font-mono"
+              className="cursor-spotlight bg-card text-sm shadow-lg [&_code]:font-mono [&_pre]:font-mono"
             >
               {LINES.map((line, i) =>
                 line.kind === "cmd" ? (

@@ -27,9 +27,9 @@ export function Contact() {
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex min-w-0 items-center gap-3 rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+              className="cursor-spotlight group flex min-w-0 items-center gap-3 rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
             >
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full border bg-card">
+              <span className="cursor-spotlight flex size-8 shrink-0 items-center justify-center rounded-full border bg-card">
                 {social.icon ? (
                   <BrandIcon icon={social.icon} className="size-4" />
                 ) : (
@@ -49,9 +49,9 @@ export function Contact() {
             <DialogTrigger asChild>
               <button
                 type="button"
-                className="group flex min-w-0 cursor-pointer items-center gap-3 rounded-xl border bg-card p-4 text-left transition-colors hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+                className="cursor-spotlight group flex min-w-0 cursor-pointer items-center gap-3 rounded-xl border bg-card p-4 text-left transition-colors hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full border bg-card">
+                <span className="cursor-spotlight flex size-8 shrink-0 items-center justify-center rounded-full border bg-card">
                   <BrandIcon icon={siWechat} className="size-4" />
                 </span>
                 <span className="min-w-0 flex-1">

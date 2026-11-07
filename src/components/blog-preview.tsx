@@ -25,7 +25,7 @@ export function BlogPreview({ posts }: { posts: Post[] }) {
           <Reveal key={post.slug} delay={`${i * 0.08}s`} direction="down">
             <Link
               href={`/blog/${post.slug}`}
-              className="cursor-spotlight relative block rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50"
+              className="relative block rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50"
             >
               <h3 className="font-serif-song font-semibold text-lg tracking-tight">
                 {post.title}

@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { cn } from "@/lib/utils";
 
 const BILIBILI_BVID = "BV1KWhJ67EYm";
-const panelClass = "cursor-spotlight relative min-w-0 overflow-hidden rounded-xl border border-border/60 bg-muted/40";
+const panelClass = "relative min-w-0 overflow-hidden rounded-xl border border-border/60 bg-muted/40";
 
 export function Focus() {
   const { t, locale } = useLanguage();
@@ -40,7 +40,7 @@ export function Focus() {
     const cover = screenshots[0];
     return {
       ...cover,
-      title: projectId === "spark" ? "Spark" : projectId === "intereco-home" ? (zh ? "界面生态主页" : "Intereco Homepage") : projectId === "ipoa" ? (zh ? "IPOA 赛事系统" : "IPOA Competition System") : projectId === "gallery" ? (zh ? "界面生态作品中心" : "Intereco Works Center") : projectId === "newspaper" ? (zh ? "澎湃报" : "The Surging Newspaper") : cover.alt,
+      title: projectId === "roadmap" ? "roadmap" : projectId === "intereco-home" ? (zh ? "界面生态主页" : "Intereco Homepage") : projectId === "ipoa" ? (zh ? "IPOA 赛事系统" : "IPOA Competition System") : projectId === "gallery" ? (zh ? "界面生态作品中心" : "Intereco Works Center") : projectId === "newspaper" ? (zh ? "澎湃报" : "The Surging Newspaper") : cover.alt,
       screenshots,
     };
   });
@@ -60,7 +60,7 @@ export function Focus() {
             {zh ? "在技术、设计与影像之间，持续探索。" : "Exploring code, design, and visual stories."}
           </span>
         </p>
-        <Link href="/projects" className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-muted px-4 text-sm transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
+        <Link href="/projects" className="cursor-spotlight inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-muted px-4 text-sm transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
           {zh ? "查看项目" : "See projects"}
           <ArrowUpRight aria-hidden className="size-3.5" />
         </Link>
@@ -91,7 +91,7 @@ export function Focus() {
               className="flex-wrap"
             >
               {collections.map((collection, index) => (
-                <ToggleGroupItem key={index} value={String(index)} className="rounded-full px-4">{collection.hint}</ToggleGroupItem>
+                <ToggleGroupItem key={index} value={String(index)} className="cursor-spotlight rounded-full px-4">{collection.hint}</ToggleGroupItem>
               ))}
             </ToggleGroup>
             {filteredProjects.length > 4 && (
@@ -100,7 +100,7 @@ export function Focus() {
                 onClick={() => setShowAll((value) => !value)}
                 aria-expanded={showAll}
                 aria-controls="focus-design-gallery"
-                className="inline-flex min-h-10 items-center gap-2 rounded-full bg-muted px-4 text-sm transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+                className="cursor-spotlight inline-flex min-h-10 items-center gap-2 rounded-full bg-muted px-4 text-sm transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               >
                 {showAll ? (zh ? "收起" : "Show less") : (zh ? "浏览全部" : "Browse all")}
                 <ArrowUpRight aria-hidden className="size-3.5" />
@@ -136,7 +136,7 @@ export function Focus() {
                     <h4 className="text-sm font-medium leading-5">{image.title}</h4>
                     <p className="mt-1 text-xs leading-5 text-muted-foreground">{image.category}</p>
                   </div>
-                  <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted/70 text-muted-foreground transition-colors group-hover:bg-accent group-hover:text-foreground"><ArrowUpRight className="size-3.5" /></span>
+                  <span aria-hidden className="cursor-spotlight flex size-8 shrink-0 items-center justify-center rounded-full bg-muted/70 text-muted-foreground transition-colors group-hover:bg-accent group-hover:text-foreground"><ArrowUpRight className="size-3.5" /></span>
                 </div>
               </button>
             ))}
@@ -155,7 +155,7 @@ export function Focus() {
               {zh ? "让想法落地，也让每一次运行稳定可靠。" : "Building ideas into products, and keeping them running."}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {development.options.map((option) => <Badge key={option} variant="outline" className="h-7 px-3">{option}</Badge>)}
+              {development.options.map((option) => <Badge key={option} variant="outline" className="cursor-spotlight h-7 px-3">{option}</Badge>)}
             </div>
           </div>
           <div data-focus-terminal className="mt-auto ml-6 min-h-48 overflow-hidden rounded-tl-lg border-t border-l border-border/60 bg-background sm:ml-7">
@@ -182,7 +182,7 @@ export function Focus() {
               {zh ? "用镜头记录日常，从另一个角度看世界。" : "Capturing everyday moments, seeing the world from another angle."}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {visual.options.map((option) => <Badge key={option} variant="outline" className="h-7 px-3">{option}</Badge>)}
+              {visual.options.map((option) => <Badge key={option} variant="outline" className="cursor-spotlight h-7 px-3">{option}</Badge>)}
             </div>
           </div>
           <div className="mx-4 mt-5 overflow-hidden rounded-lg border border-border/60 bg-background">

@@ -21,12 +21,12 @@ function ProjectLinks({ project, en }: { project: Project; en: boolean }) {
   return (
     <div className="flex shrink-0 items-center gap-2">
       {githubUrl && (
-        <a href={githubUrl} target="_blank" rel="noopener noreferrer" aria-label={`${project.nameEn} · GitHub`} title="GitHub" className="inline-flex size-8 items-center justify-center rounded-full bg-muted transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+        <a href={githubUrl} target="_blank" rel="noopener noreferrer" aria-label={`${project.nameEn} · GitHub`} title="GitHub" className="cursor-spotlight inline-flex size-8 items-center justify-center rounded-full bg-muted transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
           <GithubIcon className="size-4" />
         </a>
       )}
       {websiteUrl && (
-        <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-8 items-center gap-1.5 rounded-full bg-muted px-3 text-xs transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{en ? "Visit" : "访问"}<ArrowUpRight aria-hidden className="size-3.5" /></a>
+        <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="cursor-spotlight inline-flex min-h-8 items-center gap-1.5 rounded-full bg-muted px-3 text-xs transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{en ? "Visit" : "访问"}<ArrowUpRight aria-hidden className="size-3.5" /></a>
       )}
       {!githubUrl && !websiteUrl && <span className="text-xs text-muted-foreground">{en ? "Archived" : "已归档"}</span>}
     </div>
@@ -59,28 +59,25 @@ export function Projects() {
   return (
     <section id="projects" className="min-w-0 pb-8">
       <SectionHeading title={t.projects.title} tag="#PROJECTS" level={1} />
-      <div className="mt-6 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
-        <p className="max-w-lg text-xl leading-relaxed tracking-tight sm:text-2xl">
-          {en ? "Ideas, brought to life." : "把想法，做成可以使用的东西。"}
-          <span className="block text-muted-foreground">{en ? "A collection of things I build and care about." : "一些独立开发，一些共同创造。"}</span>
-        </p>
-        <span className="shrink-0 font-mono text-xs text-muted-foreground">{String(PROJECTS.length + 1).padStart(2, "0")} {en ? "PROJECTS" : "个项目"}</span>
-      </div>
+      <p className="mt-6 max-w-lg text-xl leading-relaxed tracking-tight sm:text-2xl">
+        {en ? "Ideas, brought to life." : "把想法，做成可以使用的东西。"}
+        <span className="block text-muted-foreground">{en ? "A collection of things I build and care about." : "一些独立开发，一些共同创造。"}</span>
+      </p>
 
-      <article className="cursor-spotlight mt-7 overflow-hidden rounded-xl border border-border/60 bg-muted/40 sm:mt-10">
+      <article className="mt-7 overflow-hidden rounded-xl border border-border/60 bg-muted/40 sm:mt-10">
         <div className="grid items-start gap-5 p-4 min-[375px]:p-5 sm:gap-8 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-10">
           <div className="flex min-w-0 flex-col items-start">
             <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground">{en ? featured.name : featured.nameEn.toUpperCase()}</p>
             <h2 className="text-2xl font-medium tracking-tight sm:text-4xl">{en ? featured.nameEn : featured.name}</h2>
             <div className="mt-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
               {roles.map((role) => (
-                <Badge key={role} variant="outline" className="h-6 px-2 sm:px-3">{role}</Badge>
+                <Badge key={role} variant="outline" className="cursor-spotlight h-6 px-2 sm:px-3">{role}</Badge>
               ))}
             </div>
             <p className="mt-4 max-w-prose text-sm leading-6 text-pretty text-muted-foreground sm:mt-5 sm:leading-7">{en ? featured.descEn : featured.descZh}</p>
             <dl className="mt-5 grid w-full grid-cols-2 gap-2 sm:gap-2.5">
               {stats.map(({ value, label }) => (
-                <div key={label} className="flex min-w-0 flex-col rounded-lg border border-border/60 bg-card px-3 pt-3 pb-2 sm:px-3.5">
+                <div key={label} className="cursor-spotlight flex min-w-0 flex-col rounded-lg border border-border/60 bg-card px-3 pt-3 pb-2 sm:px-3.5">
                   <dt className="mt-1 text-xs leading-5 text-muted-foreground">{label}</dt>
                   <dd className="stat-number order-first text-2xl leading-none font-medium tracking-tight tabular-nums">{value}</dd>
                 </div>
@@ -93,9 +90,9 @@ export function Projects() {
 
       <div className="mt-12 flex flex-wrap items-center justify-between gap-4">
         <ToggleGroup type="single" variant="outline" value={filter} onValueChange={(value) => { if (value) setFilter(value); }} aria-label={en ? "Project collection" : "项目分类"}>
-          <ToggleGroupItem value="all" className="gap-2 px-4">{en ? "All" : "全部"}<span className="text-xs text-muted-foreground">{PROJECTS.length}</span></ToggleGroupItem>
-          <ToggleGroupItem value="active" className="gap-2 px-4">{en ? "Development" : "开发"}<span className="text-xs text-muted-foreground">{activeCount}</span></ToggleGroupItem>
-          <ToggleGroupItem value="archive" className="gap-2 px-4">{en ? "Archive" : "归档"}<span className="text-xs text-muted-foreground">{archiveCount}</span></ToggleGroupItem>
+          <ToggleGroupItem value="all" className="cursor-spotlight gap-2 px-4">{en ? "All" : "全部"}<span className="text-xs text-muted-foreground">{PROJECTS.length}</span></ToggleGroupItem>
+          <ToggleGroupItem value="active" className="cursor-spotlight gap-2 px-4">{en ? "Development" : "开发"}<span className="text-xs text-muted-foreground">{activeCount}</span></ToggleGroupItem>
+          <ToggleGroupItem value="archive" className="cursor-spotlight gap-2 px-4">{en ? "Archive" : "归档"}<span className="text-xs text-muted-foreground">{archiveCount}</span></ToggleGroupItem>
         </ToggleGroup>
 
       </div>
@@ -115,7 +112,7 @@ export function Projects() {
                 </div>
                 <div className="mt-4 flex w-full items-start justify-between gap-3 px-1">
                   <h2 className="min-w-0 text-base font-medium tracking-tight">{en ? project.nameEn : project.name}</h2>
-                  <Badge variant="outline">
+                  <Badge variant="outline" className="cursor-spotlight">
                     {archived && en ? "Archive" : en ? project.tagEn : project.tagZh}
                   </Badge>
                 </div>

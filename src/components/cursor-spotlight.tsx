@@ -1,16 +1,14 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
-import { useTheme } from "next-themes";
 
-/** One delegated listener for the homepage; pointer updates never re-render cards. */
+/** One delegated listener for the content area; pointer updates never re-render cards. */
 export function CursorSpotlight({ children, className }: { children: ReactNode; className?: string }) {
   const scope = useRef<HTMLElement>(null);
-  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const root = scope.current;
-    if (!root || resolvedTheme !== "dark") return;
+    if (!root) return;
 
     const media = window.matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
     let active: HTMLElement | null = null;
@@ -65,7 +63,7 @@ export function CursorSpotlight({ children, className }: { children: ReactNode; 
       window.removeEventListener("blur", reset);
       media.removeEventListener("change", reset);
     };
-  }, [resolvedTheme]);
+  }, []);
 
   return <main ref={scope} className={className}>{children}</main>;
 }

@@ -39,9 +39,6 @@ export const dictionaries = {
             {
               hint: "UI/UX",
               images: [
-                { projectId: "spark", src: "/gallery-spark.webp", alt: "Spark 待办应用界面" },
-                { projectId: "spark", src: "/gallery-spark-sync.webp", alt: "Spark 云同步设置" },
-                { projectId: "spark", src: "/gallery-spark-appearance.webp", alt: "Spark 外观与光效设置" },
                 { projectId: "gallery", src: "/gallery-home.webp", alt: "Gallery 作品库页面" },
                 { projectId: "gallery", src: "/gallery-post.webp", alt: "Gallery 作品详情页" },
                 { projectId: "gallery", src: "/gallery-user.webp", alt: "Gallery 个人主页" },
@@ -53,6 +50,7 @@ export const dictionaries = {
                 { projectId: "intereco-home", src: "/gallery-intereco-footer.webp", alt: "界面生态主页页脚" },
                 { projectId: "intereco-home", src: "/gallery-intereco-partners.webp", alt: "界面生态合作项目" },
                 { projectId: "intereco-home", src: "/gallery-intereco-news.webp", alt: "界面生态新闻中心" },
+                { projectId: "roadmap", src: "/project-roadmap.webp", alt: "roadmap 界面：功能投票与路线图看板" },
               ],
             },
             {
@@ -103,7 +101,6 @@ export const dictionaries = {
       empty: "没有找到相关结果",
       nav: "板块",
       actions: "操作",
-      links: "外链",
       copyEmail: "复制邮箱",
       emailCopied: "邮箱已复制",
       toggleTheme: "切换深浅色主题",
@@ -153,9 +150,6 @@ export const dictionaries = {
             {
               hint: "UI/UX",
               images: [
-                { projectId: "spark", src: "/gallery-spark.webp", alt: "Spark todo app interface" },
-                { projectId: "spark", src: "/gallery-spark-sync.webp", alt: "Spark cloud sync settings" },
-                { projectId: "spark", src: "/gallery-spark-appearance.webp", alt: "Spark appearance and glow settings" },
                 { projectId: "gallery", src: "/gallery-home.webp", alt: "Gallery library page" },
                 { projectId: "gallery", src: "/gallery-post.webp", alt: "Gallery work detail page" },
                 { projectId: "gallery", src: "/gallery-user.webp", alt: "Gallery profile page" },
@@ -167,6 +161,7 @@ export const dictionaries = {
                 { projectId: "intereco-home", src: "/gallery-intereco-footer.webp", alt: "Intereco homepage footer" },
                 { projectId: "intereco-home", src: "/gallery-intereco-partners.webp", alt: "Intereco partnership projects" },
                 { projectId: "intereco-home", src: "/gallery-intereco-news.webp", alt: "Intereco news center" },
+                { projectId: "roadmap", src: "/project-roadmap.webp", alt: "roadmap interface: feature voting and roadmap board" },
               ],
             },
             {
@@ -217,7 +212,6 @@ export const dictionaries = {
       empty: "No results found.",
       nav: "Sections",
       actions: "Actions",
-      links: "Links",
       copyEmail: "Copy email",
       emailCopied: "Email copied",
       toggleTheme: "Toggle theme",

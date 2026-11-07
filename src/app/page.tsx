@@ -7,7 +7,6 @@ import { FlickeringGridTop } from "@/components/flickering-grid-top";
 import { Focus } from "@/components/focus";
 import { Hero } from "@/components/hero";
 import { HomeNav } from "@/components/home-nav";
-import { BottomGlow } from "@/components/ui/bottom-glow";
 
 export const revalidate = 300;
 
@@ -24,7 +23,6 @@ export default function Home() {
         <Contributions />
         <Contact />
       </CursorSpotlight>
-      <BottomGlow />
     </>
   );
 }

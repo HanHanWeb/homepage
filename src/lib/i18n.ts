@@ -20,8 +20,10 @@ export const dictionaries = {
     },
     about: {
       title: "关于",
+      lead: "一名来自中国河南的大学学生，同时是一名开发者与设计师。",
       description:
-        "一名来自中国河南的大学学生，同时是一名开发者与设计师。平时喜欢折腾各种小项目，把想法从草图变成可用的产品。我关注简洁、克制的设计。",
+        "平时喜欢折腾各种小项目，把想法从草图变成可用的产品。",
+      designNote: "我关注简洁、克制的设计。",
       personality: "INFJ · 提倡者",
       skills: "技能",
       tools: "开发工具",
@@ -133,8 +135,10 @@ export const dictionaries = {
     },
     about: {
       title: "About",
+      lead: "A university student from Henan, China, also a developer and designer.",
       description:
-        "A university student from Henan, China, also a developer and designer. I love tinkering with small projects and turning ideas from sketches into usable products. I care about concise, restrained design.",
+        "I love tinkering with small projects and turning ideas from sketches into usable products.",
+      designNote: "I care about concise, restrained design.",
       personality: "INFJ · Advocate",
       skills: "Skills",
       tools: "Tools",

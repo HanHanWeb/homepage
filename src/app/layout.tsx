@@ -4,6 +4,7 @@ import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 import { LanguageProvider } from "@/components/language-provider";
+import { FooterMascots } from "@/components/footer-mascots";
 import { CommandPalette } from "@/components/command-palette";
 import { SuppressScriptWarning } from "@/components/suppress-script-warning";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -48,23 +49,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           rel="stylesheet"
           href="https://cdn-font.hyperos.mi.com/font/css?family=MiSans:100,200,300,400,500,600:Chinese_Simplify,Latin&display=swap"
         />
-        {/* 思源宋体 400/600/700：全站统一在此加载，跨页复用浏览器缓存 */}
-        <link
-          rel="stylesheet"
-          href="https://registry.npmmirror.com/@fontsource/noto-serif-sc/5.3.0/files/chinese-simplified-400.css"
-        />
-        <link
-          rel="stylesheet"
-          href="https://registry.npmmirror.com/@fontsource/noto-serif-sc/5.3.0/files/chinese-simplified-600.css"
-        />
-        <link
-          rel="stylesheet"
-          href="https://registry.npmmirror.com/@fontsource/noto-serif-sc/5.3.0/files/chinese-simplified-700.css"
-        />
-        {/* 预加载标题字体，避免 font swap 在入场动画中途改变字形 */}
+        {/* 预加载常用标题字形，其余字形由完整字体按需提供。 */}
         <link
           rel="preload"
-          href="/fonts/CorpSrcWinSong-.4.woff2"
+          href="/fonts/CorpSrcWinSong-titles.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
@@ -80,6 +68,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           <LanguageProvider>
             {children}
+            <FooterMascots />
             <CommandPalette />
           </LanguageProvider>
         </ThemeProvider>

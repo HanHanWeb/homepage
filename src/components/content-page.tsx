@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import { BackToTop } from "@/components/back-to-top";
 import { CursorSpotlight } from "@/components/cursor-spotlight";
 import { HomeNav } from "@/components/home-nav";
-import { BottomGlow } from "@/components/ui/bottom-glow";
 
 export function ContentPage({ children }: { children: ReactNode }) {
   return (
@@ -13,7 +12,6 @@ export function ContentPage({ children }: { children: ReactNode }) {
         {children}
       </CursorSpotlight>
       <BackToTop />
-      <BottomGlow />
     </>
   );
 }

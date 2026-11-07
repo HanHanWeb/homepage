@@ -85,10 +85,14 @@ export function About() {
         <SectionHeading title={t.about.title} tag="#ABOUT" />
       </Reveal>
 
-      <div className="mt-4 space-y-4">
+      <div className="mt-6 space-y-4">
         <Reveal delay="1.5s" direction="down">
           <div className="space-y-2.5">
-            <p className="text-sm leading-6 text-muted-foreground">{t.about.description}</p>
+            <p className="max-w-3xl text-xl leading-relaxed tracking-tight sm:text-2xl">
+              {t.about.lead}
+              <span className="block text-muted-foreground">{t.about.description}</span>
+              <span className="block text-muted-foreground">{t.about.designNote}</span>
+            </p>
             <Badge variant="outline" className="dark:border-white/20">
               <Sparkles />
               {t.about.personality}

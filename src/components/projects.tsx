@@ -35,35 +35,42 @@ function ProjectLinks({ project, en }: { project: Project; en: boolean }) {
 export function Projects() {
   const { t, locale } = useLanguage();
   const en = locale === "en";
-  const [filter, setFilter] = useState("active");
+  const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState<Project | null>(null);
   const [shotIndex, setShotIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState(1);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const featured = FEATURED_PROJECT;
+  const roles = [
+    { label: en ? featured.roleEn : featured.roleZh, color: "bg-lime-200 text-lime-900 dark:bg-lime-900/70 dark:text-lime-200" },
+    { label: en ? "Planning" : "策划", color: "bg-cyan-200 text-cyan-900 dark:bg-cyan-900/70 dark:text-cyan-200" },
+    { label: en ? "Design" : "设计", color: "bg-rose-200 text-rose-900 dark:bg-rose-900/70 dark:text-rose-200" },
+    { label: en ? "Promotion" : "宣传", color: "bg-amber-200 text-amber-900 dark:bg-amber-900/70 dark:text-amber-200" },
+    { label: en ? "Development" : "开发", color: "bg-violet-200 text-violet-900 dark:bg-violet-900/70 dark:text-violet-200" },
+  ];
   const activeCount = PROJECTS.filter((project) => project.tagZh !== "归档").length;
   const archiveCount = PROJECTS.length - activeCount;
-  const visible = PROJECTS.filter((project) => (project.tagZh === "归档") === (filter === "archive"));
+  const visible = PROJECTS.filter((project) => filter === "all" || (project.tagZh === "归档") === (filter === "archive"));
   const selectedShot = selected?.images?.[shotIndex];
 
   return (
     <section id="projects" className="min-w-0 pb-8">
       <SectionHeading title={t.projects.title} tag="#PROJECTS" level={1} />
-      <div className="mt-7 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
-        <p className="max-w-xl text-2xl leading-relaxed tracking-tight sm:text-3xl">
+      <div className="mt-6 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
+        <p className="max-w-lg text-xl leading-relaxed tracking-tight sm:text-2xl">
           {en ? "Ideas, brought to life." : "把想法，做成可以使用的东西。"}
           <span className="block text-muted-foreground">{en ? "A collection of things I build and care about." : "一些独立开发，一些共同创造。"}</span>
         </p>
         <span className="shrink-0 font-mono text-xs text-muted-foreground">{String(PROJECTS.length + 1).padStart(2, "0")} {en ? "PROJECTS" : "个项目"}</span>
       </div>
 
-      <article className="cursor-spotlight mt-10 overflow-hidden rounded-xl border border-border/60 bg-muted/40">
+      <article className="cursor-spotlight mt-10 overflow-hidden rounded-xl border border-emerald-200/70 bg-linear-to-br from-emerald-100/70 via-card to-cyan-100/60 dark:border-emerald-800/60 dark:from-emerald-950/65 dark:to-cyan-950/55">
         <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
           <div className="flex min-w-0 flex-col items-start">
             <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">{en ? featured.nameEn : featured.name}</h2>
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              {[en ? featured.roleEn : featured.roleZh, ...(en ? ["Planning", "Design", "Promotion", "Development"] : ["策划", "设计", "宣传", "开发"])].map((role) => (
-                <Badge key={role} variant="outline" className="h-6 px-3">{role}</Badge>
+              {roles.map(({ label, color }) => (
+                <Badge key={label} className={`h-6 rounded-full border-0 px-2.5 ${color}`}>{label}</Badge>
               ))}
             </div>
             <p className="mt-5 text-sm leading-7 text-muted-foreground">{en ? featured.descEn : featured.descZh}</p>
@@ -72,7 +79,7 @@ export function Projects() {
               <ul className="grid grid-cols-1 gap-x-5 gap-y-3 border-t border-border/70 pt-5 min-[400px]:grid-cols-2">
                 {featured.subProjects.map((project) => (
                   <li key={project.name} className="flex min-w-0 items-center gap-2.5 text-sm leading-5">
-                    <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
+                    <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-emerald-500/65" />
                     {en ? project.nameEn : project.name}
                   </li>
                 ))}
@@ -80,7 +87,7 @@ export function Projects() {
             </div>
           </div>
           <figure className="flex min-w-0 flex-col justify-between rounded-lg border border-border/60 bg-card p-5 sm:p-6">
-            <Quote aria-hidden className="size-6 text-muted-foreground/40" />
+            <Quote aria-hidden className="size-6 text-emerald-600/60 dark:text-emerald-400/70" />
             <blockquote className="mt-4 text-base leading-8 tracking-tight">{en ? featured.quote.textEn : featured.quote.textZh}</blockquote>
             <figcaption className="mt-6 flex items-start gap-3 border-t border-border/60 pt-5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -93,6 +100,7 @@ export function Projects() {
 
       <div className="mt-12 flex flex-wrap items-center justify-between gap-4">
         <ToggleGroup type="single" variant="outline" value={filter} onValueChange={(value) => { if (value) setFilter(value); }} aria-label={en ? "Project collection" : "项目分类"}>
+          <ToggleGroupItem value="all" className="gap-2 px-4">{en ? "All" : "全部"}<span className="text-xs text-muted-foreground">{PROJECTS.length}</span></ToggleGroupItem>
           <ToggleGroupItem value="active" className="gap-2 px-4">{en ? "Development" : "开发"}<span className="text-xs text-muted-foreground">{activeCount}</span></ToggleGroupItem>
           <ToggleGroupItem value="archive" className="gap-2 px-4">{en ? "Archive" : "归档"}<span className="text-xs text-muted-foreground">{archiveCount}</span></ToggleGroupItem>
         </ToggleGroup>
@@ -102,6 +110,7 @@ export function Projects() {
       <div className="mt-5 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((project) => {
           const cover = project.images?.[0];
+          const archived = project.tagZh === "归档";
           return (
             <article key={project.name} className="cursor-spotlight group flex min-w-0 flex-col rounded-xl border border-border/70 bg-card p-3 shadow-xs transition-shadow hover:shadow-md">
               <button type="button" aria-label={en ? `View ${project.nameEn}` : `查看项目：${project.name}`} aria-haspopup="dialog" className="flex min-w-0 flex-1 cursor-pointer flex-col text-left focus-visible:rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring" onClick={(event) => { trigger.current = event.currentTarget; setShotIndex(0); setSelected(project); }}>
@@ -113,7 +122,12 @@ export function Projects() {
                 </div>
                 <div className="mt-4 flex w-full items-start justify-between gap-3 px-1">
                   <h2 className="min-w-0 text-base font-medium tracking-tight">{en ? project.nameEn : project.name}</h2>
-                  <Badge variant="outline" className="shrink-0">{project.tagZh === "归档" ? (en ? "Archive" : "归档") : (en ? project.tagEn : project.tagZh)}</Badge>
+                  <Badge className={archived
+                    ? "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200"
+                    : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200"
+                  }>
+                    {archived && en ? "Archive" : en ? project.tagEn : project.tagZh}
+                  </Badge>
                 </div>
                 <p className="mt-2 px-1 text-sm leading-6 text-muted-foreground">{en ? project.descEn : project.descZh}</p>
               </button>

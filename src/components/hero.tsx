@@ -1,7 +1,7 @@
 "use client";
 
 import { InstallBadge } from "@/components/install-badge";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 import { TiltCard } from "@/components/ui/tilt-card";
 import { useLanguage } from "@/components/language-provider";
 import { Terminal } from "@/registry/magicui/terminal";
@@ -58,13 +58,9 @@ export function Hero() {
             className="mt-6 flex flex-wrap items-center justify-center gap-3 animate-blur-in md:justify-start"
             style={{ "--blur-delay": "0.85s" } as React.CSSProperties}
           >
-            <ShimmerButton
-              href="#about"
-              background="rgba(0, 0, 0, 1)"
-              className="h-10 shadow-xl"
-            >
-              <span className="text-sm font-medium text-white">{t.hero.ctaAbout}</span>
-            </ShimmerButton>
+            <RainbowButton asChild variant="outline" className="rounded-full">
+              <a href="#about">{t.hero.ctaAbout}</a>
+            </RainbowButton>
           </div>
         </div>
 

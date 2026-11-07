@@ -10,6 +10,8 @@ import React, {
 
 import { cn } from "@/lib/utils";
 
+const frameInterval = 1000 / 20;
+
 interface FlickeringGridProps extends React.HTMLAttributes<HTMLDivElement> {
   squareSize?: number;
   gridGap?: number;
@@ -102,8 +104,6 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
       dpr: number,
     ) => {
       ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "transparent";
-      ctx.fillRect(0, 0, width, height);
 
       for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
@@ -140,11 +140,13 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
 
       updateCanvasSize();
 
-      let lastTime = 0;
+      let lastTime: number | undefined;
       const animate = (time: number) => {
         if (!isInView || !gridParams) return;
+        animationFrameId = requestAnimationFrame(animate);
+        if (lastTime !== undefined && time - lastTime < frameInterval) return;
 
-        const deltaTime = (time - lastTime) / 1000;
+        const deltaTime = Math.min((time - (lastTime ?? time)) / 1000, 0.1);
         lastTime = time;
 
         updateSquares(gridParams.squares, deltaTime);
@@ -157,7 +159,6 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
           gridParams.squares,
           gridParams.dpr,
         );
-        animationFrameId = requestAnimationFrame(animate);
       };
 
       resizeObserver = new ResizeObserver(() => {

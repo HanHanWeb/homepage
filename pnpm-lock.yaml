@@ -11,6 +11,9 @@ importers:
       '@fancyapps/ui':
         specifier: ^6.1.15
         version: 6.1.15
+      bot-avatars:
+        specifier: ^0.2.2
+        version: 0.2.2(react@19.2.8)
       canvas-confetti:
         specifier: ^1.9.4
         version: 1.9.4
@@ -1760,6 +1763,11 @@ packages:
   body-parser@2.3.0:
     resolution: {integrity: sha512-2cGmJupaNgg+QUwVLAucDuWuoMZ6EX9iHDRswZ5lsNYEmwPaRknMPCLZz07yTzVq/83p4o/wzbDZbBrTvGGTIw==}
     engines: {node: '>=18'}
+
+  bot-avatars@0.2.2:
+    resolution: {integrity: sha512-EszpDsXfbO7SD3Jv/g8/7mt3I4EpN4WuDy6Uk3reuzIgU+dl4iKtk+fuIzGgfXjOraF1jQqUjaDOdcql1khXHQ==}
+    peerDependencies:
+      react: '>=18.0.0'
 
   brace-expansion@1.1.18:
     resolution: {integrity: sha512-Edep/X9fGqVNmzKBVsDYIOtD+z1tuezV70LBjdCst9Tqu76lsnvRiZ6oTic1n+/BIwX6QDGAO94PN4N2SADvtw==}
@@ -5575,6 +5583,10 @@ snapshots:
       type-is: 2.1.0
     transitivePeerDependencies:
       - supports-color
+
+  bot-avatars@0.2.2(react@19.2.8):
+    dependencies:
+      react: 19.2.8
 
   brace-expansion@1.1.18:
     dependencies:

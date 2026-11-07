@@ -1,6 +1,7 @@
 "use client";
 
-import { ImageDown, Loader2 } from "lucide-react";
+import { ImageDown } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
 import { useTheme } from "next-themes";
 
@@ -519,7 +520,7 @@ export function SharePosterButton({ post }: { post: Post }) {
         className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2 text-sm text-muted-foreground transition-colors hover:border-[#00bc7d]/50 hover:text-[#00bc7d] disabled:pointer-events-none disabled:opacity-60"
       >
         {busy ? (
-          <Loader2 className="size-4 animate-spin" strokeWidth={1.5} />
+          <Spinner className="size-4" />
         ) : (
           <ImageDown className="size-4" strokeWidth={1.5} />
         )}

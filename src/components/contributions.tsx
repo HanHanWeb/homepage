@@ -1,16 +1,26 @@
 "use client";
 
-import { cloneElement, useCallback, useEffect, useState } from "react";
+import { cloneElement, useRef, useState } from "react";
 import type { MouseEvent as ReactMouseEvent, ReactElement, ReactNode } from "react";
-import { GitHubCalendar } from "react-github-calendar";
-import { Loader2 } from "lucide-react";
+import { useInView } from "motion/react";
+import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
-import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLanguage } from "@/components/language-provider";
+
+function CalendarLoading() {
+  const { locale } = useLanguage();
+  return <Spinner label={locale === "en" ? "Loading contributions" : "正在加载贡献日历"} className="m-auto size-6 text-emerald-600 dark:text-emerald-400" />;
+}
+
+const GitHubCalendar = dynamic(() => import("react-github-calendar").then((module) => module.GitHubCalendar), {
+  ssr: false,
+  loading: CalendarLoading,
+});
 
 // Radix Tooltip 不响应触摸（onPointerMove 直接忽略 touch），用受控 open 实现：
 // 触摸设备上点击格子切换 tooltip 显隐
@@ -21,21 +31,14 @@ type BlockProps = {
 function BlockTooltip({
   block,
   children,
-  onFirstRender,
 }: {
   block: ReactElement;
   children: ReactNode;
-  /** renderBlock 被调用即代表日历数据已到达，上报一次供父级切换加载态 */
-  onFirstRender: () => void;
 }) {
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    onFirstRender();
-  }, [onFirstRender]);
-
   return (
-    <Tooltip open={open} onOpenChange={setOpen}>
+    <Tooltip open={open} onOpenChange={setOpen} disableHoverableContent>
       <TooltipTrigger asChild>
         {cloneElement(block as ReactElement<BlockProps>, {
           onClick: (event: ReactMouseEvent) => {
@@ -45,27 +48,17 @@ function BlockTooltip({
           },
         })}
       </TooltipTrigger>
-      <TooltipContent>{children}</TooltipContent>
+      {open && <TooltipContent className="pointer-events-none">{children}</TooltipContent>}
     </Tooltip>
   );
 }
 
 export function Contributions() {
   const { resolvedTheme } = useTheme();
-  const { t } = useLanguage();
-  // 日历含 365 个 Tooltip，渲染是长任务；推迟到入场动画（约 3s）结束后再挂载，
-  // 避免巨型 React commit 阻塞主线程、卡住按钮/关于等板块的动画
-  const [mounted, setMounted] = useState(false);
-  // 数据到达（首个格子渲染）后：spinner 淡出、日历淡入
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const id = setTimeout(() => setMounted(true), 3000);
-    return () => clearTimeout(id);
-  }, []);
-
-  // 重复调用 setReady(true) 会被 React 忽略，365 个格子只有首个触发状态更新
-  const handleFirstRender = useCallback(() => setReady(true), []);
+  const { t, locale } = useLanguage();
+  const en = locale === "en";
+  const calendar = useRef<HTMLDivElement>(null);
+  const nearViewport = useInView(calendar, { once: true, margin: "480px" });
 
   return (
     <section id="contributions" className="scroll-mt-6 py-10">
@@ -74,16 +67,19 @@ export function Contributions() {
       </Reveal>
 
       <Reveal delay="3.05s" direction="down">
-        <div className="relative mt-4 w-full overflow-hidden rounded-xl border bg-card p-4">
-          {/* 日历层：就绪前透明（min-h 防塌陷），数据到达后淡入 */}
-          <div
-            className={cn(
-              "flex min-h-[112px] min-w-0 justify-center transition-opacity duration-500",
-              ready ? "opacity-100" : "opacity-0",
-            )}
-            aria-hidden={!ready}
-          >
-            {mounted ? (
+        <div className="mt-4 grid w-full gap-6 rounded-xl border bg-muted/40 p-4 sm:p-6 lg:grid-cols-[180px_minmax(0,1fr)] lg:items-stretch lg:gap-8">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-1 lg:grid-rows-2">
+            <div className="flex flex-col justify-center rounded-xl border border-border/40 bg-card px-4 py-3">
+              <p className="contribution-number text-3xl font-medium tracking-tight tabular-nums">8B+</p>
+              <p className="mt-1 text-sm text-muted-foreground">{en ? "Total tokens" : "累计 Token"}</p>
+            </div>
+            <div className="flex flex-col justify-center rounded-xl border border-border/40 bg-card px-4 py-3">
+              <p className="contribution-number text-3xl font-medium tracking-tight tabular-nums">1B+</p>
+              <p className="mt-1 text-sm text-muted-foreground">{en ? "Peak tokens" : "峰值 Token"}</p>
+            </div>
+          </div>
+          <div ref={calendar} className="contribution-calendar flex min-h-[150px] min-w-0 justify-center">
+            {nearViewport ? (
               <GitHubCalendar
                 username="HanHanWeb"
                 year="last"
@@ -93,8 +89,9 @@ export function Contributions() {
                 colorScheme={resolvedTheme === "dark" ? "dark" : "light"}
                 showTotalCount={false}
                 throwOnError={false}
+                errorMessage={en ? "Could not load contribution data." : "暂时无法加载贡献数据。"}
                 renderBlock={(block, activity) => (
-                  <BlockTooltip key={activity.date} block={block} onFirstRender={handleFirstRender}>
+                  <BlockTooltip key={activity.date} block={block}>
                     <p>
                       {activity.count === 0
                         ? t.contributions.tooltipEmpty.replace("{date}", activity.date)
@@ -105,18 +102,7 @@ export function Contributions() {
                   </BlockTooltip>
                 )}
               />
-            ) : null}
-          </div>
-
-          {/* 圆圈加载层：数据到达后淡出并放行交互 */}
-          <div
-            className={cn(
-              "absolute inset-0 flex items-center justify-center transition-opacity duration-300",
-              ready ? "pointer-events-none opacity-0" : "opacity-100",
-            )}
-            aria-hidden
-          >
-            <Loader2 className="size-6 animate-spin text-muted-foreground/50" />
+            ) : <CalendarLoading />}
           </div>
         </div>
       </Reveal>

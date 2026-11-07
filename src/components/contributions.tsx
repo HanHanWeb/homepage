@@ -74,7 +74,7 @@ export function Contributions() {
               <p className="mt-1 text-sm text-muted-foreground">{en ? "Total tokens" : "累计 Token"}</p>
             </div>
             <div className="flex flex-col justify-center rounded-xl border border-border/40 bg-card px-4 py-3">
-              <p className="contribution-number text-3xl font-medium tracking-tight tabular-nums">1B+</p>
+              <p className="contribution-number text-3xl font-medium tracking-tight tabular-nums">300M+</p>
               <p className="mt-1 text-sm text-muted-foreground">{en ? "Peak tokens" : "峰值 Token"}</p>
             </div>
           </div>

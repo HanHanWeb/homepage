@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, Quote } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Code2 } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { GithubIcon } from "@/components/icons";
 import { ImageSlide } from "@/components/image-slide";
+import { ProjectTestimonials } from "@/components/project-testimonials";
 import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,12 @@ export function Projects() {
   const roles = en
     ? [featured.roleEn, "Planning", "Design", "Promotion", "Development"]
     : [featured.roleZh, "策划", "设计", "宣传", "开发"];
+  const stats = [
+    { value: "500+", label: en ? "Registered users" : "注册用户" },
+    { value: "360+", label: en ? "Days in operation" : "运营天数" },
+    { value: "5+", label: en ? "Supporting services" : "附属设施" },
+    { value: "10+", label: en ? "Team members" : "团队人数" },
+  ];
   const activeCount = PROJECTS.filter((project) => project.tagZh !== "归档").length;
   const archiveCount = PROJECTS.length - activeCount;
   const visible = PROJECTS.filter((project) => filter === "all" || (project.tagZh === "归档") === (filter === "archive"));
@@ -61,36 +68,26 @@ export function Projects() {
       </div>
 
       <article className="cursor-spotlight mt-7 overflow-hidden rounded-xl border border-border/60 bg-muted/40 sm:mt-10">
-        <div className="grid gap-5 p-4 min-[375px]:p-5 sm:gap-8 sm:p-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
+        <div className="grid items-start gap-5 p-4 min-[375px]:p-5 sm:gap-8 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-10">
           <div className="flex min-w-0 flex-col items-start">
+            <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground">{en ? featured.name : featured.nameEn.toUpperCase()}</p>
             <h2 className="text-2xl font-medium tracking-tight sm:text-4xl">{en ? featured.nameEn : featured.name}</h2>
             <div className="mt-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
               {roles.map((role) => (
                 <Badge key={role} variant="outline" className="h-6 px-2 sm:px-3">{role}</Badge>
               ))}
             </div>
-            <p className="mt-4 text-sm leading-6 text-muted-foreground sm:mt-5 sm:leading-7">{en ? featured.descEn : featured.descZh}</p>
-            <div className="mt-auto w-full pt-5 sm:pt-8">
-              <p className="mb-2.5 text-xs text-muted-foreground sm:mb-4">{t.projects.affiliated}</p>
-              <ul className="grid grid-cols-2 gap-x-3 gap-y-2.5 border-t border-border/70 pt-3 sm:gap-x-5 sm:gap-y-3 sm:pt-5">
-                {featured.subProjects.map((project) => (
-                  <li key={project.name} className="flex min-w-0 items-start gap-2 text-sm leading-5 sm:items-center sm:gap-2.5">
-                    <span aria-hidden className="mt-[7px] size-1.5 shrink-0 rounded-full bg-muted-foreground/40 sm:mt-0" />
-                    {en ? project.nameEn : project.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <p className="mt-4 max-w-prose text-sm leading-6 text-pretty text-muted-foreground sm:mt-5 sm:leading-7">{en ? featured.descEn : featured.descZh}</p>
+            <dl className="mt-5 grid w-full grid-cols-2 gap-2 sm:gap-2.5">
+              {stats.map(({ value, label }) => (
+                <div key={label} className="flex min-w-0 flex-col rounded-lg border border-border/60 bg-card px-3 pt-3 pb-2 sm:px-3.5">
+                  <dt className="mt-1 text-xs leading-5 text-muted-foreground">{label}</dt>
+                  <dd className="stat-number order-first text-2xl leading-none font-medium tracking-tight tabular-nums">{value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
-          <figure className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2.5 rounded-lg border border-border/60 bg-card p-4 sm:flex sm:flex-col sm:justify-between sm:p-6">
-            <Quote aria-hidden className="mt-1 size-4 text-muted-foreground/40 sm:mt-0 sm:size-6" />
-            <blockquote className="text-sm leading-6 tracking-tight sm:mt-4 sm:text-base sm:leading-8">{en ? featured.quote.textEn : featured.quote.textZh}</blockquote>
-            <figcaption className="col-span-full mt-4 flex w-full items-start gap-3 border-t border-border/60 pt-3 sm:mt-6 sm:pt-5">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={featured.quote.avatar} alt="" loading="lazy" className="size-9 shrink-0 rounded-full border object-cover" />
-              <div className="min-w-0"><p className="text-sm font-medium">{en ? featured.quote.authorEn : featured.quote.author}</p><div className="mt-1 h-5 overflow-hidden text-xs leading-5 text-muted-foreground" title={en ? featured.quote.titleEn : featured.quote.titleZh}><span className="sr-only">{en ? featured.quote.titleEn : featured.quote.titleZh}</span><div aria-hidden className="project-title-cycle">{[...(en ? featured.quote.titleEn : featured.quote.titleZh).split("·"), (en ? featured.quote.titleEn : featured.quote.titleZh).split("·")[0]].map((title, index) => <span key={index} className="block h-5 truncate">{title.trim()}</span>)}</div></div></div>
-            </figcaption>
-          </figure>
+          <ProjectTestimonials quotes={featured.quotes} en={en} />
         </div>
       </article>
 

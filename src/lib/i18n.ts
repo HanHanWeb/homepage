@@ -78,7 +78,6 @@ export const dictionaries = {
     },
     projects: {
       title: "项目",
-      affiliated: "附属项目",
     },
     blog: {
       title: "博客",
@@ -193,7 +192,6 @@ export const dictionaries = {
     },
     projects: {
       title: "Projects",
-      affiliated: "Affiliated",
     },
     blog: {
       title: "Blog",

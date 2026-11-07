@@ -52,7 +52,7 @@ export function HomeNav({ menu }: { menu?: ReactNode }) {
         <nav aria-label={zh ? "主导航" : "Main navigation"} style={{ height: navHeight }} className="site-container flex items-center justify-between gap-4">
           <div className="flex items-center gap-6 lg:gap-10">
             <Link href="/" aria-label={zh ? "Han · 首页" : "Han · Home"} className="flex min-h-11 shrink-0 items-center gap-2.5 rounded-md text-lg font-semibold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-              <Image src="/icon.png" alt="" width={28} height={28} className="size-7 rounded-lg" />
+              <Image src="/icon.png" alt="" width={28} height={28} className="size-7 rounded-full object-cover" />
               Han
             </Link>
             <div className="hidden items-center gap-1 sm:flex">

@@ -1,6 +1,6 @@
 "use client";
 
-import { Monitor, Moon, Search, SlidersHorizontal, Sun } from "lucide-react";
+import { Menu, Monitor, Moon, Search, SlidersHorizontal, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -64,14 +64,17 @@ export function HomeNav({ menu }: { menu?: ReactNode }) {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <button type="button" aria-label={zh ? "搜索与快捷操作" : "Search and quick actions"} aria-haspopup="dialog" onClick={() => document.dispatchEvent(new Event("open-command-palette"))} className="inline-flex h-9 min-w-9 items-center justify-center gap-2 rounded-full nav-glass px-3 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:min-w-36 sm:justify-start">
+            <button type="button" aria-label={zh ? "搜索与快捷操作" : "Search and quick actions"} aria-haspopup="dialog" onClick={() => document.dispatchEvent(new Event("open-command-palette"))} className="inline-flex size-9 shrink-0 items-center justify-center gap-2 rounded-full nav-glass p-0 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto sm:min-w-36 sm:justify-start sm:px-3">
               <Search aria-hidden className="size-4" />
               <span className="hidden sm:inline">{zh ? "搜索" : "Search"}</span>
               <kbd aria-hidden className="ml-auto hidden pl-1 font-sans text-xs text-muted-foreground/70 sm:inline-flex">Ctrl K</kbd>
             </button>
               <DropdownMenu>
-                <DropdownMenuTrigger aria-label={zh ? "外观与语言设置" : "Appearance and language settings"} className="flex size-9 shrink-0 items-center justify-center rounded-full nav-glass text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <SlidersHorizontal aria-hidden className="size-[18px]" />
+                <DropdownMenuTrigger className="flex size-9 shrink-0 items-center justify-center rounded-full nav-glass text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  <Menu aria-hidden className="size-[18px] sm:hidden" />
+                  <SlidersHorizontal aria-hidden className="hidden size-[18px] sm:block" />
+                  <span className="sr-only sm:hidden">{zh ? "导航与设置" : "Navigation and settings"}</span>
+                  <span className="sr-only hidden sm:block">{zh ? "外观与语言设置" : "Appearance and language settings"}</span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
@@ -79,10 +82,10 @@ export function HomeNav({ menu }: { menu?: ReactNode }) {
                   collisionPadding={12}
                   className="w-[min(22rem,calc(100vw-1.5rem))] min-w-0 rounded-2xl border border-border bg-popover p-1.5 shadow-lg ring-0"
                 >
-                  <DropdownMenuGroup className="border-b border-border/70 px-1 pb-1 sm:hidden">
+                  <DropdownMenuGroup aria-label={zh ? "快速导航" : "Quick navigation"} className="space-y-0.5 border-b border-border/70 pb-1.5 sm:hidden">
                     {items.map((item) => (
                       <DropdownMenuItem key={item.href} asChild>
-                        <Link href={item.href} aria-current={isActive(item.href) ? "page" : undefined} className="min-h-8">{item.label}</Link>
+                        <Link href={item.href} aria-current={isActive(item.href) ? "page" : undefined} className="min-h-10 rounded-lg px-2.5 aria-[current=page]:bg-muted aria-[current=page]:font-medium">{item.label}</Link>
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuGroup>

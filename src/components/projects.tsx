@@ -41,13 +41,9 @@ export function Projects() {
   const [slideDirection, setSlideDirection] = useState(1);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const featured = FEATURED_PROJECT;
-  const roles = [
-    { label: en ? featured.roleEn : featured.roleZh, color: "bg-lime-200 text-lime-900 dark:bg-lime-900/70 dark:text-lime-200" },
-    { label: en ? "Planning" : "策划", color: "bg-cyan-200 text-cyan-900 dark:bg-cyan-900/70 dark:text-cyan-200" },
-    { label: en ? "Design" : "设计", color: "bg-rose-200 text-rose-900 dark:bg-rose-900/70 dark:text-rose-200" },
-    { label: en ? "Promotion" : "宣传", color: "bg-amber-200 text-amber-900 dark:bg-amber-900/70 dark:text-amber-200" },
-    { label: en ? "Development" : "开发", color: "bg-violet-200 text-violet-900 dark:bg-violet-900/70 dark:text-violet-200" },
-  ];
+  const roles = en
+    ? [featured.roleEn, "Planning", "Design", "Promotion", "Development"]
+    : [featured.roleZh, "策划", "设计", "宣传", "开发"];
   const activeCount = PROJECTS.filter((project) => project.tagZh !== "归档").length;
   const archiveCount = PROJECTS.length - activeCount;
   const visible = PROJECTS.filter((project) => filter === "all" || (project.tagZh === "归档") === (filter === "archive"));
@@ -64,32 +60,32 @@ export function Projects() {
         <span className="shrink-0 font-mono text-xs text-muted-foreground">{String(PROJECTS.length + 1).padStart(2, "0")} {en ? "PROJECTS" : "个项目"}</span>
       </div>
 
-      <article className="cursor-spotlight mt-10 overflow-hidden rounded-xl border border-border/60 bg-muted/40">
-        <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
+      <article className="cursor-spotlight mt-7 overflow-hidden rounded-xl border border-border/60 bg-muted/40 sm:mt-10">
+        <div className="grid gap-5 p-4 min-[375px]:p-5 sm:gap-8 sm:p-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
           <div className="flex min-w-0 flex-col items-start">
-            <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">{en ? featured.nameEn : featured.name}</h2>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              {roles.map(({ label, color }) => (
-                <Badge key={label} className={`h-6 rounded-full border-0 px-2.5 ${color}`}>{label}</Badge>
+            <h2 className="text-2xl font-medium tracking-tight sm:text-4xl">{en ? featured.nameEn : featured.name}</h2>
+            <div className="mt-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
+              {roles.map((role) => (
+                <Badge key={role} variant="outline" className="h-6 px-2 sm:px-3">{role}</Badge>
               ))}
             </div>
-            <p className="mt-5 text-sm leading-7 text-muted-foreground">{en ? featured.descEn : featured.descZh}</p>
-            <div className="mt-auto w-full pt-8">
-              <p className="mb-4 text-xs text-muted-foreground">{t.projects.affiliated}</p>
-              <ul className="grid grid-cols-1 gap-x-5 gap-y-3 border-t border-border/70 pt-5 min-[400px]:grid-cols-2">
+            <p className="mt-4 text-sm leading-6 text-muted-foreground sm:mt-5 sm:leading-7">{en ? featured.descEn : featured.descZh}</p>
+            <div className="mt-auto w-full pt-5 sm:pt-8">
+              <p className="mb-2.5 text-xs text-muted-foreground sm:mb-4">{t.projects.affiliated}</p>
+              <ul className="grid grid-cols-2 gap-x-3 gap-y-2.5 border-t border-border/70 pt-3 sm:gap-x-5 sm:gap-y-3 sm:pt-5">
                 {featured.subProjects.map((project) => (
-                  <li key={project.name} className="flex min-w-0 items-center gap-2.5 text-sm leading-5">
-                    <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
+                  <li key={project.name} className="flex min-w-0 items-start gap-2 text-sm leading-5 sm:items-center sm:gap-2.5">
+                    <span aria-hidden className="mt-[7px] size-1.5 shrink-0 rounded-full bg-muted-foreground/40 sm:mt-0" />
                     {en ? project.nameEn : project.name}
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-          <figure className="flex min-w-0 flex-col justify-between rounded-lg border border-border/60 bg-card p-5 sm:p-6">
-            <Quote aria-hidden className="size-6 text-muted-foreground/40" />
-            <blockquote className="mt-4 text-base leading-8 tracking-tight">{en ? featured.quote.textEn : featured.quote.textZh}</blockquote>
-            <figcaption className="mt-6 flex items-start gap-3 border-t border-border/60 pt-5">
+          <figure className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2.5 rounded-lg border border-border/60 bg-card p-4 sm:flex sm:flex-col sm:justify-between sm:p-6">
+            <Quote aria-hidden className="mt-1 size-4 text-muted-foreground/40 sm:mt-0 sm:size-6" />
+            <blockquote className="text-sm leading-6 tracking-tight sm:mt-4 sm:text-base sm:leading-8">{en ? featured.quote.textEn : featured.quote.textZh}</blockquote>
+            <figcaption className="col-span-full mt-4 flex w-full items-start gap-3 border-t border-border/60 pt-3 sm:mt-6 sm:pt-5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={featured.quote.avatar} alt="" loading="lazy" className="size-9 shrink-0 rounded-full border object-cover" />
               <div className="min-w-0"><p className="text-sm font-medium">{en ? featured.quote.authorEn : featured.quote.author}</p><div className="mt-1 h-5 overflow-hidden text-xs leading-5 text-muted-foreground" title={en ? featured.quote.titleEn : featured.quote.titleZh}><span className="sr-only">{en ? featured.quote.titleEn : featured.quote.titleZh}</span><div aria-hidden className="project-title-cycle">{[...(en ? featured.quote.titleEn : featured.quote.titleZh).split("·"), (en ? featured.quote.titleEn : featured.quote.titleZh).split("·")[0]].map((title, index) => <span key={index} className="block h-5 truncate">{title.trim()}</span>)}</div></div></div>
@@ -122,10 +118,7 @@ export function Projects() {
                 </div>
                 <div className="mt-4 flex w-full items-start justify-between gap-3 px-1">
                   <h2 className="min-w-0 text-base font-medium tracking-tight">{en ? project.nameEn : project.name}</h2>
-                  <Badge className={archived
-                    ? "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200"
-                    : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200"
-                  }>
+                  <Badge variant="outline">
                     {archived && en ? "Archive" : en ? project.tagEn : project.tagZh}
                   </Badge>
                 </div>

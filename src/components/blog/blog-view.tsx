@@ -9,7 +9,7 @@ import {
   Menu,
   Rss,
   Search,
-} from "lucide-react";
+} from "@/components/animated-icons";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";

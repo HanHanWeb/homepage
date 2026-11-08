@@ -1,9 +1,6 @@
 import type { SVGProps } from "react";
 
-/**
- * lucide-react v1.x 已移除品牌图标（Github、QQ、Bilibili 等），
- * 这里用官方品牌 SVG 补充，样式与 lucide 一致（currentColor、24x24）。
- */
+/** 品牌图标使用 24×24 坐标系和 currentColor。 */
 export function GithubIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg

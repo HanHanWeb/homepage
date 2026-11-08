@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@/components/animated-icons";
 import Link from "next/link";
 
 /** 分区标题行：衬线大标题 + 右侧 #TAG 标签；提供 href 时 TAG 是独立页入口 */

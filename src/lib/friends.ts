@@ -1,4 +1,4 @@
-/** 友情链接(友情链接板块使用;description 为简介,avatar/href 缺省时渲染 lucide Link2/无链接卡片) */
+/** 友情链接。没有头像时使用链接图标，没有网址时显示静态卡片。 */
 export const FRIENDS: Array<{
   name: string;
   description: string;

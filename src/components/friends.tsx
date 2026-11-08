@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, Link2, Mail } from "lucide-react";
+import { ArrowUpRight, Link2, Mail } from "@/components/animated-icons";
 
 import { useLanguage } from "@/components/language-provider";
 import { Reveal } from "@/components/reveal";

@@ -9,7 +9,7 @@ import {
   Target,
   Trophy,
   User,
-} from "lucide-react";
+} from "@/components/animated-icons";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 

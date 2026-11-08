@@ -441,6 +441,73 @@ html::-webkit-scrollbar {
   .marquee-copy { gap: 10px; padding: 0; }
 }
 
+@property --text-reveal-progress {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@supports (animation-timeline: view()) and (color: color-mix(in srgb, black, transparent)) {
+  @media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+    .scroll-text-reveal {
+      animation: scroll-text-reveal auto linear both;
+      animation-timeline: view(block 42% 20%);
+    }
+
+    .scroll-text-reveal-from-top {
+      animation-timeline: scroll(root block);
+      animation-range: 0px 5rem;
+    }
+
+    .scroll-text-reveal-word {
+      --word-progress: clamp(0, var(--text-reveal-progress) - var(--text-reveal-index), 1);
+      color: color-mix(in srgb, var(--foreground) calc(45% + 55% * var(--word-progress)), transparent);
+    }
+
+    @keyframes scroll-text-reveal {
+      from { --text-reveal-progress: 0; }
+      to { --text-reveal-progress: var(--text-reveal-count); }
+    }
+  }
+}
+
+.site-icon-animation > svg {
+  width: 100%;
+  height: 100%;
+}
+
+.site-icon-animation {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-icon:has(> .site-icon-animation > svg) > use {
+    visibility: hidden;
+  }
+
+  .site-icon > use, [data-brand-icon] {
+    transform-box: view-box;
+    transform-origin: center;
+    transition: scale 200ms ease-out;
+  }
+
+  .site-icon[data-icon-hover] > use, :focus-visible [data-brand-icon] {
+    scale: 1.12;
+  }
+
+  @media (hover: hover) {
+    :is(a, button, [data-slot="badge"]):hover [data-brand-icon] {
+      scale: 1.12;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-icon-animation {
+    display: none;
+  }
+}
+
 /* Local hover light, with a neutral tint on light surfaces. */
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .cursor-spotlight {

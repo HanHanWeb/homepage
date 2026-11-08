@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Pause, Play, Quote } from "lucide-react";
+import { ChevronDown, ChevronUp, Pause, Play, Quote } from "@/components/animated-icons";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 

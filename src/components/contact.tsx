@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, Mail, QrCode } from "lucide-react";
+import { ArrowUpRight, Mail, QrCode } from "@/components/animated-icons";
 import Image from "next/image";
 import { siWechat } from "simple-icons";
 

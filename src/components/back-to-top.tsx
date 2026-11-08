@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUp } from "lucide-react";
+import { ArrowUp } from "@/components/animated-icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 

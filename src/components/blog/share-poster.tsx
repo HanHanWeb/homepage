@@ -1,6 +1,6 @@
 "use client";
 
-import { ImageDown } from "lucide-react";
+import { ImageDown } from "@/components/animated-icons";
 import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
 import { useTheme } from "next-themes";
@@ -148,7 +148,7 @@ function pathRoundRect(
   ctx.closePath();
 }
 
-/** lucide 风格线性小图标（24 viewBox 坐标），通过 drawIcon 缩放上屏 */
+/** 线性小图标使用 24×24 坐标，通过 drawIcon 缩放。 */
 function iconCalendar(ctx: CanvasRenderingContext2D) {
   ctx.beginPath();
   if (typeof ctx.roundRect === "function") ctx.roundRect(3, 4, 18, 18, 3);

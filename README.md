@@ -35,7 +35,7 @@
 | 框架 | [Next.js 16](https://nextjs.org) · [React 19](https://react.dev) |
 | 语言 | [TypeScript](https://www.typescriptlang.org) |
 | 样式 | [Tailwind CSS 4](https://tailwindcss.com) · [shadcn/ui](https://ui.shadcn.com) |
-| 组件 | [Radix UI](https://radix-ui.com) · [lucide-react](https://lucide.dev) |
+| 组件 | [Radix UI](https://radix-ui.com) · [useAnimations](https://useanimations.com/zh) |
 | 动效 | [Motion](https://motion.dev) · [tw-animate-css](https://tw-animate-css.vercel.app) |
 | 主题 | [next-themes](https://github.com/pacocoursey/next-themes) |
 

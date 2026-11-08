@@ -19,6 +19,7 @@ export function BrandIcon({
   const viewBox = "viewBox" in icon && icon.viewBox ? icon.viewBox : "0 0 24 24";
   return (
     <svg
+      data-brand-icon=""
       viewBox={viewBox}
       aria-hidden="true"
       className={cn("size-3 shrink-0", className)}

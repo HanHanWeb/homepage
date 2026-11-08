@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Monitor, Moon, Search, SlidersHorizontal, Sun } from "lucide-react";
+import { Menu, Monitor, Moon, Search, SlidersHorizontal, Sun } from "@/components/animated-icons";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -108,7 +108,7 @@ export function HomeNav({ menu }: { menu?: ReactNode }) {
                           aria-label={option.label}
                           title={option.label}
                           onSelect={(event) => event.preventDefault()}
-                          className={cn(settingsOption, "w-9 px-0")}
+                          className={cn(settingsOption, "size-8 px-0 sm:size-7")}
                         >
                           <option.icon aria-hidden />
                         </DropdownMenuRadioItem>

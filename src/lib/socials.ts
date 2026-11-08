@@ -1,7 +1,7 @@
 import type { SimpleIcon } from "simple-icons";
 import { siAfdian, siBilibili, siGithub, siQq, siX } from "simple-icons";
 
-/** 联系方式(联系板块使用;handle 为副标题;icon 缺省时渲染 lucide Mail) */
+/** 联系方式。handle 为副标题，未提供品牌图标时使用邮件图标。 */
 export const SOCIALS: Array<{
   name: string;
   handle: string;

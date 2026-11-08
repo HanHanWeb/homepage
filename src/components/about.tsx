@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import { Sparkles } from "@/components/animated-icons";
 import {
   siCodebuddy,
   siCss,
@@ -28,6 +28,7 @@ import {
 
 import { useLanguage } from "@/components/language-provider";
 import { Reveal } from "@/components/reveal";
+import { ScrollTextReveal } from "@/components/scroll-text-reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { BrandIcon, type BrandIconDef } from "@/components/ui/brand-icon";
@@ -88,11 +89,10 @@ export function About() {
       <div className="mt-6 space-y-4">
         <Reveal delay="1.5s" direction="down">
           <div className="space-y-2.5">
-            <p className="max-w-3xl text-xl leading-relaxed tracking-tight sm:text-2xl">
-              {t.about.lead}
-              <span className="block text-muted-foreground">{t.about.description}</span>
-              <span className="block text-muted-foreground">{t.about.designNote}</span>
-            </p>
+            <ScrollTextReveal
+              className="max-w-3xl text-xl leading-relaxed tracking-tight sm:text-2xl"
+              lines={[t.about.lead, t.about.description, t.about.designNote]}
+            />
             <Badge variant="outline" className="dark:border-white/20">
               <Sparkles />
               {t.about.personality}

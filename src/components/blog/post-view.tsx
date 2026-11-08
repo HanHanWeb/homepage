@@ -2,7 +2,7 @@
 
 import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
-import { Calendar, Clock, Menu } from "lucide-react";
+import { Calendar, Clock, Menu } from "@/components/animated-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 

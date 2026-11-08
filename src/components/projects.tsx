@@ -1,12 +1,12 @@
 "use client";
 
-import { ArrowUpRight, ChevronLeft, ChevronRight, Code2 } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, GithubIcon } from "@/components/animated-icons";
 import { useRef, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
-import { GithubIcon } from "@/components/icons";
 import { ImageSlide } from "@/components/image-slide";
 import { ProjectTestimonials } from "@/components/project-testimonials";
+import { ScrollTextReveal } from "@/components/scroll-text-reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -59,10 +59,12 @@ export function Projects() {
   return (
     <section id="projects" className="min-w-0 pb-8">
       <SectionHeading title={t.projects.title} tag="#PROJECTS" level={1} />
-      <p className="mt-6 max-w-lg text-xl leading-relaxed tracking-tight sm:text-2xl">
-        {en ? "Ideas, brought to life." : "把想法，做成可以使用的东西。"}
-        <span className="block text-muted-foreground">{en ? "A collection of things I build and care about." : "一些独立开发，一些共同创造。"}</span>
-      </p>
+      <ScrollTextReveal
+        className="scroll-text-reveal-from-top mt-6 max-w-lg text-xl leading-relaxed tracking-tight sm:text-2xl"
+        lines={en
+          ? ["Ideas, brought to life.", "A collection of things I build and care about."]
+          : ["把想法，做成可以使用的东西。", "一些独立开发，一些共同创造。"]}
+      />
 
       <article className="mt-7 overflow-hidden rounded-xl border border-border/60 bg-muted/40 sm:mt-10">
         <div className="grid items-start gap-5 p-4 min-[375px]:p-5 sm:gap-8 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-10">

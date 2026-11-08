@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Clock } from "lucide-react";
+import { Clock } from "@/components/animated-icons";
 
 import { useLanguage } from "@/components/language-provider";
 import { Reveal } from "@/components/reveal";

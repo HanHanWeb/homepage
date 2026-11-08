@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, Component, SquarePlay, Terminal } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, Component, SquarePlay, Terminal } from "@/components/animated-icons";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { ImageSlide } from "@/components/image-slide";
+import { ScrollTextReveal } from "@/components/scroll-text-reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
@@ -54,19 +55,19 @@ export function Focus() {
     <section id="focus" className="w-full min-w-0 scroll-mt-20 py-12 sm:py-16">
       <SectionHeading title={t.services.title} tag="#FOCUS" />
       <div className="mt-6 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
-        <p className="max-w-lg text-xl leading-relaxed tracking-tight sm:text-2xl">
-          {zh ? "把想法变成看得见的作品。" : "Turning ideas into things you can see."}
-          <span className="block text-muted-foreground">
-            {zh ? "在技术、设计与影像之间，持续探索。" : "Exploring code, design, and visual stories."}
-          </span>
-        </p>
+        <ScrollTextReveal
+          className="max-w-lg text-xl leading-relaxed tracking-tight sm:text-2xl"
+          lines={zh
+            ? ["把想法变成看得见的作品。", "在技术、设计与影像之间，持续探索。"]
+            : ["Turning ideas into things you can see.", "Exploring code, design, and visual stories."]}
+        />
         <Link href="/projects" className="cursor-spotlight inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-muted px-4 text-sm transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
           {zh ? "查看项目" : "See projects"}
           <ArrowUpRight aria-hidden className="size-3.5" />
         </Link>
       </div>
 
-      <div className="mt-10 flex flex-col gap-8">
+      <div className="mt-10 flex flex-col gap-4">
         <article className={`${panelClass} p-6 sm:p-7`}>
           <div>
             <div className="flex items-center justify-between gap-4">

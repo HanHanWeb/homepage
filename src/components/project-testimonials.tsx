@@ -90,7 +90,7 @@ export function ProjectTestimonials({ quotes, en }: { quotes: FeaturedProject["q
                 )}
               >
                 <div className={cn("flex items-start gap-2.5 transition-opacity duration-200 motion-reduce:transition-none", !active && "opacity-0")}>
-                  <Quote aria-hidden className="mt-1 size-4 shrink-0 rotate-180 text-muted-foreground/40" />
+                  <Quote aria-hidden className="mt-1 size-4 shrink-0 text-muted-foreground/40" />
                   <blockquote className="text-sm leading-6">{en ? quote.textEn : quote.textZh}</blockquote>
                 </div>
                 <figcaption className={cn("mt-auto flex min-w-0 items-start gap-2.5 pt-3.5 transition-opacity duration-200 motion-reduce:transition-none", !active && "opacity-0")}>

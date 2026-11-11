@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, GithubIcon } from "@/components/animated-icons";
+import { motion } from "motion/react";
 import { useRef, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
@@ -11,8 +12,35 @@ import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn } from "@/lib/utils";
 import { FEATURED_PROJECT, PROJECTS, type Project } from "@/lib/projects";
+
+/** 统计卡片右下的水印图标：用户 / 日历 / 楼宇 / 多人 */
+const STAT_ICONS = [
+  <>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </>,
+  <>
+    <path d="M8 2v4M16 2v4" />
+    <rect width="18" height="18" x="3" y="4" rx="2" />
+    <path d="M3 10h18" />
+    <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
+  </>,
+  <>
+    <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+    <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+    <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+    <path d="M10 6h4M10 10h4M10 14h4M10 18h4" />
+  </>,
+  <>
+    <path d="M18 21a8 8 0 0 0-16 0" />
+    <circle cx="10" cy="8" r="5" />
+    <path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3" />
+  </>,
+];
 
 function ProjectLinks({ project, en }: { project: Project; en: boolean }) {
   const isGitHub = project.url?.startsWith("https://github.com/");
@@ -61,9 +89,7 @@ export function Projects() {
       <SectionHeading title={t.projects.title} tag="#PROJECTS" level={1} />
       <ScrollTextReveal
         className="scroll-text-reveal-from-top mt-6 max-w-lg text-xl leading-relaxed tracking-tight sm:text-2xl"
-        lines={en
-          ? ["Ideas, brought to life.", "A collection of things I build and care about."]
-          : ["把想法，做成可以使用的东西。", "一些独立开发，一些共同创造。"]}
+        lines={en ? ["Ideas, brought to life."] : ["把想法，做成可以使用的东西。"]}
       />
 
       <article className="mt-7 overflow-hidden rounded-xl border border-border/60 bg-muted/40 sm:mt-10">
@@ -78,9 +104,23 @@ export function Projects() {
             </div>
             <p className="mt-4 max-w-prose text-sm leading-6 text-pretty text-muted-foreground sm:mt-5 sm:leading-7">{en ? featured.descEn : featured.descZh}</p>
             <dl className="mt-5 grid w-full grid-cols-2 gap-2 sm:gap-2.5">
-              {stats.map(({ value, label }) => (
+              {stats.map(({ value, label }, index) => (
                 <div key={label} className="cursor-spotlight flex min-w-0 flex-col rounded-lg border border-border/60 bg-card px-3 pt-3 pb-2 sm:px-3.5">
-                  <dt className="mt-1 text-xs leading-5 text-muted-foreground">{label}</dt>
+                  <dt className="mt-1 flex items-center justify-between gap-2 text-xs leading-5 text-muted-foreground">
+                    <span className="truncate">{label}</span>
+                    <svg
+                      aria-hidden
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="size-3.5 shrink-0 opacity-40"
+                    >
+                      {STAT_ICONS[index]}
+                    </svg>
+                  </dt>
                   <dd className="stat-number order-first text-2xl leading-none font-medium tracking-tight tabular-nums">{value}</dd>
                 </div>
               ))}
@@ -91,11 +131,38 @@ export function Projects() {
       </article>
 
       <div className="mt-12 flex flex-wrap items-center justify-between gap-4">
-        <ToggleGroup type="single" variant="outline" value={filter} onValueChange={(value) => { if (value) setFilter(value); }} aria-label={en ? "Project collection" : "项目分类"}>
-          <ToggleGroupItem value="all" className="cursor-spotlight gap-2 px-4">{en ? "All" : "全部"}<span className="text-xs text-muted-foreground">{PROJECTS.length}</span></ToggleGroupItem>
-          <ToggleGroupItem value="active" className="cursor-spotlight gap-2 px-4">{en ? "Development" : "开发"}<span className="text-xs text-muted-foreground">{activeCount}</span></ToggleGroupItem>
-          <ToggleGroupItem value="archive" className="cursor-spotlight gap-2 px-4">{en ? "Archive" : "归档"}<span className="text-xs text-muted-foreground">{archiveCount}</span></ToggleGroupItem>
-        </ToggleGroup>
+        <div role="tablist" aria-label={en ? "Project collection" : "项目分类"} className="inline-flex items-center gap-1 rounded-full bg-muted p-1 dark:bg-muted/50">
+          {[
+            { value: "all", label: en ? "All" : "全部", count: PROJECTS.length },
+            { value: "active", label: en ? "Development" : "开发", count: activeCount },
+            { value: "archive", label: en ? "Archive" : "归档", count: archiveCount },
+          ].map((item) => {
+            const active = filter === item.value;
+            return (
+              <button
+                key={item.value}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setFilter(item.value)}
+                className={cn(
+                  "relative inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                  active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="project-filter-pill"
+                    className="absolute inset-0 rounded-full bg-background shadow-xs dark:bg-accent"
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                  />
+                )}
+                <span className="relative">{item.label}</span>
+                <span className={cn("relative text-xs tabular-nums transition-colors", active ? "text-muted-foreground" : "text-muted-foreground/60")}>{item.count}</span>
+              </button>
+            );
+          })}
+        </div>
 
       </div>
 

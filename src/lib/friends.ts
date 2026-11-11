@@ -17,4 +17,10 @@ export const FRIENDS: Array<{
     href: "https://v0id.ink/",
     avatar: "https://q1.qlogo.cn/g?b=qq&nk=1280993766&s=640",
   },
+  {
+    name: "Malloy",
+    description: "🌌 📚 🚴 🍻 🌅 📷 🥤 🤟",
+    href: "https://malloymanga.github.io/",
+    avatar: "https://malloymanga.github.io/_nuxt/avatar-pixel.DHvx2yCj.webp",
+  },
 ];

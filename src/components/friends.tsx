@@ -11,7 +11,7 @@ import { SOCIALS } from "@/lib/socials";
 export function Friends() {
   const { t } = useLanguage();
   return (
-    <section id="friends" className="scroll-mt-6 py-10">
+    <section id="friends" className="scroll-mt-6 pb-8">
       <Reveal delay="3.5s" direction="down">
         <SectionHeading title={t.friends.title} tag="#FRIENDS" level={1} />
       </Reveal>

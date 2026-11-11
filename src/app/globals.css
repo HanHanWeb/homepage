@@ -527,7 +527,11 @@ html::-webkit-scrollbar {
   .cursor-spotlight::after {
     content: "";
     position: absolute;
-    inset: 0;
+    /* `inset: 0` resolves against the padding box, so on a bordered card the
+       pseudo element sat 1px inside while still inheriting the outer radius —
+       that mismatch is what produced a second, slightly flatter arc at the
+       corners. Overhang by the border width so both boxes share one radius. */
+    inset: -1px;
     z-index: 2;
     border-radius: inherit;
     pointer-events: none;
@@ -567,9 +571,7 @@ html::-webkit-scrollbar {
   0% { transform: rotate(0deg) scale(0.85); opacity: 0.65; }
   50% { transform: rotate(90deg) scale(1); opacity: 1; }
   100% { transform: rotate(180deg) scale(0.85); opacity: 0.65; }
-}
-
-.thinking-spark {
+}.thinking-spark {
   animation: thinking-spark 2s steps(8, end) infinite;
   transform-origin: center;
 }

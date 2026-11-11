@@ -91,7 +91,7 @@ export function About() {
               className="max-w-3xl text-xl leading-relaxed tracking-tight sm:text-2xl"
               lines={[t.about.lead, t.about.description, t.about.designNote]}
             />
-            <dl className="mt-2 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
+            <dl className="mt-6 grid max-w-2xl grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4 sm:gap-x-12">
               {t.about.facts.map((fact) => (
                 <div key={fact.label} className="min-w-0">
                   <dt className="text-xs tracking-widest text-muted-foreground">{fact.label}</dt>

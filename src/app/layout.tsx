@@ -5,7 +5,9 @@ import "./globals.css";
 
 import { LanguageProvider } from "@/components/language-provider";
 import { FooterMascots } from "@/components/footer-mascots";
+import { BackToTop } from "@/components/back-to-top";
 import { CommandPalette } from "@/components/command-palette";
+import { HomeNav } from "@/components/home-nav";
 import { SuppressScriptWarning } from "@/components/suppress-script-warning";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SITE_URL } from "@/lib/site";
@@ -67,7 +69,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           disableTransitionOnChange
         >
           <LanguageProvider>
+            <HomeNav />
             {children}
+            <BackToTop />
             <FooterMascots />
             <CommandPalette />
           </LanguageProvider>

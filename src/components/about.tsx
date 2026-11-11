@@ -22,7 +22,6 @@ import {
   siTailwindcss,
   siTrae,
   siTypescript,
-  siZdotai,
   type SimpleIcon,
 } from "simple-icons";
 
@@ -71,7 +70,6 @@ const codexIcon: BrandIconDef = {
 const TOOLS: Array<{ name: string; icon?: SimpleIcon | BrandIconDef }> = [
   { name: "OpenCode", icon: siOpencode },
   { name: "Codex", icon: codexIcon },
-  { name: "ZCode", icon: siZdotai },
   { name: "DeepSeek Harness", icon: siDeepseek },
   { name: "Trae", icon: siTrae },
   { name: "VS Code", icon: siVisualstudiocode },
@@ -93,15 +91,18 @@ export function About() {
               className="max-w-3xl text-xl leading-relaxed tracking-tight sm:text-2xl"
               lines={[t.about.lead, t.about.description, t.about.designNote]}
             />
-            <Badge variant="outline" className="dark:border-white/20">
-              <Sparkles />
-              {t.about.personality}
-            </Badge>
-            <dl className="mt-2 grid max-w-md grid-cols-3 gap-x-4 gap-y-1">
+            <dl className="mt-2 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
               {t.about.facts.map((fact) => (
                 <div key={fact.label} className="min-w-0">
                   <dt className="text-xs tracking-widest text-muted-foreground">{fact.label}</dt>
-                  <dd className="mt-1 text-sm font-medium">{fact.value}</dd>
+                  <dd className="mt-1 flex items-center gap-1.5 text-sm font-medium">
+                    {fact.value}
+                    {fact.tag ? (
+                      <Badge variant="outline" className="dark:border-white/20">
+                        {fact.tag}
+                      </Badge>
+                    ) : null}
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -127,11 +128,16 @@ export function About() {
             {t.about.tools}
           </h3>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {TOOLS.map((tool) => (
-              <Badge key={tool.name} variant="outline" className="dark:border-white/20">
-                {tool.icon ? <BrandIcon icon={tool.icon} /> : <Sparkles className="size-3 shrink-0" />}
-                {tool.name}
-              </Badge>
+            {TOOLS.map((tool, index) => (
+              <span key={tool.name} className="inline-flex items-center gap-1">
+                <Badge variant="outline" className="dark:border-white/20">
+                  {tool.icon ? <BrandIcon icon={tool.icon} /> : <Sparkles className="size-3 shrink-0" />}
+                  {tool.name}
+                </Badge>
+                {index === TOOLS.length - 1 && (
+                  <span aria-hidden className="text-muted-foreground">…</span>
+                )}
+              </span>
             ))}
           </div>
         </Reveal>

@@ -24,6 +24,11 @@ export const dictionaries = {
       description:
         "平时喜欢折腾各种小项目，把想法从草图变成可用的产品。",
       designNote: "我关注简洁、克制的设计。",
+      facts: [
+        { label: "Base", value: "西安" },
+        { label: "年龄", value: "19" },
+        { label: "年级", value: "大一在读" },
+      ],
       personality: "INFJ · 提倡者",
       skills: "技能",
       tools: "开发工具",
@@ -135,6 +140,11 @@ export const dictionaries = {
       description:
         "I love tinkering with small projects and turning ideas from sketches into usable products.",
       designNote: "I care about concise, restrained design.",
+      facts: [
+        { label: "Base", value: "Xi'an" },
+        { label: "Age", value: "19" },
+        { label: "Year", value: "Freshman" },
+      ],
       personality: "INFJ · Advocate",
       skills: "Skills",
       tools: "Tools",

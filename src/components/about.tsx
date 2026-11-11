@@ -97,6 +97,14 @@ export function About() {
               <Sparkles />
               {t.about.personality}
             </Badge>
+            <dl className="mt-2 grid max-w-md grid-cols-3 gap-x-4 gap-y-1">
+              {t.about.facts.map((fact) => (
+                <div key={fact.label} className="min-w-0">
+                  <dt className="text-xs tracking-widest text-muted-foreground">{fact.label}</dt>
+                  <dd className="mt-1 text-sm font-medium">{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </Reveal>
 

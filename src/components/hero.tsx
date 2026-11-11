@@ -68,7 +68,7 @@ export function Hero() {
           className="w-full min-w-0 animate-blur-in"
           style={{ "--blur-delay": "1.1s" } as React.CSSProperties}
         >
-          <TiltCard>
+          <TiltCard className="mx-auto w-full max-w-[26rem]">
             <Terminal
               sequence={false}
               className="cursor-spotlight bg-card text-sm shadow-lg [&_code]:font-mono [&_pre]:font-mono"

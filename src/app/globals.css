@@ -111,7 +111,8 @@
 
 :root {
   --site-content-width: 64rem;
-  --thinking-color: #a75c3c;
+  /* Status text stays in the brand hue; darker on light surfaces for contrast. */
+  --thinking-color: oklch(from var(--ring) calc(l - 0.14) c h);
   --site-gutter: clamp(1rem, 3vw, 1.5rem);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -148,15 +149,15 @@
   --sidebar-ring: oklch(0.708 0 0);
   --bottom-glow-primary: oklch(0.702 0.158 160 / 18%);
   --bottom-glow-secondary: oklch(0.702 0.158 160 / 12%);
-  --color-1: oklch(66.2% 0.225 25.9);
-  --color-2: oklch(60.4% 0.26 302);
-  --color-3: oklch(69.6% 0.165 251);
-  --color-4: oklch(80.2% 0.134 225);
-  --color-5: oklch(90.7% 0.231 133);
+  --color-1: oklch(0.7 0.16 162);
+  --color-2: oklch(0.62 0.15 180);
+  --color-3: oklch(0.84 0.13 148);
+  --color-4: oklch(0.74 0.11 195);
+  --color-5: oklch(0.9 0.09 140);
 }
 
 .dark {
-  --thinking-color: #d99a78;
+  --thinking-color: oklch(from var(--ring) calc(l + 0.08) c h);
   --background: oklch(0.182 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -190,11 +191,11 @@
   --sidebar-ring: oklch(0.556 0 0);
   --bottom-glow-primary: oklch(0.702 0.158 160 / 36%);
   --bottom-glow-secondary: oklch(0.702 0.158 160 / 16%);
-  --color-1: oklch(66.2% 0.225 25.9);
-  --color-2: oklch(60.4% 0.26 302);
-  --color-3: oklch(69.6% 0.165 251);
-  --color-4: oklch(80.2% 0.134 225);
-  --color-5: oklch(90.7% 0.231 133);
+  --color-1: oklch(0.7 0.16 162);
+  --color-2: oklch(0.62 0.15 180);
+  --color-3: oklch(0.84 0.13 148);
+  --color-4: oklch(0.74 0.11 195);
+  --color-5: oklch(0.9 0.09 140);
 }
 
 @layer base {
@@ -542,13 +543,17 @@ html::-webkit-scrollbar {
   }
 
   .cursor-spotlight::after {
-    /* Keep the edge light inside the existing border radius. */
-    padding: 1px;
+    /* Ring is cut from a transparent border, so the mask's inner radius derives
+       from the element radius; a content-box hole leaves square shoulders at the
+       corners and the light drifts off the outline. */
+    border: 1px solid transparent;
     background: radial-gradient(
       52px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
       var(--spotlight-edge), transparent 75%
-    );
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    ) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0) border-box;
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0) border-box;
     mask-composite: exclude;
   }
 

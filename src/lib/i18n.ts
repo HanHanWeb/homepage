@@ -108,7 +108,7 @@ export const dictionaries = {
       actions: "操作",
       copyEmail: "复制邮箱",
       emailCopied: "邮箱已复制",
-      toggleTheme: "切换深浅色主题",
+      toggleTheme: "切换主题",
       toggleLang: "切换语言",
     },
     meta: {

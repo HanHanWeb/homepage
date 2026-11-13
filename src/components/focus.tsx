@@ -8,7 +8,7 @@ import { useLanguage } from "@/components/language-provider";
 import { ImageSlide } from "@/components/image-slide";
 import { ScrollTextReveal } from "@/components/scroll-text-reveal";
 import { SectionHeading } from "@/components/section-heading";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { FilterTabs } from "@/components/filter-tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -79,22 +79,19 @@ export function Focus() {
             </p>
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-            <ToggleGroup
-              type="single"
-              variant="outline"
+            <FilterTabs
+              ariaLabel={zh ? "设计作品分类" : "Design categories"}
               value={category}
               onValueChange={(value) => {
-                if (!value) return;
                 setCategory(value);
                 setShowAll(false);
               }}
-              aria-label={zh ? "设计作品分类" : "Design categories"}
-              className="flex-wrap"
-            >
-              {collections.map((collection, index) => (
-                <ToggleGroupItem key={index} value={String(index)} className="cursor-spotlight rounded-full px-4">{collection.hint}</ToggleGroupItem>
-              ))}
-            </ToggleGroup>
+              items={collections.map((collection, index) => ({
+                value: String(index),
+                label: collection.hint,
+                count: projects.filter((project) => project.categoryId === String(index)).length,
+              }))}
+            />
             {filteredProjects.length > 4 && (
               <button
                 type="button"

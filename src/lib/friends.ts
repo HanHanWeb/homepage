@@ -21,6 +21,6 @@ export const FRIENDS: Array<{
     name: "Malloy",
     description: "🌌 📚 🚴 🍻 🌅 📷 🥤 🤟",
     href: "https://malloymanga.github.io/",
-    avatar: "https://malloymanga.github.io/_nuxt/avatar-pixel.DHvx2yCj.webp",
+    avatar: "https://malloymanga.github.io/avatar-pixel.webp",
   },
 ];

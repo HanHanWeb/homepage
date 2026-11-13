@@ -1,9 +1,9 @@
 "use client";
 
 import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, GithubIcon } from "@/components/animated-icons";
-import { motion } from "motion/react";
 import { useRef, useState } from "react";
 
+import { FilterTabs } from "@/components/filter-tabs";
 import { useLanguage } from "@/components/language-provider";
 import { ImageSlide } from "@/components/image-slide";
 import { ProjectTestimonials } from "@/components/project-testimonials";
@@ -12,7 +12,6 @@ import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
 import { FEATURED_PROJECT, PROJECTS, type Project } from "@/lib/projects";
 
 /** 统计卡片右下的水印图标：用户 / 日历 / 楼宇 / 多人 */
@@ -131,39 +130,16 @@ export function Projects() {
       </article>
 
       <div className="mt-12 flex flex-wrap items-center justify-between gap-4">
-        <div role="tablist" aria-label={en ? "Project collection" : "项目分类"} className="inline-flex items-center gap-1 rounded-full bg-muted p-1 dark:bg-muted/50">
-          {[
+        <FilterTabs
+          ariaLabel={en ? "Project collection" : "项目分类"}
+          value={filter}
+          onValueChange={setFilter}
+          items={[
             { value: "all", label: en ? "All" : "全部", count: PROJECTS.length },
             { value: "active", label: en ? "Development" : "开发", count: activeCount },
             { value: "archive", label: en ? "Archive" : "归档", count: archiveCount },
-          ].map((item) => {
-            const active = filter === item.value;
-            return (
-              <button
-                key={item.value}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setFilter(item.value)}
-                className={cn(
-                  "relative inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                  active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {active && (
-                  <motion.span
-                    layoutId="project-filter-pill"
-                    className="absolute inset-0 rounded-full bg-background shadow-xs dark:bg-accent"
-                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                  />
-                )}
-                <span className="relative">{item.label}</span>
-                <span className={cn("relative text-xs tabular-nums transition-colors", active ? "text-muted-foreground" : "text-muted-foreground/60")}>{item.count}</span>
-              </button>
-            );
-          })}
-        </div>
-
+          ]}
+        />
       </div>
 
       <div className="mt-5 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">

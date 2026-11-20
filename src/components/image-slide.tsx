@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Ref } from "react";
 
 const decodedImages = new Map<string, Promise<void>>();
 
@@ -26,7 +26,7 @@ const variants = {
 };
 
 /** Shared directional transition for portfolio and project preview dialogs. */
-export function ImageSlide({ src, alt, direction, sources = [] }: { src: string; alt: string; direction: number; sources?: string[] }) {
+export function ImageSlide({ src, alt, direction, sources = [], imageRef }: { src: string; alt: string; direction: number; sources?: string[]; imageRef?: Ref<HTMLImageElement> }) {
   const reducedMotion = useReducedMotion();
   const [displayed, setDisplayed] = useState({ src, alt, direction });
 
@@ -60,7 +60,7 @@ export function ImageSlide({ src, alt, direction, sources = [] }: { src: string;
         >
           {/* The whole viewport moves, rather than the narrower image itself. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={displayed.src} alt={displayed.alt} className="block min-h-0 max-h-full w-auto max-w-full rounded-md object-contain shadow-md" />
+          <img ref={imageRef} src={displayed.src} alt={displayed.alt} className="block min-h-0 max-h-full w-auto max-w-full rounded-md object-contain shadow-md" />
         </motion.div>
       </AnimatePresence>
     </div>

@@ -1,8 +1,10 @@
 "use client";
 
-import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, Component, SquarePlay, Terminal } from "@/components/animated-icons";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, Component, SquarePlay, Terminal, XIcon } from "@/components/animated-icons";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { Dialog as DialogPrimitive } from "radix-ui";
+import { useEffect, useRef, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { ImageSlide } from "@/components/image-slide";
@@ -11,11 +13,13 @@ import { SectionHeading } from "@/components/section-heading";
 import { FilterTabs } from "@/components/filter-tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 const BILIBILI_BVID = "BV1KWhJ67EYm";
 const panelClass = "relative min-w-0 overflow-hidden rounded-xl border border-border/60 bg-muted/40";
+
+type ImageFlight = { src: string; from: DOMRect; to: DOMRect; cropTop: boolean };
 
 export function Focus() {
   const { t, locale } = useLanguage();
@@ -24,9 +28,15 @@ export function Focus() {
   const [category, setCategory] = useState("0");
   const [showAll, setShowAll] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [screenshotIndex, setScreenshotIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState(1);
+  const [previewRevealed, setPreviewRevealed] = useState(true);
+  const [previewFlight, setPreviewFlight] = useState<ImageFlight | null>(null);
   const previewTrigger = useRef<HTMLButtonElement | null>(null);
+  const previewImage = useRef<HTMLImageElement | null>(null);
+  const pendingPreviewFlight = useRef<{ src: string; rect: DOMRect; cropTop: boolean } | null>(null);
+  const reducedMotion = useReducedMotion();
   const collections = "collections" in design ? design.collections : [];
   const images = "collections" in design
     ? design.collections.flatMap((collection, collectionIndex) => collection.images.map((image) => ({
@@ -49,6 +59,72 @@ export function Focus() {
   const visibleProjects = showAll ? filteredProjects : filteredProjects.slice(0, 4);
   const selectedProject = projects.find((project) => project.projectId === selectedProjectId);
   const selectedScreenshot = selectedProject?.screenshots[screenshotIndex];
+
+  useEffect(() => {
+    if (!previewOpen || reducedMotion) return;
+
+    const pending = pendingPreviewFlight.current;
+    if (!pending) return;
+
+    let cancelled = false;
+    let settled = false;
+    let frame = 0;
+
+    const reveal = () => {
+      if (cancelled || settled) return;
+      settled = true;
+      pendingPreviewFlight.current = null;
+      setPreviewRevealed(true);
+    };
+
+    const measure = () => {
+      if (cancelled || settled) return;
+
+      const image = previewImage.current;
+      const rect = image?.getBoundingClientRect();
+
+      if (image?.complete && image.naturalWidth > 0 && rect && rect.width > 1 && rect.height > 1) {
+        settled = true;
+        pendingPreviewFlight.current = null;
+        window.clearTimeout(timeout);
+        setPreviewFlight({ src: pending.src, from: pending.rect, to: rect, cropTop: pending.cropTop });
+        return;
+      }
+
+      frame = requestAnimationFrame(measure);
+    };
+
+    const timeout = window.setTimeout(reveal, 1000);
+    frame = requestAnimationFrame(measure);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timeout);
+    };
+  }, [previewOpen, reducedMotion]);
+
+  const openPreview = (projectId: string, src: string, cropTop: boolean, button: HTMLButtonElement) => {
+    // The acrylic card also contains a blurred background image; only measure
+    // the marked foreground cover so the flight starts from the right element.
+    const rect = button.querySelector("[data-preview-cover]")?.getBoundingClientRect();
+    const source = rect && rect.width > 1 && rect.height > 1 ? { src, rect, cropTop } : null;
+
+    pendingPreviewFlight.current = source;
+    setPreviewFlight(null);
+    setPreviewRevealed(!source || reducedMotion === true);
+    setScreenshotIndex(0);
+    setSlideDirection(1);
+    previewTrigger.current = button;
+    setSelectedProjectId(projectId);
+    setPreviewOpen(true);
+  };
+
+  const closePreview = () => {
+    setPreviewFlight(null);
+    setPreviewRevealed(true);
+    setPreviewOpen(false);
+  };
 
   return (
     <>
@@ -110,11 +186,7 @@ export function Focus() {
               <button
                 type="button"
                 key={image.src}
-                onClick={(event) => {
-                  previewTrigger.current = event.currentTarget;
-                  setScreenshotIndex(0);
-                  setSelectedProjectId(image.projectId);
-                }}
+                onClick={(event) => openPreview(image.projectId, image.src, image.cropTop, event.currentTarget)}
                 aria-label={zh ? `查看作品：${image.title}` : `View work: ${image.title}`}
                 aria-haspopup="dialog"
                 className="cursor-spotlight group block w-full min-w-0 cursor-pointer rounded-xl border border-border/70 bg-card p-3 text-left shadow-xs transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
@@ -126,7 +198,7 @@ export function Focus() {
                   )}
                   <div className={cn("absolute inset-3 flex items-center justify-center", image.projectId === "acrylic-cd" && "inset-5")}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={image.src} alt={image.alt} loading="lazy" className={cn("block max-h-full max-w-full rounded-md shadow-md", image.cropTop ? "size-full object-cover object-top" : "h-auto w-auto object-contain")} />
+                    <img data-preview-cover src={image.src} alt={image.alt} loading="lazy" className={cn("block max-h-full max-w-full rounded-md shadow-md", image.cropTop ? "size-full object-cover object-top" : "h-auto w-auto object-contain")} />
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-3">
@@ -198,34 +270,80 @@ export function Focus() {
         </div>
       </div>
     </section>
-    <Dialog open={Boolean(selectedProject)} onOpenChange={(open) => { if (!open) setSelectedProjectId(null); }}>
-      <DialogContent
-        className="flex max-h-[90dvh] min-w-0 flex-col overflow-hidden sm:max-w-4xl"
-        onCloseAutoFocus={(event) => {
-          event.preventDefault();
-          previewTrigger.current?.focus();
-        }}
-      >
-        <DialogHeader className="shrink-0 pr-8">
-          <DialogTitle>{selectedProject?.title}</DialogTitle>
-          <DialogDescription>{selectedProject?.category}</DialogDescription>
-        </DialogHeader>
-        {selectedProject && selectedScreenshot && (
-          <>
-            <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-lg border bg-muted/40 p-3 sm:p-5">
-              <ImageSlide src={selectedScreenshot.src} alt={selectedScreenshot.alt} direction={slideDirection} sources={selectedProject.screenshots.map((image) => image.src)} />
-            </div>
-            {selectedProject.screenshots.length > 1 && (
-                <div className="flex shrink-0 items-center justify-end gap-2">
-                  <Button variant="outline" size="icon" aria-label={zh ? "上一张" : "Previous image"} onClick={() => { setSlideDirection(-1); setScreenshotIndex((index) => (index - 1 + selectedProject.screenshots.length) % selectedProject.screenshots.length); }}><ChevronLeft aria-hidden /></Button>
-                  <span className="min-w-10 text-center text-xs text-muted-foreground">{screenshotIndex + 1} / {selectedProject.screenshots.length}</span>
-                  <Button variant="outline" size="icon" aria-label={zh ? "下一张" : "Next image"} onClick={() => { setSlideDirection(1); setScreenshotIndex((index) => (index + 1) % selectedProject.screenshots.length); }}><ChevronRight aria-hidden /></Button>
-                </div>
+    <DialogPrimitive.Root open={previewOpen} onOpenChange={(next) => { if (!next) closePreview(); }}>
+      <AnimatePresence onExitComplete={() => setSelectedProjectId(null)}>
+        {previewOpen && selectedProject && (
+          <DialogPrimitive.Portal key="focus-preview-dialog" forceMount>
+            <DialogPrimitive.Overlay asChild forceMount>
+              <motion.div
+                className="fixed inset-0 isolate z-50 bg-black/30 supports-backdrop-filter:backdrop-blur-sm"
+                initial={reducedMotion ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: reducedMotion ? 0 : 0.22, ease: "easeOut" }}
+              />
+            </DialogPrimitive.Overlay>
+            <DialogPrimitive.Content asChild forceMount onCloseAutoFocus={(event) => { event.preventDefault(); previewTrigger.current?.focus(); }}>
+              <motion.div
+                className="fixed top-1/2 left-1/2 z-50 flex max-h-[90dvh] w-full max-w-[calc(100%-2rem)] min-w-0 -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-hidden rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 outline-none sm:max-w-4xl"
+                initial={reducedMotion ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: reducedMotion ? 0 : 0.2, ease: [0.4, 0, 1, 1] } }}
+                transition={{ duration: reducedMotion ? 0 : 0.18, ease: "easeOut" }}
+              >
+                <motion.div
+                  initial={reducedMotion ? false : { opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: reducedMotion ? 0 : 0.1, duration: reducedMotion ? 0 : 0.24, ease: "easeOut" }}
+                >
+                  <DialogHeader className="shrink-0 pr-8">
+                    <DialogTitle>{selectedProject.title}</DialogTitle>
+                    <DialogDescription>{selectedProject.category}</DialogDescription>
+                  </DialogHeader>
+                </motion.div>
+                {selectedScreenshot && (
+                  <>
+                    <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-lg border bg-muted/40 p-3 sm:p-5">
+                      <div className={cn("flex w-full items-center justify-center", previewRevealed ? "visible" : "invisible")}>
+                        <ImageSlide src={selectedScreenshot.src} alt={selectedScreenshot.alt} direction={slideDirection} sources={selectedProject.screenshots.map((image) => image.src)} imageRef={previewImage} />
+                      </div>
+                    </div>
+                    {selectedProject.screenshots.length > 1 && (
+                      <div className="flex shrink-0 items-center justify-end gap-2">
+                        <Button variant="outline" size="icon" aria-label={zh ? "上一张" : "Previous image"} onClick={() => { setSlideDirection(-1); setScreenshotIndex((index) => (index - 1 + selectedProject.screenshots.length) % selectedProject.screenshots.length); }}><ChevronLeft aria-hidden /></Button>
+                        <span className="min-w-10 text-center text-xs text-muted-foreground">{screenshotIndex + 1} / {selectedProject.screenshots.length}</span>
+                        <Button variant="outline" size="icon" aria-label={zh ? "下一张" : "Next image"} onClick={() => { setSlideDirection(1); setScreenshotIndex((index) => (index + 1) % selectedProject.screenshots.length); }}><ChevronRight aria-hidden /></Button>
+                      </div>
+                    )}
+                  </>
+                )}
+                <DialogPrimitive.Close asChild>
+                  <Button variant="ghost" className="absolute top-2 right-2" size="icon-sm">
+                    <XIcon />
+                    <span className="sr-only">Close</span>
+                  </Button>
+                </DialogPrimitive.Close>
+              </motion.div>
+            </DialogPrimitive.Content>
+            {previewFlight && (
+              <motion.img
+                key="focus-preview-flight"
+                src={previewFlight.src}
+                alt=""
+                aria-hidden
+                draggable={false}
+                className="pointer-events-none fixed z-[60] rounded-md object-cover shadow-lg"
+                style={{ left: previewFlight.to.left, top: previewFlight.to.top, width: previewFlight.to.width, height: previewFlight.to.height, objectPosition: previewFlight.cropTop ? "top" : "center", transformOrigin: "top left" }}
+                initial={{ x: previewFlight.from.left - previewFlight.to.left, y: previewFlight.from.top - previewFlight.to.top, scaleX: previewFlight.from.width / previewFlight.to.width, scaleY: previewFlight.from.height / previewFlight.to.height }}
+                animate={{ x: 0, y: 0, scaleX: 1, scaleY: 1 }}
+                transition={{ duration: 0.46, ease: [0.22, 1, 0.36, 1] }}
+                onAnimationComplete={() => { setPreviewFlight(null); setPreviewRevealed(true); }}
+              />
             )}
-          </>
+          </DialogPrimitive.Portal>
         )}
-      </DialogContent>
-    </Dialog>
+      </AnimatePresence>
+    </DialogPrimitive.Root>
     </>
   );
 }

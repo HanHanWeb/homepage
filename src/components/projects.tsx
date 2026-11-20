@@ -1,7 +1,9 @@
 "use client";
 
-import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, GithubIcon } from "@/components/animated-icons";
-import { useRef, useState } from "react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, GithubIcon, XIcon } from "@/components/animated-icons";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { Dialog as DialogPrimitive } from "radix-ui";
+import { useEffect, useRef, useState } from "react";
 
 import { FilterTabs } from "@/components/filter-tabs";
 import { useLanguage } from "@/components/language-provider";
@@ -11,8 +13,12 @@ import { ScrollTextReveal } from "@/components/scroll-text-reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { FEATURED_PROJECT, PROJECTS, type Project } from "@/lib/projects";
+
+/** Cover geometry captured on click, replayed so the same bitmap flies into the dialog. */
+type ImageFlight = { src: string; from: DOMRect; to: DOMRect };
 
 /** 统计卡片右下的水印图标：用户 / 日历 / 楼宇 / 多人 */
 const STAT_ICONS = [
@@ -65,9 +71,15 @@ export function Projects() {
   const en = locale === "en";
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState<Project | null>(null);
+  const [open, setOpen] = useState(false);
   const [shotIndex, setShotIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState(1);
+  const [revealed, setRevealed] = useState(true);
+  const [flight, setFlight] = useState<ImageFlight | null>(null);
   const trigger = useRef<HTMLButtonElement | null>(null);
+  const dialogImage = useRef<HTMLImageElement | null>(null);
+  const pendingFlight = useRef<{ src: string; rect: DOMRect } | null>(null);
+  const reducedMotion = useReducedMotion();
   const featured = FEATURED_PROJECT;
   const roles = en
     ? [featured.roleEn, "Planning", "Design", "Promotion", "Development"]
@@ -82,6 +94,74 @@ export function Projects() {
   const archiveCount = PROJECTS.length - activeCount;
   const visible = PROJECTS.filter((project) => filter === "all" || (project.tagZh === "归档") === (filter === "archive"));
   const selectedShot = selected?.images?.[shotIndex];
+
+  // Wait for the dialog image to be laid out and decoded before starting the
+  // shared-element flight. Keeping the pending measurement until it succeeds
+  // also makes this safe when React StrictMode replays the effect.
+  useEffect(() => {
+    if (!open || reducedMotion) return;
+
+    const pending = pendingFlight.current;
+    if (!pending) return;
+
+    let cancelled = false;
+    let settled = false;
+    let frame = 0;
+
+    const reveal = () => {
+      if (cancelled || settled) return;
+      settled = true;
+      pendingFlight.current = null;
+      setRevealed(true);
+    };
+
+    const measure = () => {
+      if (cancelled || settled) return;
+
+      const image = dialogImage.current;
+      const rect = image?.getBoundingClientRect();
+
+      if (image?.complete && image.naturalWidth > 0 && rect && rect.width > 1 && rect.height > 1) {
+        settled = true;
+        pendingFlight.current = null;
+        window.clearTimeout(timeout);
+        setFlight({ src: pending.src, from: pending.rect, to: rect });
+        return;
+      }
+
+      frame = requestAnimationFrame(measure);
+    };
+
+    const timeout = window.setTimeout(reveal, 1000);
+    frame = requestAnimationFrame(measure);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timeout);
+    };
+  }, [open, reducedMotion]);
+
+  const openProject = (project: Project, button: HTMLButtonElement) => {
+    const cover = project.images?.[0];
+    const rect = button.querySelector("img")?.getBoundingClientRect();
+    const source = cover && rect && rect.width > 1 && rect.height > 1 ? { src: cover.src, rect } : null;
+
+    pendingFlight.current = source;
+    setFlight(null);
+    setRevealed(!source || reducedMotion === true);
+    setShotIndex(0);
+    setSlideDirection(1);
+    trigger.current = button;
+    setSelected(project);
+    setOpen(true);
+  };
+
+  const closeProject = () => {
+    setFlight(null);
+    setRevealed(true);
+    setOpen(false);
+  };
 
   return (
     <section id="projects" className="min-w-0 pb-8">
@@ -148,7 +228,7 @@ export function Projects() {
           const archived = project.tagZh === "归档";
           return (
             <article key={project.name} className="cursor-spotlight group flex min-w-0 flex-col rounded-xl border border-border/70 bg-card p-3 shadow-xs transition-shadow hover:shadow-md">
-              <button type="button" aria-label={en ? `View ${project.nameEn}` : `查看项目：${project.name}`} aria-haspopup="dialog" className="flex min-w-0 flex-1 cursor-pointer flex-col text-left focus-visible:rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring" onClick={(event) => { trigger.current = event.currentTarget; setShotIndex(0); setSelected(project); }}>
+              <button type="button" aria-label={en ? `View ${project.nameEn}` : `查看项目：${project.name}`} aria-haspopup="dialog" className="flex min-w-0 flex-1 cursor-pointer flex-col text-left focus-visible:rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring" onClick={(event) => openProject(project, event.currentTarget)}>
                 <div className="relative w-full overflow-hidden rounded-lg border border-border/40 bg-muted/40 aspect-[4/3]">
                   {cover ? <div className="absolute inset-4 flex items-center justify-center sm:inset-5">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -172,18 +252,70 @@ export function Projects() {
         })}
       </div>
 
-      <Dialog open={Boolean(selected)} onOpenChange={(open) => { if (!open) setSelected(null); }}>
-        <DialogContent className="flex max-h-[90dvh] min-w-0 flex-col overflow-hidden sm:max-w-4xl" onCloseAutoFocus={(event) => { event.preventDefault(); trigger.current?.focus(); }}>
-          <DialogHeader className="shrink-0 pr-8"><DialogTitle>{en ? selected?.nameEn : selected?.name}</DialogTitle><DialogDescription>{en ? selected?.descEn : selected?.descZh}</DialogDescription></DialogHeader>
-          {selectedShot && <div className="flex min-h-0 flex-1 items-center justify-center rounded-lg border bg-muted/40 p-4">
-            <ImageSlide src={selectedShot.src} alt={en ? selectedShot.altEn : selectedShot.altZh} direction={slideDirection} sources={selected?.images?.map((image) => image.src)} />
-          </div>}
-          <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
-            {selected && <ProjectLinks project={selected} en={en} />}
-            {selected?.images && selected.images.length > 1 && <div className="flex items-center gap-2"><Button variant="outline" size="icon" aria-label={en ? "Previous image" : "上一张"} onClick={() => { setSlideDirection(-1); setShotIndex((index) => (index - 1 + selected.images!.length) % selected.images!.length); }}><ChevronLeft aria-hidden /></Button><span className="min-w-10 text-center text-xs text-muted-foreground">{shotIndex + 1} / {selected.images.length}</span><Button variant="outline" size="icon" aria-label={en ? "Next image" : "下一张"} onClick={() => { setSlideDirection(1); setShotIndex((index) => (index + 1) % selected.images!.length); }}><ChevronRight aria-hidden /></Button></div>}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <DialogPrimitive.Root open={open} onOpenChange={(next) => { if (!next) closeProject(); }}>
+        <AnimatePresence onExitComplete={() => setSelected(null)}>
+          {open && selected && (
+            <DialogPrimitive.Portal key="project-dialog" forceMount>
+              <DialogPrimitive.Overlay asChild forceMount>
+                <motion.div
+                  className="fixed inset-0 isolate z-50 bg-black/30 supports-backdrop-filter:backdrop-blur-sm"
+                  initial={reducedMotion ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: reducedMotion ? 0 : 0.22, ease: "easeOut" }}
+                />
+              </DialogPrimitive.Overlay>
+              <DialogPrimitive.Content asChild forceMount onCloseAutoFocus={(event) => { event.preventDefault(); trigger.current?.focus(); }}>
+                <motion.div
+                  className="fixed top-1/2 left-1/2 z-50 flex max-h-[90dvh] w-full max-w-[calc(100%-2rem)] min-w-0 -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-hidden rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 outline-none sm:max-w-4xl"
+                  initial={reducedMotion ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, transition: { duration: reducedMotion ? 0 : 0.2, ease: [0.4, 0, 1, 1] } }}
+                  transition={{ duration: reducedMotion ? 0 : 0.18, ease: "easeOut" }}
+                >
+                  <motion.div
+                    initial={reducedMotion ? false : { opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: reducedMotion ? 0 : 0.1, duration: reducedMotion ? 0 : 0.24, ease: "easeOut" }}
+                  >
+                    <DialogHeader className="shrink-0 pr-8"><DialogTitle>{en ? selected?.nameEn : selected?.name}</DialogTitle><DialogDescription>{en ? selected?.descEn : selected?.descZh}</DialogDescription></DialogHeader>
+                  </motion.div>
+                  {selectedShot && <div className="flex min-h-0 flex-1 items-center justify-center rounded-lg border bg-muted/40 p-4">
+                    <div className={cn("flex w-full items-center justify-center", revealed ? "visible" : "invisible")}>
+                      <ImageSlide src={selectedShot.src} alt={en ? selectedShot.altEn : selectedShot.altZh} direction={slideDirection} sources={selected?.images?.map((image) => image.src)} imageRef={dialogImage} />
+                    </div>
+                  </div>}
+                  <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
+                    {selected && <ProjectLinks project={selected} en={en} />}
+                    {selected?.images && selected.images.length > 1 && <div className="flex items-center gap-2"><Button variant="outline" size="icon" aria-label={en ? "Previous image" : "上一张"} onClick={() => { setSlideDirection(-1); setShotIndex((index) => (index - 1 + selected.images!.length) % selected.images!.length); }}><ChevronLeft aria-hidden /></Button><span className="min-w-10 text-center text-xs text-muted-foreground">{shotIndex + 1} / {selected.images.length}</span><Button variant="outline" size="icon" aria-label={en ? "Next image" : "下一张"} onClick={() => { setSlideDirection(1); setShotIndex((index) => (index + 1) % selected.images!.length); }}><ChevronRight aria-hidden /></Button></div>}
+                  </div>
+                  <DialogPrimitive.Close asChild>
+                    <Button variant="ghost" className="absolute top-2 right-2" size="icon-sm">
+                      <XIcon />
+                      <span className="sr-only">Close</span>
+                    </Button>
+                  </DialogPrimitive.Close>
+                </motion.div>
+              </DialogPrimitive.Content>
+              {flight && (
+                <motion.img
+                  key="project-flight"
+                  src={flight.src}
+                  alt=""
+                  aria-hidden
+                  draggable={false}
+                  className="pointer-events-none fixed z-[60] rounded-md object-contain shadow-lg"
+                  style={{ left: flight.to.left, top: flight.to.top, width: flight.to.width, height: flight.to.height, transformOrigin: "top left" }}
+                  initial={{ x: flight.from.left - flight.to.left, y: flight.from.top - flight.to.top, scale: flight.from.width / flight.to.width }}
+                  animate={{ x: 0, y: 0, scale: 1 }}
+                  transition={{ duration: 0.46, ease: [0.22, 1, 0.36, 1] }}
+                  onAnimationComplete={() => { setFlight(null); setRevealed(true); }}
+                />
+              )}
+            </DialogPrimitive.Portal>
+          )}
+        </AnimatePresence>
+      </DialogPrimitive.Root>
     </section>
   );
 }

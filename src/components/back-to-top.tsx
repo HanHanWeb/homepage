@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { ScrollProgress } from "@/components/scroll-progress";
+import { scrollBehavior } from "@/lib/utils";
 
 export function BackToTop() {
   const { t } = useLanguage();
@@ -29,7 +30,7 @@ export function BackToTop() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 12, scale: 0.9 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          onClick={() => window.scrollTo({ top: 0, behavior: scrollBehavior() })}
           className="fixed right-6 bottom-6 z-50 flex size-12 items-center justify-center rounded-full border bg-card/80 shadow-sm backdrop-blur transition-colors hover:bg-card hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
         >
           <ScrollProgress />

@@ -78,6 +78,13 @@ export const dictionaries = {
         },
         { title: "影像创作", options: ["摄影", "航拍", "视频剪辑"], video: true, note: "仅展示部分航拍片段，素材仅经初步剪辑、未做后期处理，请以实际成片为准。" },
       ],
+      workTitles: {
+        roadmap: "roadmap",
+        "intereco-home": "界面生态主页",
+        ipoa: "IPOA 赛事系统",
+        gallery: "界面生态作品中心",
+        newspaper: "澎湃报",
+      },
     },
     projects: {
       title: "项目",
@@ -194,6 +201,13 @@ export const dictionaries = {
         },
         { title: "Visual Creation", options: ["Photography", "Aerial", "Video Editing"], video: true, note: "A selection of aerial footage only — roughly cut, with no post-production; please refer to the final film." },
       ],
+      workTitles: {
+        roadmap: "roadmap",
+        "intereco-home": "Intereco Homepage",
+        ipoa: "IPOA Competition System",
+        gallery: "Intereco Works Center",
+        newspaper: "The Surging Newspaper",
+      },
     },
     projects: {
       title: "Projects",

@@ -70,7 +70,7 @@ export function FilterTabs({ items, value, onValueChange, ariaLabel, className }
   return (
     <div
       ref={listRef}
-      role="tablist"
+      role="group"
       aria-label={ariaLabel}
       className={cn("relative inline-flex max-w-full items-center gap-1 rounded-full bg-muted p-1 dark:bg-muted/50", className)}
     >
@@ -94,8 +94,7 @@ export function FilterTabs({ items, value, onValueChange, ariaLabel, className }
               btnRefs.current[item.value] = el;
             }}
             type="button"
-            role="tab"
-            aria-selected={active}
+            aria-pressed={active}
             onClick={() => onValueChange(item.value)}
             className={cn(
               "relative z-10 inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-4 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",

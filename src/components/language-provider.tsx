@@ -1,8 +1,39 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useSyncExternalStore,
+} from "react";
 
 import { dictionaries, type Locale } from "@/lib/i18n";
+
+const STORAGE_KEY = "locale";
+
+/** localStorage 是 React 之外的系统：订阅其变化，而不是在 effect 里回写 state。 */
+const listeners = new Set<() => void>();
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+function getSnapshot(): Locale {
+  if (typeof window === "undefined") return "zh";
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) === "en" ? "en" : "zh";
+  } catch {
+    return "zh";
+  }
+}
+
+function getServerSnapshot(): Locale {
+  return "zh";
+}
 
 const LanguageContext = createContext<{
   locale: Locale;
@@ -12,20 +43,27 @@ const LanguageContext = createContext<{
 } | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("zh");
+  const locale = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("locale") as Locale | null;
-    if (saved === "zh" || saved === "en") setLocaleState(saved);
+  // 写入外部存储后广播通知，由 useSyncExternalStore 统一读取
+  const setLocale = useCallback((l: Locale) => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, l);
+    } catch {
+      // 存储不可用（隐私模式等）时忽略本次持久化，仅通知更新
+    }
+    for (const listener of listeners) listener();
   }, []);
 
+  const toggle = useCallback(() => {
+    setLocale(getSnapshot() === "zh" ? "en" : "zh");
+  }, [setLocale]);
+
+  // SSR 输出默认 zh-CN；挂载与切换时同步 <html lang>
   useEffect(() => {
     document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
-    localStorage.setItem("locale", locale);
   }, [locale]);
-
-  const setLocale = useCallback((l: Locale) => setLocaleState(l), []);
-  const toggle = useCallback(() => setLocaleState((p) => (p === "zh" ? "en" : "zh")), []);
 
   return (
     <LanguageContext.Provider value={{ locale, t: dictionaries[locale], toggle, setLocale }}>

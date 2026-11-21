@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  FileText,
   FolderGit2,
   Languages,
   Link2,
@@ -24,6 +25,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useLanguage } from "@/components/language-provider";
+import { scrollBehavior } from "@/lib/utils";
 
 export function CommandPaletteDialog({ open, onOpenChange: setOpen }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const router = useRouter();
@@ -34,7 +36,7 @@ export function CommandPaletteDialog({ open, onOpenChange: setOpen }: { open: bo
     setOpen(false);
     const target = document.getElementById(id);
     if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      target.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
     } else {
       router.push(`/#${id}`);
     }
@@ -57,8 +59,7 @@ export function CommandPaletteDialog({ open, onOpenChange: setOpen }: { open: bo
     { id: "contributions", icon: Trophy, label: t.contributions.title },
     { id: "contact", icon: Mail, label: t.contact.title },
     { id: "friends", icon: Link2, label: t.friends.title, href: "/friends" },
-    // 博客暂时停用，恢复时同时启用对应路由和导航入口。
-    // { id: "blog", icon: BookOpen, label: t.blog.title, href: "/blog" },
+    { id: "blog", icon: FileText, label: t.blog.title, href: "/blog" },
   ];
 
   return (

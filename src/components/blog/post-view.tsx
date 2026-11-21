@@ -2,14 +2,14 @@
 
 import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
-import { Calendar, Clock, Menu } from "@/components/animated-icons";
+import { Calendar, Clock } from "@/components/animated-icons";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 
-import { estimateReadingMinutes, type Post } from "@/lib/blog";
+import { useLanguage } from "@/components/language-provider";
+import { estimateReadingMinutes, formatPostDate, type Post } from "@/lib/blog";
 import { BlogNav } from "@/components/blog/blog-nav";
 import { SharePosterButton } from "@/components/blog/share-poster";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 type Block =
   | { kind: "heading"; text: string }
@@ -49,18 +49,10 @@ function toHref(url: string): string {
 }
 
 export function PostView({ post }: { post: Post }) {
+  const { locale } = useLanguage();
+  const zh = locale === "zh";
   const blocks = parseBlocks(post.content ?? post.description ?? "");
-  // 目录只索引章节标题
-  const headings = blocks
-    .map((b, i) => ({ b, i }))
-    .filter(({ b }) => b.kind === "heading");
-  const showToc = headings.length >= 2;
-  const [active, setActive] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  // 点击目录后的平滑滚动期间锁定高亮，避免路过中间章节时闪烁
-  const clickLockRef = useRef(false);
-  const lockTimerRef = useRef<number | undefined>(undefined);
+  const firstImageIndex = blocks.findIndex((block) => block.kind === "image");
 
   // 正文图片灯箱
   useEffect(() => {
@@ -70,179 +62,71 @@ export function PostView({ post }: { post: Post }) {
     };
   }, []);
 
-  // 滚动时高亮视口顶附近的章节标题；不依赖 rAF（后台/节流时会被暂停导致失效）
-  useEffect(() => {
-    if (!showToc) return;
-    const update = () => {
-      if (clickLockRef.current) return;
-      const hs =
-        contentRef.current?.querySelectorAll<HTMLElement>("h2[data-toc]") ??
-        [];
-      let current = headings[0]?.i ?? 0;
-      hs.forEach((h) => {
-        if (h.getBoundingClientRect().top <= 130) {
-          current = Number((h.id ?? "").replace("toc-b-", "")) || current;
-        }
-      });
-      setActive(current);
-    };
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showToc]);
-
-  const choose = (i: number) => {
-    setActive(i);
-    clickLockRef.current = true;
-    window.clearTimeout(lockTimerRef.current);
-    lockTimerRef.current = window.setTimeout(() => {
-      clickLockRef.current = false;
-    }, 1000);
-    // scrollTo + 手动偏移定位章节（导航 56px + 呼吸空间 24px = 80px）
-    const el = document.getElementById(`toc-b-${i}`);
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY - 80;
-    window.scrollTo({ top, behavior: "smooth" });
-  };
-
-  const tocCard = (closeAfter = false) =>
-    showToc ? (
-      <section className="rounded-xl border bg-card px-4 py-3">
-        <div className="flex items-center gap-3 pb-1">
-          <p className="min-w-0 flex-1 text-sm font-medium">本文目录</p>
-          <span className="font-mono text-[10px] tracking-widest text-muted-foreground/60">
-            #TOC
-          </span>
-        </div>
-        <div>
-          {headings.map(({ b, i }) => {
-            const text = b.kind === "heading" ? b.text : "";
-            return (
-              <button
-                key={i}
-                type="button"
-                onClick={() => {
-                  choose(i);
-                  if (closeAfter) setMenuOpen(false);
-                }}
-                className={`flex w-full items-center gap-2 py-1 text-left text-xs transition-colors ${
-                  active === i
-                    ? "font-medium text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <span
-                  aria-hidden
-                  className={`h-3.5 w-[3px] shrink-0 rounded-full ${
-                    active === i ? "bg-[#00bc7d]" : "bg-border"
-                  }`}
-                />
-                <span className="truncate">{text}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-    ) : null;
 
   return (
     <>
-      <BlogNav
-        menu={
-          <button
-            type="button"
-            onClick={() => setMenuOpen(true)}
-            aria-label="打开侧边栏菜单"
-            className="rounded-full border bg-card p-2 text-foreground transition-colors hover:text-[#00bc7d]"
-          >
-            <Menu className="size-4" strokeWidth={1.5} />
-          </button>
-        }
-      />
-      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent
-          side="right"
-          className="w-80 gap-4 overflow-y-auto px-4 pt-12 pb-4"
-        >
-          <SheetTitle className="sr-only">文章侧边栏</SheetTitle>
-          <div className="space-y-4">
-            {tocCard(true)}
-          </div>
-        </SheetContent>
-      </Sheet>
+      <BlogNav />
 
       <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 pt-20 pb-16">
-      <nav
-        aria-label="面包屑"
-        className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground animate-blur-in"
-        style={{ "--blur-delay": "0.05s" } as React.CSSProperties}
-      >
-        <Link
-          href="/"
-          className="shrink-0 transition-colors hover:text-foreground"
-        >
-          主页
-        </Link>
-        <span aria-hidden className="select-none opacity-50">
-          /
-        </span>
-        <Link
-          href="/blog"
-          className="shrink-0 transition-colors hover:text-foreground"
-        >
-          博客
-        </Link>
-        <span aria-hidden className="select-none opacity-50">
-          /
-        </span>
-        <span aria-current="page" className="min-w-0 truncate">
-          {post.title}
-        </span>
-      </nav>
-
-      <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_15rem]">
+      <div className="mt-8 max-w-[44rem]">
         <header
-          className="animate-blur-in mt-4 lg:col-span-2"
+          className="animate-blur-in mt-4"
           style={{ "--blur-delay": "0.15s" } as React.CSSProperties}
         >
+          <nav
+            aria-label="面包屑"
+            className="mb-3 flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground"
+          >
+            <Link href="/" className="shrink-0 rounded-sm transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+              主页
+            </Link>
+            <span aria-hidden className="select-none opacity-50">
+              /
+            </span>
+            <Link href="/blog" className="shrink-0 rounded-sm transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+              博客
+            </Link>
+            <span aria-hidden className="select-none opacity-50">
+              /
+            </span>
+            <span aria-current="page" className="min-w-0 truncate">
+              {post.title}
+            </span>
+          </nav>
           <h1
             data-post-title
-            className="font-serif-song font-semibold text-3xl leading-snug tracking-tight sm:text-4xl"
+            className="text-balance font-serif-song font-semibold text-3xl leading-snug tracking-tight sm:text-4xl"
           >
             {post.title}
           </h1>
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
             <Calendar className="size-3.5" strokeWidth={1.5} />
-            {post.createdAt.slice(0, 10)}
+            {formatPostDate(post.createdAt, zh)}
             {post.wordCount > 0 && (
               <>
                 <span aria-hidden className="opacity-60">
                   ·
                 </span>
                 <Clock className="size-3.5" strokeWidth={1.5} />
-                约 {estimateReadingMinutes(post.wordCount)} 分钟
+                {zh ? `约 ${estimateReadingMinutes(post.wordCount)} 分钟` : `${estimateReadingMinutes(post.wordCount)} min read`}
               </>
             )}
           </div>
         </header>
 
         <article
-          className="animate-blur-in"
+          className="animate-blur-in mt-8 sm:mt-10"
           style={{ "--blur-delay": "0.15s" } as React.CSSProperties}
         >
           <div
-            ref={contentRef}
-            className="space-y-4 text-[15px] leading-8 text-foreground/90 [overflow-anchor:none]"
+            className="space-y-4 text-base leading-[1.85] text-pretty text-foreground/90 [overflow-anchor:none]"
           >
             {blocks.map((b, i) => {
               if (b.kind === "heading") {
                 return (
                   <h2
                     key={i}
-                    id={showToc ? `toc-b-${i}` : undefined}
-                    data-toc={showToc ? "" : undefined}
-                    className="font-serif-song font-bold mt-9 scroll-mt-20 text-[1.6em] leading-[1.4] tracking-tight"
+                    className="text-balance font-serif-song font-bold mt-9 scroll-mt-20 text-[1.6em] leading-[1.4] tracking-tight"
                   >
                     {b.text}
                   </h2>
@@ -261,7 +145,9 @@ export function PostView({ post }: { post: Post }) {
                     <img
                       src={src}
                       alt={b.alt}
-                      loading="eager"
+                      loading={i === firstImageIndex ? "eager" : "lazy"}
+                      decoding="async"
+                      fetchPriority={i === firstImageIndex ? "high" : "auto"}
                       data-fancybox="post"
                       data-caption={b.alt}
                       className="w-full cursor-zoom-in rounded-xl border"
@@ -275,7 +161,7 @@ export function PostView({ post }: { post: Post }) {
                 );
               }
               return (
-                <p key={i} className="whitespace-pre-line">
+                <p key={i} className="whitespace-pre-line text-pretty">
                   {splitLinks(b.text).map((seg, j) =>
                     seg.type === "text" ? (
                       seg.value
@@ -285,7 +171,7 @@ export function PostView({ post }: { post: Post }) {
                         href={toHref(seg.value)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="underline decoration-[#00bc7d]/60 decoration-[1.5px] underline-offset-4 transition-colors hover:text-[#00bc7d] hover:decoration-[#00bc7d]"
+                        className="rounded-sm underline decoration-[#00bc7d]/60 decoration-[1.5px] underline-offset-4 transition-colors hover:text-[#00bc7d] hover:decoration-[#00bc7d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                       >
                         {seg.value}
                       </a>
@@ -301,9 +187,6 @@ export function PostView({ post }: { post: Post }) {
           </div>
         </article>
 
-        <aside className="hidden space-y-4 lg:sticky lg:top-20 lg:block">
-          {tocCard()}
-        </aside>
       </div>
     </main>
     </>

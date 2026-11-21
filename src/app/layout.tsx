@@ -8,7 +8,6 @@ import { FooterMascots } from "@/components/footer-mascots";
 import { BackToTop } from "@/components/back-to-top";
 import { CommandPalette } from "@/components/command-palette";
 import { HomeNav } from "@/components/home-nav";
-import { SuppressScriptWarning } from "@/components/suppress-script-warning";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SITE_URL } from "@/lib/site";
 
@@ -32,10 +31,9 @@ export const metadata: Metadata = {
     images: ["/icon.png"],
   },
   twitter: { card: "summary" },
-  // 博客订阅暂时停用。
-  // alternates: {
-  //   types: { "application/rss+xml": "/feed.xml" },
-  // },
+  alternates: {
+    types: { "application/rss+xml": "/feed.xml" },
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -61,7 +59,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col">
-        <SuppressScriptWarning />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

@@ -10,6 +10,8 @@ export type ProjectImage = {
 export type Project = {
   name: string;
   nameEn: string;
+  /** 归档判定与筛选使用，不依赖展示文案 */
+  status: "active" | "archived";
   url?: string;
   githubUrl?: string;
   tagZh: string;
@@ -24,6 +26,7 @@ export const PROJECTS: Project[] = [
   {
     name: "界面生态主页",
     nameEn: "Intereco Homepage",
+    status: "archived",
     tagZh: "归档",
     tagEn: "archive",
     descZh: "界面生态的官方网站，展示社区介绍、合作项目与创作者寄语。",
@@ -39,6 +42,7 @@ export const PROJECTS: Project[] = [
   {
     name: "界面生态作品中心",
     nameEn: "Intereco Works Center",
+    status: "archived",
     tagZh: "归档",
     tagEn: "archive",
     descZh: "界面生态附属项目，面向 PPT OS 爱好者的一站式作品中心。",
@@ -52,6 +56,7 @@ export const PROJECTS: Project[] = [
   {
     name: "IPOA 赛事系统",
     nameEn: "IPOA Competition System",
+    status: "archived",
     tagZh: "归档",
     tagEn: "archive",
     descZh: "界面生态附属项目，PPT OS 创意赛事 IPOA 的官方赛事平台。",
@@ -70,6 +75,7 @@ export const PROJECTS: Project[] = [
   {
     name: "财务公开平台",
     nameEn: "Finance Disclosure",
+    status: "archived",
     tagZh: "归档",
     tagEn: "archive",
     descZh: "界面生态附属项目，公开界面生态财务信息的透明化平台。",
@@ -78,6 +84,7 @@ export const PROJECTS: Project[] = [
   {
     name: "homepage",
     nameEn: "homepage",
+    status: "active",
     url: "https://github.com/HanHanWeb/homepage",
     tagZh: "开发",
     tagEn: "dev",
@@ -88,6 +95,7 @@ export const PROJECTS: Project[] = [
   {
     name: "typesmith",
     nameEn: "typesmith",
+    status: "active",
     url: "https://typesmith.pages.dev/",
     githubUrl: "https://github.com/HanHanWeb/typesmith",
     tagZh: "开发",
@@ -110,6 +118,7 @@ export const PROJECTS: Project[] = [
   {
     name: "spark",
     nameEn: "spark",
+    status: "active",
     url: "https://spark.hhan.me/",
     githubUrl: "https://github.com/HanHanWeb/spark",
     tagZh: "开发",
@@ -125,6 +134,7 @@ export const PROJECTS: Project[] = [
   {
     name: "roadmap",
     nameEn: "roadmap",
+    status: "archived",
     url: "https://github.com/HanHanWeb/roadmap",
     tagZh: "归档",
     tagEn: "archive",
@@ -141,6 +151,7 @@ export const PROJECTS: Project[] = [
   {
     name: "foxity",
     nameEn: "foxity",
+    status: "active",
     url: "https://github.com/HanHanWeb/foxity",
     tagZh: "开发",
     tagEn: "dev",
@@ -151,6 +162,7 @@ export const PROJECTS: Project[] = [
   {
     name: "fill-letter",
     nameEn: "fill-letter",
+    status: "active",
     url: "https://fill-letter.pages.dev/",
     githubUrl: "https://github.com/HanHanWeb/fill-letter",
     tagZh: "开发",
@@ -168,6 +180,7 @@ export const PROJECTS: Project[] = [
   {
     name: "句刻",
     nameEn: "Asentence",
+    status: "archived",
     tagZh: "归档",
     tagEn: "dev",
     descZh: "即刻发现文字之美，高度自定义的一言 API 项目。",

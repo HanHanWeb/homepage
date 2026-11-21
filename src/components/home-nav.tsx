@@ -36,8 +36,7 @@ export function HomeNav({ menu }: { menu?: ReactNode }) {
   const pathname = usePathname();
   const items = [
     { href: "/", label: zh ? "首页" : "Home" },
-    // 博客暂时停用。
-    // { href: "/blog", label: t.blog.title },
+    { href: "/blog", label: t.blog.title },
     { href: "/projects", label: t.projects.title },
     { href: "/friends", label: t.friends.title },
   ];

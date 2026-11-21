@@ -4,7 +4,7 @@ import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, Component, SquarePlay, 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { Dialog as DialogPrimitive } from "radix-ui";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { ImageSlide } from "@/components/image-slide";
@@ -14,12 +14,11 @@ import { FilterTabs } from "@/components/filter-tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useImageFlight } from "@/lib/use-image-flight";
 import { cn } from "@/lib/utils";
 
 const BILIBILI_BVID = "BV1KWhJ67EYm";
 const panelClass = "relative min-w-0 overflow-hidden rounded-xl border border-border/60 bg-muted/40";
-
-type ImageFlight = { src: string; from: DOMRect; to: DOMRect; cropTop: boolean };
 
 export function Focus() {
   const { t, locale } = useLanguage();
@@ -31,12 +30,15 @@ export function Focus() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [screenshotIndex, setScreenshotIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState(1);
-  const [previewRevealed, setPreviewRevealed] = useState(true);
-  const [previewFlight, setPreviewFlight] = useState<ImageFlight | null>(null);
   const previewTrigger = useRef<HTMLButtonElement | null>(null);
   const previewImage = useRef<HTMLImageElement | null>(null);
-  const pendingPreviewFlight = useRef<{ src: string; rect: DOMRect; cropTop: boolean } | null>(null);
   const reducedMotion = useReducedMotion();
+  const {
+    flight: previewFlight,
+    revealed: previewRevealed,
+    begin: beginPreviewFlight,
+    settle: settlePreviewFlight,
+  } = useImageFlight(previewOpen, reducedMotion, previewImage);
   const collections = "collections" in design ? design.collections : [];
   const images = "collections" in design
     ? design.collections.flatMap((collection, collectionIndex) => collection.images.map((image) => ({
@@ -51,7 +53,7 @@ export function Focus() {
     const cover = screenshots[0];
     return {
       ...cover,
-      title: projectId === "roadmap" ? "roadmap" : projectId === "intereco-home" ? (zh ? "界面生态主页" : "Intereco Homepage") : projectId === "ipoa" ? (zh ? "IPOA 赛事系统" : "IPOA Competition System") : projectId === "gallery" ? (zh ? "界面生态作品中心" : "Intereco Works Center") : projectId === "newspaper" ? (zh ? "澎湃报" : "The Surging Newspaper") : cover.alt,
+      title: t.services.workTitles[projectId as keyof typeof t.services.workTitles] ?? cover.alt,
       screenshots,
     };
   });
@@ -60,49 +62,6 @@ export function Focus() {
   const selectedProject = projects.find((project) => project.projectId === selectedProjectId);
   const selectedScreenshot = selectedProject?.screenshots[screenshotIndex];
 
-  useEffect(() => {
-    if (!previewOpen || reducedMotion) return;
-
-    const pending = pendingPreviewFlight.current;
-    if (!pending) return;
-
-    let cancelled = false;
-    let settled = false;
-    let frame = 0;
-
-    const reveal = () => {
-      if (cancelled || settled) return;
-      settled = true;
-      pendingPreviewFlight.current = null;
-      setPreviewRevealed(true);
-    };
-
-    const measure = () => {
-      if (cancelled || settled) return;
-
-      const image = previewImage.current;
-      const rect = image?.getBoundingClientRect();
-
-      if (image?.complete && image.naturalWidth > 0 && rect && rect.width > 1 && rect.height > 1) {
-        settled = true;
-        pendingPreviewFlight.current = null;
-        window.clearTimeout(timeout);
-        setPreviewFlight({ src: pending.src, from: pending.rect, to: rect, cropTop: pending.cropTop });
-        return;
-      }
-
-      frame = requestAnimationFrame(measure);
-    };
-
-    const timeout = window.setTimeout(reveal, 1000);
-    frame = requestAnimationFrame(measure);
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(frame);
-      window.clearTimeout(timeout);
-    };
-  }, [previewOpen, reducedMotion]);
 
   const openPreview = (projectId: string, src: string, cropTop: boolean, button: HTMLButtonElement) => {
     // The acrylic card also contains a blurred background image; only measure
@@ -110,9 +69,7 @@ export function Focus() {
     const rect = button.querySelector("[data-preview-cover]")?.getBoundingClientRect();
     const source = rect && rect.width > 1 && rect.height > 1 ? { src, rect, cropTop } : null;
 
-    pendingPreviewFlight.current = source;
-    setPreviewFlight(null);
-    setPreviewRevealed(!source || reducedMotion === true);
+    beginPreviewFlight(source);
     setScreenshotIndex(0);
     setSlideDirection(1);
     previewTrigger.current = button;
@@ -121,8 +78,7 @@ export function Focus() {
   };
 
   const closePreview = () => {
-    setPreviewFlight(null);
-    setPreviewRevealed(true);
+    settlePreviewFlight();
     setPreviewOpen(false);
   };
 
@@ -337,7 +293,7 @@ export function Focus() {
                 initial={{ x: previewFlight.from.left - previewFlight.to.left, y: previewFlight.from.top - previewFlight.to.top, scaleX: previewFlight.from.width / previewFlight.to.width, scaleY: previewFlight.from.height / previewFlight.to.height }}
                 animate={{ x: 0, y: 0, scaleX: 1, scaleY: 1 }}
                 transition={{ duration: 0.46, ease: [0.22, 1, 0.36, 1] }}
-                onAnimationComplete={() => { setPreviewFlight(null); setPreviewRevealed(true); }}
+                onAnimationComplete={() => { settlePreviewFlight(); }}
               />
             )}
           </DialogPrimitive.Portal>

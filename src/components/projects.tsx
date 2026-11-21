@@ -3,7 +3,7 @@
 import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, GithubIcon, XIcon } from "@/components/animated-icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Dialog as DialogPrimitive } from "radix-ui";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { FilterTabs } from "@/components/filter-tabs";
 import { useLanguage } from "@/components/language-provider";
@@ -14,11 +14,9 @@ import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useImageFlight } from "@/lib/use-image-flight";
 import { cn } from "@/lib/utils";
 import { FEATURED_PROJECT, PROJECTS, type Project } from "@/lib/projects";
-
-/** Cover geometry captured on click, replayed so the same bitmap flies into the dialog. */
-type ImageFlight = { src: string; from: DOMRect; to: DOMRect };
 
 /** 统计卡片右下的水印图标：用户 / 日历 / 楼宇 / 多人 */
 const STAT_ICONS = [
@@ -74,12 +72,15 @@ export function Projects() {
   const [open, setOpen] = useState(false);
   const [shotIndex, setShotIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState(1);
-  const [revealed, setRevealed] = useState(true);
-  const [flight, setFlight] = useState<ImageFlight | null>(null);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const dialogImage = useRef<HTMLImageElement | null>(null);
-  const pendingFlight = useRef<{ src: string; rect: DOMRect } | null>(null);
   const reducedMotion = useReducedMotion();
+  const {
+    flight,
+    revealed,
+    begin: beginFlight,
+    settle: settleFlight,
+  } = useImageFlight(open, reducedMotion, dialogImage);
   const featured = FEATURED_PROJECT;
   const roles = en
     ? [featured.roleEn, "Planning", "Design", "Promotion", "Development"]
@@ -90,66 +91,18 @@ export function Projects() {
     { value: "5+", label: en ? "Supporting services" : "附属设施" },
     { value: "10+", label: en ? "Team members" : "团队人数" },
   ];
-  const activeCount = PROJECTS.filter((project) => project.tagZh !== "归档").length;
+  const activeCount = PROJECTS.filter((project) => project.status === "active").length;
   const archiveCount = PROJECTS.length - activeCount;
-  const visible = PROJECTS.filter((project) => filter === "all" || (project.tagZh === "归档") === (filter === "archive"));
+  const visible = PROJECTS.filter((project) => filter === "all" || (project.status === "archived") === (filter === "archive"));
   const selectedShot = selected?.images?.[shotIndex];
 
-  // Wait for the dialog image to be laid out and decoded before starting the
-  // shared-element flight. Keeping the pending measurement until it succeeds
-  // also makes this safe when React StrictMode replays the effect.
-  useEffect(() => {
-    if (!open || reducedMotion) return;
-
-    const pending = pendingFlight.current;
-    if (!pending) return;
-
-    let cancelled = false;
-    let settled = false;
-    let frame = 0;
-
-    const reveal = () => {
-      if (cancelled || settled) return;
-      settled = true;
-      pendingFlight.current = null;
-      setRevealed(true);
-    };
-
-    const measure = () => {
-      if (cancelled || settled) return;
-
-      const image = dialogImage.current;
-      const rect = image?.getBoundingClientRect();
-
-      if (image?.complete && image.naturalWidth > 0 && rect && rect.width > 1 && rect.height > 1) {
-        settled = true;
-        pendingFlight.current = null;
-        window.clearTimeout(timeout);
-        setFlight({ src: pending.src, from: pending.rect, to: rect });
-        return;
-      }
-
-      frame = requestAnimationFrame(measure);
-    };
-
-    const timeout = window.setTimeout(reveal, 1000);
-    frame = requestAnimationFrame(measure);
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(frame);
-      window.clearTimeout(timeout);
-    };
-  }, [open, reducedMotion]);
 
   const openProject = (project: Project, button: HTMLButtonElement) => {
     const cover = project.images?.[0];
     const rect = button.querySelector("img")?.getBoundingClientRect();
     const source = cover && rect && rect.width > 1 && rect.height > 1 ? { src: cover.src, rect } : null;
 
-    pendingFlight.current = source;
-    setFlight(null);
-    setRevealed(!source || reducedMotion === true);
+    beginFlight(source);
     setShotIndex(0);
     setSlideDirection(1);
     trigger.current = button;
@@ -158,8 +111,7 @@ export function Projects() {
   };
 
   const closeProject = () => {
-    setFlight(null);
-    setRevealed(true);
+    settleFlight();
     setOpen(false);
   };
 
@@ -225,7 +177,7 @@ export function Projects() {
       <div className="mt-5 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((project) => {
           const cover = project.images?.[0];
-          const archived = project.tagZh === "归档";
+          const archived = project.status === "archived";
           return (
             <article key={project.name} className="cursor-spotlight group flex min-w-0 flex-col rounded-xl border border-border/70 bg-card p-3 shadow-xs transition-shadow hover:shadow-md">
               <button type="button" aria-label={en ? `View ${project.nameEn}` : `查看项目：${project.name}`} aria-haspopup="dialog" className="flex min-w-0 flex-1 cursor-pointer flex-col text-left focus-visible:rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring" onClick={(event) => openProject(project, event.currentTarget)}>
@@ -309,7 +261,7 @@ export function Projects() {
                   initial={{ x: flight.from.left - flight.to.left, y: flight.from.top - flight.to.top, scale: flight.from.width / flight.to.width }}
                   animate={{ x: 0, y: 0, scale: 1 }}
                   transition={{ duration: 0.46, ease: [0.22, 1, 0.36, 1] }}
-                  onAnimationComplete={() => { setFlight(null); setRevealed(true); }}
+                  onAnimationComplete={() => { settleFlight(); }}
                 />
               )}
             </DialogPrimitive.Portal>

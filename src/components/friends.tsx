@@ -10,6 +10,40 @@ import { SOCIALS } from "@/lib/socials";
 
 export function Friends() {
   const { t } = useLanguage();
+  const applyHref = SOCIALS.find((s) => s.href.startsWith("mailto:"))?.href;
+  const applyCard = applyHref ? (
+    <a
+      href={applyHref}
+      className="cursor-spotlight group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
+    >
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card">
+        <Mail className="size-4" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium leading-5">
+          {t.friends.apply}
+        </span>
+        <span className="block truncate text-xs leading-5 text-muted-foreground">
+          {t.friends.applyHint}
+        </span>
+      </span>
+      <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+    </a>
+  ) : (
+    <div className="cursor-spotlight flex items-center gap-3 rounded-xl border p-4">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card">
+        <Mail className="size-4" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium leading-5">
+          {t.friends.apply}
+        </span>
+        <span className="block truncate text-xs leading-5 text-muted-foreground">
+          {t.friends.applyHint}
+        </span>
+      </span>
+    </div>
+  );
   return (
     <section id="friends" className="scroll-mt-6 pb-8">
       <Reveal delay="3.5s" direction="down">
@@ -63,46 +97,14 @@ export function Friends() {
                 </div>
               );
             })}
-            <a
-              href={SOCIALS.find((s) => s.href.startsWith("mailto:"))?.href}
-              className="cursor-spotlight group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
-            >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card">
-                <Mail className="size-4" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium leading-5">
-                  {t.friends.apply}
-                </span>
-                <span className="block truncate text-xs leading-5 text-muted-foreground">
-                  {t.friends.applyHint}
-                </span>
-              </span>
-              <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-            </a>
+            {applyCard}
           </div>
         ) : (
           <div className="mt-4 space-y-3">
             <div className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
               {t.friends.empty}
             </div>
-            <a
-              href={SOCIALS.find((s) => s.href.startsWith("mailto:"))?.href}
-              className="cursor-spotlight group flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/50"
-            >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card">
-                <Mail className="size-4" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium leading-5">
-                  {t.friends.apply}
-                </span>
-                <span className="block truncate text-xs leading-5 text-muted-foreground">
-                  {t.friends.applyHint}
-                </span>
-              </span>
-              <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-            </a>
+            {applyCard}
           </div>
         )}
       </Reveal>

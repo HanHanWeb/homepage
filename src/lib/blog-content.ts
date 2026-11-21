@@ -2,7 +2,7 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { BLOG_DIR } from "@/lib/blog-dir";
-import type { Post } from "@/lib/blog";
+import { postCover, type Post } from "@/lib/blog";
 
 /**
  * 文章存储（仅服务端）：每篇文章一个目录 blog/<slug>/，入口为 index.md，
@@ -132,11 +132,7 @@ export function postExcerpt(post: Post, max = 100): string {
   return text.length > max ? `${text.slice(0, max)}…` : text;
 }
 
-/** 分享缩略图：取正文第一张图片的绝对路径；无图返回 undefined */
+/** 分享与列表缩略图：取正文第一张图片；无图返回 undefined */
 export function postOgImage(post: Post): string | undefined {
-  const m = (post.content ?? "").match(/^!\[[^\]]*\]\(([^)]+)\)$/m);
-  if (!m) return undefined;
-  const src = m[1];
-  if (/^(https?:)?\/\//.test(src) || src.startsWith("/")) return src;
-  return `/blog/${post.slug}/${src}`;
+  return postCover(post);
 }

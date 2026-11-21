@@ -26,13 +26,6 @@
   font-style: normal;
 }
 
-@font-face {
-  font-family: "CorpSrcWinSong";
-  src: url("/fonts/CorpSrcWinSong-.4.woff2") format("woff2");
-  font-display: swap;
-  font-weight: 400;
-  font-style: normal;
-}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -207,6 +200,8 @@
   }
   html {
     @apply font-sans;
+    /* 固定导航下的锚点/焦点不被遮挡（WCAG 2.2 Focus Not Obscured） */
+    scroll-padding-top: 5rem;
   }
   ::selection {
     background: #00bc7d;
@@ -315,6 +310,23 @@ html::-webkit-scrollbar {
 .animate-dock-in {
   animation: dock-in 0.5s ease-out backwards;
   animation-delay: var(--blur-delay, 0s);
+}
+
+/* 开启「减少动态效果」时，入场动画直接呈现最终状态 */
+@media (prefers-reduced-motion: reduce) {
+  .animate-blur-in,
+  .animate-dock-in {
+    animation: none;
+    will-change: auto;
+  }
+
+  .hero-char {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transform: none;
+    will-change: auto;
+  }
 }
 
 /* 贡献图：覆写 react-activity-calendar 默认横向滚动，居右裁剪、无滚动条 */
